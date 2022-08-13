@@ -2,8 +2,6 @@ module github.com/bvisness/bvisness.me
 
 go 1.18
 
-require github.com/bvisness/bhp v0.0.0-20220813202142-95e65897be46
-
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
@@ -18,4 +16,3 @@ require (
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 )
 
-replace github.com/bvisness/bhp => ../bhp
