@@ -1,7 +1,7 @@
 {{ $article := index .Articles 0 }}
 
-{{ template "header.html" $article }}
+{{ template "common.html" $article }}
 
-wasm yay
-
-{{ template "footer.html" $article }}
+{{ define "common content" }}
+    wasm yay
+{{ end }}

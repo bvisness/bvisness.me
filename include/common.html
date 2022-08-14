@@ -1,0 +1,6 @@
+{{ template "base.html" . }}
+
+{{ define "content" }}
+    <h1>Ben Visness</h1>
+    {{ block "common content" . }}common default{{ end }}
+{{ end }}
