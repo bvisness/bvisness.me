@@ -45,7 +45,12 @@ func Run(srcDir, includeDir string, data interface{}) {
 		t := must1(builtin.Clone())
 		must1(t.ParseFS(os.DirFS(includeDir), "*"))
 
-		filename := must1(filepath.Rel("/", r.URL.Path))
+		var filename string
+		if r.URL.Path == "" || r.URL.Path == "/" {
+			filename = ""
+		} else {
+			filename = must1(filepath.Rel("/", r.URL.Path))
+		}
 		if filepath.Ext(filename) == "" {
 			filename += "/index.html"
 		}
@@ -71,7 +76,9 @@ func Run(srcDir, includeDir string, data interface{}) {
 		must0(t.Execute(w, data))
 	})
 
-	log.Fatal(http.ListenAndServe(":8484", nil))
+	addr := ":8484"
+	fmt.Println("Listening on", addr)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
 func getRedirect(t *template.Template, data interface{}) (int, string) {
