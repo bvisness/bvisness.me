@@ -32,7 +32,7 @@ func readFileString(fs embed.FS, name string) string {
 	return string(must1(fs.ReadFile(name)))
 }
 
-func Run(srcDir, includeDir string, data interface{}) {
+func Run(srcDir, includeDir string, funcs template.FuncMap, data interface{}) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if r := recover(); r != nil {
@@ -43,6 +43,7 @@ func Run(srcDir, includeDir string, data interface{}) {
 		}()
 
 		t := must1(builtin.Clone())
+		t.Funcs(funcs)
 		must1(t.ParseFS(os.DirFS(includeDir), "*"))
 
 		var filename string
