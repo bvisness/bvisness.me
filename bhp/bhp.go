@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"net/url"
@@ -33,7 +35,7 @@ func readFileString(fs embed.FS, name string) string {
 	return string(must1(fs.ReadFile(name)))
 }
 
-func Run(srcDir, includeDir string, funcs template.FuncMap, data interface{}) {
+func Run(srcDir, includeDir string, funcs template.FuncMap, data any) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if r := recover(); r != nil {
@@ -46,8 +48,15 @@ func Run(srcDir, includeDir string, funcs template.FuncMap, data interface{}) {
 		t := must1(builtin.Clone())
 		addBuiltinFuncs(t, r)
 		t.Funcs(funcs)
-		must1(t.ParseFS(os.DirFS(includeDir), "*"))
-
+		filepath.Walk(includeDir, func(path string, info fs.FileInfo, err error) error {
+			if !info.IsDir() {
+				name := must1(filepath.Rel(includeDir, path))
+				name = strings.ReplaceAll(name, "\\", "/")
+				contents := must1(io.ReadAll(must1(os.Open(path))))
+				must1(t.New(name).Parse(string(contents)))
+			}
+			return nil
+		})
 		var filename string
 		if r.URL.Path == "" || r.URL.Path == "/" {
 			filename = ""
@@ -84,6 +93,7 @@ func Run(srcDir, includeDir string, funcs template.FuncMap, data interface{}) {
 				return
 			}
 
+			w.Header().Add("Content-Type", contentType)
 			must0(t.Execute(w, data))
 		default:
 			must1(w.Write(fileBytes))
@@ -95,7 +105,7 @@ func Run(srcDir, includeDir string, funcs template.FuncMap, data interface{}) {
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
-func getRedirect(t *template.Template, data interface{}) (int, string) {
+func getRedirect(t *template.Template, data any) (int, string) {
 	if redirect := t.Lookup("redirect"); redirect != nil {
 		code := http.StatusSeeOther
 		if templateCode := getStatus(t, data); templateCode != 0 {
@@ -111,7 +121,7 @@ func getRedirect(t *template.Template, data interface{}) (int, string) {
 	return 0, ""
 }
 
-func getStatus(t *template.Template, data interface{}) int {
+func getStatus(t *template.Template, data any) int {
 	if status := t.Lookup("status"); status != nil {
 		var statusBytes bytes.Buffer
 		must0(t.ExecuteTemplate(&statusBytes, "status", data))
@@ -134,12 +144,25 @@ func addBuiltinFuncs(t *template.Template, r *http.Request) {
 			err := t.ExecuteTemplate(&buf, name, arg)
 			return buf.String(), err
 		},
+		"absurl": func(path string) string {
+			newurl := *r.URL
+			newurl.Path = path
+			return newurl.String()
+		},
 		"relurl": func(relurl string) string {
 			res, err := url.JoinPath(r.URL.Path, relurl)
 			if err != nil {
 				panic(err)
 			}
-			return res
+			newurl := *r.URL
+			newurl.Path = res
+			return newurl.String()
+		},
+		"query": func(name string) string {
+			return r.URL.Query().Get(name)
+		},
+		"safeHTML": func(html string) template.HTML {
+			return template.HTML(html)
 		},
 	})
 }

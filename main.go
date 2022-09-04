@@ -3,13 +3,12 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"regexp"
-	"strings"
+	"net/url"
+	"runtime/debug"
 	"time"
-	"unicode"
 
 	"github.com/bvisness/bvisness.me/bhp"
-	"github.com/gomarkdown/markdown"
+	"github.com/bvisness/bvisness.me/markdown"
 )
 
 type Bvisness struct {
@@ -38,6 +37,20 @@ var articles = []Article{
 	},
 }
 
+var hash string = fmt.Sprintf("%d", time.Now().Unix())
+
+func init() {
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		panic("failed to read build info")
+	}
+	for _, setting := range info.Settings {
+		if setting.Key == "vcs.revision" {
+			hash = setting.Value
+		}
+	}
+}
+
 var funcs = template.FuncMap{
 	"article": func(slug string) Article {
 		for _, article := range articles {
@@ -48,8 +61,18 @@ var funcs = template.FuncMap{
 		panic(fmt.Errorf("No article found with slug %s", slug))
 	},
 	"markdown": func(md string) template.HTML {
-		md = Unindent(md)
-		return template.HTML(markdown.ToHTML([]byte(md), nil, nil))
+		md = markdown.Unindent(md)
+		return template.HTML(markdown.ToHTML(md))
+	},
+	"bust": func(resourceUrl string) string {
+		resUrlParsed, err := url.Parse(resourceUrl)
+		if err != nil {
+			panic(err)
+		}
+		q := resUrlParsed.Query()
+		q.Set("v", hash)
+		resUrlParsed.RawQuery = q.Encode()
+		return resUrlParsed.String()
 	},
 }
 
@@ -57,18 +80,4 @@ func main() {
 	bhp.Run("site", "include", funcs, Bvisness{
 		Articles: articles,
 	})
-}
-
-// Un-indents a string according to the whitespace on its first line of content.
-func Unindent(str string) string {
-	var leadingWhitespace string
-	for i, r := range str {
-		if !unicode.IsSpace(r) {
-			leadingWhitespace = str[:i]
-			break
-		}
-	}
-	leadingWhitespace = strings.TrimLeft(leadingWhitespace, "\n\r")
-	reLeadingSpace := regexp.MustCompile(`(?m)^` + leadingWhitespace)
-	return reLeadingSpace.ReplaceAllString(str, "")
 }

@@ -1,0 +1,30 @@
+{
+    "version": "2.0.0",
+    // "windows": {
+    //     "options": {
+    //         "shell": {
+    //             "executable": "cmd.exe",
+    //             "args": [
+    //                 "/C", "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\Tools\\VsDevCmd.bat\"",
+    //                 "&&"
+    //             ]
+    //         }
+    //     }
+    // },
+    "tasks": [
+        {
+            "label": "Build SCSS",
+            "group": {
+                "kind": "build"
+            },
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "buildscss.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+    ]
+}

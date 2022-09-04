@@ -1,6 +1,30 @@
 {{ template "base.html" . }}
 
 {{ define "content" }}
-    <h1>Ben Visness</h1>
-    {{ block "common content" . }}You need to define "common content".{{ end }}
+    <div class="container">
+        <header class="site-header">
+            <h1><a href="/">Ben Visness</a></h1>
+        </header>
+    </div>
+
+    <div class="container">
+        <main>
+            {{/*
+            {{ if .Page.Params.banner }}
+                <div class="banner" style="
+                    background-image: url('{{ .Params.banner | absURL }}');
+                {{ if .Params.banner_position }}
+                    background-position: {{ .Params.banner_position }};
+                {{ end }}
+                "></div>
+            {{ end }}
+            */}}
+
+            {{ block "common content" . }}You need to define "common content".{{ end }}
+        </main>
+
+        <footer>
+            &copy;{{ now.Format "2006" }} Ben Visness &#8226; <a href="{{ absurl "/about/" }}">About Me</a> &#8226; <a href="{{ absurl "/apps/" }}">Apps</a> &#8226; <a href="https://github.com/bvisness/">{{ eval "svg/github.svg" . | safeHTML }}</a> <a href="https://twitter.com/its_bvisness">{{ eval "svg/twitter.svg" . | safeHTML }}</a>
+        </footer>
+    </div>
 {{ end }}

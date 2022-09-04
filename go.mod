@@ -7,9 +7,12 @@ require (
 	github.com/gomarkdown/markdown v0.0.0-20220830015526-01a3c37d6f50
 )
 
+require github.com/dlclark/regexp2 v1.4.0 // indirect
+
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
+	github.com/alecthomas/chroma v0.10.0
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
