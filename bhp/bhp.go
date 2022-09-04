@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -43,6 +44,7 @@ func Run(srcDir, includeDir string, funcs template.FuncMap, data interface{}) {
 		}()
 
 		t := must1(builtin.Clone())
+		addBuiltinFuncs(t, r)
 		t.Funcs(funcs)
 		must1(t.ParseFS(os.DirFS(includeDir), "*"))
 
@@ -52,12 +54,11 @@ func Run(srcDir, includeDir string, funcs template.FuncMap, data interface{}) {
 		} else {
 			filename = must1(filepath.Rel("/", r.URL.Path))
 		}
-		if filepath.Ext(filename) == "" {
-			filename += "/index.html"
-		}
 
+	findfile:
 		srcFilename := filepath.Join(srcDir, filename)
-		if _, err := os.Stat(srcFilename); err != nil {
+		fileInfo, err := os.Stat(srcFilename)
+		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				w.WriteHeader(http.StatusNotFound)
 				t.ExecuteTemplate(w, "404.html", nil)
@@ -66,15 +67,27 @@ func Run(srcDir, includeDir string, funcs template.FuncMap, data interface{}) {
 				panic(err)
 			}
 		}
-		must1(t.Parse(string(must1(os.ReadFile(srcFilename)))))
-
-		if code, location := getRedirect(t, data); location != "" {
-			w.Header().Add("Location", location)
-			w.WriteHeader(code)
-			return
+		if fileInfo.IsDir() {
+			filename += "/index.html"
+			goto findfile // would be hilarious if you made a directory called index.html
 		}
 
-		must0(t.Execute(w, data))
+		fileBytes := must1(os.ReadFile(srcFilename))
+		contentType := detectContentType(fileInfo, fileBytes)
+		switch contentType {
+		case "text/html", "text/css":
+			must1(t.Parse(string(fileBytes)))
+
+			if code, location := getRedirect(t, data); location != "" {
+				w.Header().Add("Location", location)
+				w.WriteHeader(code)
+				return
+			}
+
+			must0(t.Execute(w, data))
+		default:
+			must1(w.Write(fileBytes))
+		}
 	})
 
 	addr := ":8484"
@@ -112,6 +125,35 @@ func getStatus(t *template.Template, data interface{}) int {
 	}
 
 	return 0
+}
+
+func addBuiltinFuncs(t *template.Template, r *http.Request) {
+	t.Funcs(template.FuncMap{
+		"eval": func(name string, arg any) (string, error) {
+			var buf bytes.Buffer
+			err := t.ExecuteTemplate(&buf, name, arg)
+			return buf.String(), err
+		},
+		"relurl": func(relurl string) string {
+			res, err := url.JoinPath(r.URL.Path, relurl)
+			if err != nil {
+				panic(err)
+			}
+			return res
+		},
+	})
+}
+
+func detectContentType(fileInfo os.FileInfo, fileBytes []byte) string {
+	// In the presence of some extensions, we trust you will not name your files stupidly
+	switch filepath.Ext(fileInfo.Name()) {
+	case ".html":
+		return "text/html"
+	case ".css":
+		return "text/css"
+	default:
+		return http.DetectContentType(fileBytes)
+	}
 }
 
 // Takes an (error) return and panics if there is an error.

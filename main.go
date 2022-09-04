@@ -43,6 +43,9 @@ var funcs = template.FuncMap{
 		}
 		panic(fmt.Errorf("No article found with slug %s", slug))
 	},
+	"markdown": func(md string) template.HTML {
+		return template.HTML(fmt.Sprintf("<pre>%s</pre>", md))
+	},
 }
 
 func main() {

@@ -3,5 +3,29 @@
 {{ template "common.html" $article }}
 
 {{ define "common content" }}
-    wasm yay
+    {{ apply markdown }}
+        Hello, **{{ .Title }}**!
+    {{ end }}
+
+    <p>We're currently rewriting the <a href="https://handmade.network/">Handmade Network</a> website in Go. As part of this, we're taking the opportunity to revamp the old, dated forum post editor, which still doesn't have Markdown support, and only supports BBCode.</p>
+
+    <img alt="Everybody loves BBCode!" src="{{ relurl "images/bbcode-example.png" }}">
+
+    <p>Yep.</p>
+
+    <p>Besides Markdown, one of the things we found we wanted right away was real-time previews. There's no reason these days to make a round-trip to the server just to preview some formatted text. We were able to just compile our server-side Markdown-parsing code to WebAssembly and run it on the client. This worked really well! There was only one snag:</p>
+
+    <video src="{{ relurl "images/crash.mp4" }}" controls></video>
+
+    <p>This crash didn't make a lot of sense. It says the tab is out of memory, but this occurs even if you never interact with the page. In fact, if you profile the page, it's clear that no user code is running. The heap size isn't even growing. So how could we be running out of memory?</p>
+
+    <img alt="Nothing much to see on this profile..." src="{{ relurl "images/empty-profile.png" }}">
+
+    <p>Commenting out most of the Go code made the issue go away, so it was clear that something in our WASM was the culprit. But with no code running, how could that be? Furthermore, the page was interactive and real-time previews were working, so the WASM code was definitely running. What could be the culprit?</p>
+
+    <p>On a <a href="https://handmade.network/podcast/ep/532a3573-490a-45e8-975d-e11de617ec29">recent episode</a> of the Handmade Network podcast, <a href="https://github.com/AsafGartner/">Asaf</a> reminded me that Chrome actually has another profiler, which can profile Chrome itself. Since it didn't look like our code was directly causing any problems, it felt like that was worth a shot. It took some fiddling to figure out which categories were relevant, but eventually we turned up something interesting:</p>
+
+    <img alt="A Chrome trace with one abnormally massive WASM-related function" src="{{ relurl "images/beeg-flamegraph.png" }}">
+
+    <p>This was clearly the problem. It was related to WASM, and it was the only thing running in the browser at the time of the crash. From function names like `wasm.CompileTopTier` and `V8.WasmOptimization`, it was clear that optimization was to blame somehow. But we were confused - the code was clearly already compiled. The WASM code was running successfully, after all.</p>
 {{ end }}
