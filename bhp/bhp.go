@@ -45,6 +45,14 @@ func Run(srcDir, includeDir string, funcs template.FuncMap, data any) {
 			}
 		}()
 
+		proxyHeaders(r)
+		if r.URL.Scheme == "" {
+			r.URL.Scheme = "http"
+		}
+		if r.URL.Host == "" {
+			r.URL.Host = r.Host
+		}
+
 		t := must1(builtin.Clone())
 		addBuiltinFuncs(t, r)
 		t.Funcs(funcs)

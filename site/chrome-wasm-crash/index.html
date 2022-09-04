@@ -6,9 +6,7 @@
     {{ $article := article "chrome-wasm-crash" }}
     <article>
         <header>
-            <h1>
-                <a href="sdfsdf">{{ $article.Title }}</a>
-            </h1>
+            {{ template "article/title.html" $article }}
         </header>
         {{ apply markdown }}
             We're currently rewriting the [Handmade Network](https://handmade.network/) website in Go. As part of this, we're taking the opportunity to revamp the old, dated forum post editor, which still doesn't have Markdown support, and only supports BBCode.
