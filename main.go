@@ -3,9 +3,13 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"regexp"
+	"strings"
 	"time"
+	"unicode"
 
 	"github.com/bvisness/bvisness.me/bhp"
+	"github.com/gomarkdown/markdown"
 )
 
 type Bvisness struct {
@@ -44,7 +48,8 @@ var funcs = template.FuncMap{
 		panic(fmt.Errorf("No article found with slug %s", slug))
 	},
 	"markdown": func(md string) template.HTML {
-		return template.HTML(fmt.Sprintf("<pre>%s</pre>", md))
+		md = Unindent(md)
+		return template.HTML(markdown.ToHTML([]byte(md), nil, nil))
 	},
 }
 
@@ -52,4 +57,18 @@ func main() {
 	bhp.Run("site", "include", funcs, Bvisness{
 		Articles: articles,
 	})
+}
+
+// Un-indents a string according to the whitespace on its first line of content.
+func Unindent(str string) string {
+	var leadingWhitespace string
+	for i, r := range str {
+		if !unicode.IsSpace(r) {
+			leadingWhitespace = str[:i]
+			break
+		}
+	}
+	leadingWhitespace = strings.TrimLeft(leadingWhitespace, "\n\r")
+	reLeadingSpace := regexp.MustCompile(`(?m)^` + leadingWhitespace)
+	return reLeadingSpace.ReplaceAllString(str, "")
 }

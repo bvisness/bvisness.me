@@ -2,7 +2,10 @@ module github.com/bvisness/bvisness.me
 
 go 1.19
 
-require github.com/Masterminds/sprig v2.22.0+incompatible
+require (
+	github.com/Masterminds/sprig v2.22.0+incompatible
+	github.com/gomarkdown/markdown v0.0.0-20220830015526-01a3c37d6f50
+)
 
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
