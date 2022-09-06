@@ -10,7 +10,6 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -152,19 +151,14 @@ func addBuiltinFuncs(t *template.Template, r *http.Request) {
 			err := t.ExecuteTemplate(&buf, name, arg)
 			return buf.String(), err
 		},
-		"absurl": func(path string) string {
-			newurl := *r.URL
-			newurl.Path = path
-			return newurl.String()
+		"request": func() *http.Request {
+			return r
 		},
-		"relurl": func(relurl string) string {
-			res, err := url.JoinPath(r.URL.Path, relurl)
-			if err != nil {
-				panic(err)
-			}
-			newurl := *r.URL
-			newurl.Path = res
-			return newurl.String()
+		"absurl": func(path string) string {
+			return AbsURL(r, path)
+		},
+		"relurl": func(path string) string {
+			return RelURL(r, path)
 		},
 		"query": func(name string) string {
 			return r.URL.Query().Get(name)

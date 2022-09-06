@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"net/http"
 	"net/url"
 	"runtime/debug"
 	"time"
@@ -15,22 +16,30 @@ type Bvisness struct {
 	Articles []Article
 }
 
-type HeaderData struct {
-	Title string
+type BaseData struct {
+	Title          string
+	Description    string
+	OpenGraphImage string // Relative URL within site folder
+}
+
+type CommonData struct {
+	Banner string
 }
 
 type Article struct {
-	HeaderData
-	Date    time.Time
-	Slug    string
-	Excerpt string
-	Url     string
+	BaseData
+	CommonData
+	Date time.Time
+	Slug string
+	Url  string
 }
 
 var articles = []Article{
 	{
-		HeaderData: HeaderData{
-			Title: "Untangling a bizarre WASM crash in Chrome",
+		BaseData: BaseData{
+			Title:          "Untangling a bizarre WASM crash in Chrome",
+			Description:    "How we solved a strange issue involving the guts of Chrome and the Go compiler.",
+			OpenGraphImage: "chrome-wasm-crash/ogimage.png",
 		},
 		Slug: "chrome-wasm-crash",
 		Date: time.Date(2021, 7, 9, 0, 0, 0, 0, time.UTC),
@@ -73,6 +82,9 @@ var funcs = template.FuncMap{
 		q.Set("v", hash)
 		resUrlParsed.RawQuery = q.Encode()
 		return resUrlParsed.String()
+	},
+	"permalink": func(r *http.Request) string {
+		return bhp.RelURL(r, "/")
 	},
 }
 

@@ -7,11 +7,46 @@
     <title>{{ with .Title }}{{ . }} | {{ end }}Ben Visness</title>
 
     <meta name="author" content="Ben Visness">
+    {{ if .Description }}
+        <meta name="description" content="{{ .Description | trunc 160 }}">
+    {{ end }}
     
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ "/style.css" | bust }}">
 
     <link rel="canonical" href="https://bvisness.me/">
     <link rel="alternate" type="application/rss+xml" href="https://bvisness.me/index.xml" title="Ben Visness" />
+
+    <!-- Search metadata -->
+    <link rel="canonical" href="{{ permalink request }}">
+
+    {{ $social_image := "" }}
+    {{ if .OpenGraphImage }}
+        {{ $social_image = .OpenGraphImage | absurl }}
+    {{ else if .Banner }}
+        {{ $social_image = .Banner | absurl }}
+    {{ end }}
+
+    <!-- General OpenGraph data -->
+    {{ if $social_image }}
+        <link rel="image_src" href="{{ $social_image }}">
+        <meta property="og:image" content="{{ $social_image }}">
+    {{ end }}
+
+    <!-- Twitter metadata -->
+    {{ if $social_image }}
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="{{ $social_image }}">
+    {{ else }}
+        <meta name="twitter:card" content="summary">
+    {{ end }}
+    <meta name="twitter:site" content="@its_bvisness">
+    <meta name="twitter:title" content="{{ or .Title "Ben Visness" }}">
+    {{ if .Description }}
+        <meta name="twitter:description" content="{{ .Description }}">
+    {{ end }}
+
+    {{ block "head" . }}{{ end }}
 </head>
 
 <body>
