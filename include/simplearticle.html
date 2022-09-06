@@ -1,0 +1,10 @@
+{{ template "common.html" . }}
+
+{{ define "common content" }}
+    <article>
+        <header>
+            {{ template "article/title.html" . }}
+        </header>
+        {{ block "article content" . }}You need to define "article content".{{ end }}
+    </article>
+{{ end }}

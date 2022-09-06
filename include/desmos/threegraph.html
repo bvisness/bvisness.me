@@ -1,0 +1,115 @@
+<div class="threegraph" id="threegraph-{{ .ID }}"></div>
+
+<script>
+    {{ $id := .ID | toString | safeJS }}
+    function initThreeGraph{{ $id }}() {
+        var container = document.querySelector('#threegraph-{{ $id }}');
+        var parent = container.parentNode;
+
+        var scene = new THREE.Scene();
+
+        var cameraAnchor = new THREE.Object3D();
+        var camera = new THREE.PerspectiveCamera(
+            75,
+            parent.clientWidth / parent.clientHeight,
+            0.1,
+            1000
+        );
+        scene.add(cameraAnchor);
+        cameraAnchor.add(camera);
+
+        var renderer = null;
+        function _makeRenderer() {
+            if (renderer) {
+                return false;
+            }
+
+            var canvas = document.createElement('canvas');
+            canvas.innerHTML = 'Animations are not supported in your browser.';
+            container.appendChild(canvas);
+
+            renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                antialias: true,
+                alpha: true,
+            });
+            renderer.setClearColor(new THREE.Color(0xffffff), 0);
+
+            return true;
+        }
+        function _destroyRenderer() {
+            if (!renderer) {
+                return false;
+            }
+
+            renderer = null;
+            container.innerHTML = '';
+
+            return true;
+        }
+
+        function animate() {}
+
+        {{ .JS }}
+        
+        function _resizeRenderer() {
+            if (!renderer) {
+                return;
+            }
+
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(parent.clientWidth, parent.clientHeight);
+            camera.aspect = parent.clientWidth / parent.clientHeight;
+            camera.updateProjectionMatrix();
+        }
+
+        var baseTime = Date.now();
+        var time = 0;
+
+        function isOnscreen() {
+            var containerRect = container.getBoundingClientRect();
+            return containerRect.top < window.innerHeight && containerRect.bottom > 0;
+        }
+
+        function _animate() {
+            requestAnimationFrame( _animate );
+
+            var newTime = Date.now() - baseTime;
+            var dt = (newTime - time) / 1000;
+
+            animate(dt, newTime / 1000);
+
+            if (!isOnscreen()) {
+                return;
+            }
+
+            if (renderer) {
+                renderer.render( scene, camera );
+            }
+
+            time = newTime;
+        }
+        if (isOnscreen()) {
+            _makeRenderer();
+            _resizeRenderer();
+        }
+        _animate();
+
+        window.addEventListener('resize', function() {
+            _resizeRenderer();
+        });
+        window.addEventListener('scroll', function() {
+            if (isOnscreen()) {
+                var didCreate = _makeRenderer();
+                if (didCreate) {
+                    _resizeRenderer();
+                }
+            } else {
+                _destroyRenderer();
+            }
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        initThreeGraph{{ $id }}();
+    });
+</script>

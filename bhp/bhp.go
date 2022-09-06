@@ -34,7 +34,13 @@ func readFileString(fs embed.FS, name string) string {
 	return string(must1(fs.ReadFile(name)))
 }
 
-func Run(srcDir, includeDir string, funcs template.FuncMap, data any) {
+type Request[UserData any] struct {
+	T    *template.Template
+	R    *http.Request
+	User UserData
+}
+
+func Run[UserData any](srcDir, includeDir string, userData UserData, funcs func(Request[UserData]) template.FuncMap, data any) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if r := recover(); r != nil {
@@ -54,7 +60,14 @@ func Run(srcDir, includeDir string, funcs template.FuncMap, data any) {
 
 		t := must1(builtin.Clone())
 		addBuiltinFuncs(t, r)
-		t.Funcs(funcs)
+
+		bhpRequest := Request[UserData]{
+			T:    t,
+			R:    r,
+			User: userData,
+		}
+		t.Funcs(funcs(bhpRequest))
+
 		filepath.Walk(includeDir, func(path string, info fs.FileInfo, err error) error {
 			if !info.IsDir() {
 				name := must1(filepath.Rel(includeDir, path))
@@ -101,7 +114,7 @@ func Run(srcDir, includeDir string, funcs template.FuncMap, data any) {
 			}
 
 			w.Header().Add("Content-Type", contentType)
-			must0(t.Execute(w, data))
+			must(t.Execute(w, data))
 		default:
 			must1(w.Write(fileBytes))
 		}
@@ -120,7 +133,7 @@ func getRedirect(t *template.Template, data any) (int, string) {
 		}
 
 		var locationBytes bytes.Buffer
-		must0(t.ExecuteTemplate(&locationBytes, "redirect", data))
+		must(t.ExecuteTemplate(&locationBytes, "redirect", data))
 		location := strings.TrimSpace(locationBytes.String())
 		return code, location
 	}
@@ -131,7 +144,7 @@ func getRedirect(t *template.Template, data any) (int, string) {
 func getStatus(t *template.Template, data any) int {
 	if status := t.Lookup("status"); status != nil {
 		var statusBytes bytes.Buffer
-		must0(t.ExecuteTemplate(&statusBytes, "status", data))
+		must(t.ExecuteTemplate(&statusBytes, "status", data))
 		statusStr := strings.TrimSpace(statusBytes.String())
 
 		code, err := strconv.Atoi(statusStr)
@@ -146,10 +159,11 @@ func getStatus(t *template.Template, data any) int {
 
 func addBuiltinFuncs(t *template.Template, r *http.Request) {
 	t.Funcs(template.FuncMap{
-		"eval": func(name string, arg any) (string, error) {
-			var buf bytes.Buffer
-			err := t.ExecuteTemplate(&buf, name, arg)
-			return buf.String(), err
+		"eval": func(name string, arg any) string {
+			return Eval(t, name, arg)
+		},
+		"echo": func(str string) string {
+			return str
 		},
 		"request": func() *http.Request {
 			return r
@@ -165,6 +179,9 @@ func addBuiltinFuncs(t *template.Template, r *http.Request) {
 		},
 		"safeHTML": func(html string) template.HTML {
 			return template.HTML(html)
+		},
+		"safeJS": func(js string) template.JS {
+			return template.JS(js)
 		},
 	})
 }
@@ -183,7 +200,7 @@ func detectContentType(fileInfo os.FileInfo, fileBytes []byte) string {
 
 // Takes an (error) return and panics if there is an error.
 // Helps avoid `if err != nil` in scripts. Use sparingly in real code.
-func must0(err error) {
+func must(err error) {
 	if err != nil {
 		panic(err)
 	}
