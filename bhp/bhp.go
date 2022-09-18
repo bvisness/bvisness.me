@@ -10,6 +10,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -40,7 +41,6 @@ type Instance[UserData any] struct {
 	SrcDir, IncludeDir string
 	Funcs              AddFuncsFunc[UserData]
 	UserData           UserData
-	TemplateData       any
 }
 
 type Request[UserData any] struct {
@@ -51,105 +51,110 @@ type Request[UserData any] struct {
 
 func New[UserData any](
 	srcDir, includeDir string,
-	userData UserData,
 	funcs AddFuncsFunc[UserData],
-	templateData any,
+	userData UserData,
 ) Instance[UserData] {
 	return Instance[UserData]{
-		SrcDir:       srcDir,
-		IncludeDir:   includeDir,
-		Funcs:        funcs,
-		UserData:     userData,
-		TemplateData: templateData,
+		SrcDir:     srcDir,
+		IncludeDir: includeDir,
+		Funcs:      funcs,
+		UserData:   userData,
 	}
 }
 
 func Run[UserData any](
 	srcDir, includeDir string,
-	userData UserData,
 	funcs AddFuncsFunc[UserData],
-	templateData any,
+	userData UserData,
 ) {
-	New(srcDir, includeDir, userData, funcs, templateData).Run()
+	New(srcDir, includeDir, funcs, userData).Run()
 }
 
 func (b Instance[UserData]) Run() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			if r := recover(); r != nil {
-				fmt.Printf("\nERROR: %v\n\n", r)
-				debug.PrintStack()
-				w.WriteHeader(http.StatusInternalServerError)
-			}
-		}()
-
-		proxyHeaders(r)
-		if r.URL.Scheme == "" {
-			r.URL.Scheme = "http"
-		}
-		if r.URL.Host == "" {
-			r.URL.Host = r.Host
-		}
-
-		t := must1(builtin.Clone())
-		b.addBuiltinFuncs(t, r)
-
-		bhpRequest := Request[UserData]{
-			T:    t,
-			R:    r,
-			User: b.UserData,
-		}
-		t.Funcs(b.Funcs(bhpRequest))
-
-		filepath.Walk(b.IncludeDir, func(path string, info fs.FileInfo, err error) error {
-			if !info.IsDir() {
-				name := must1(filepath.Rel(b.IncludeDir, path))
-				name = strings.ReplaceAll(name, "\\", "/")
-				contents := must1(io.ReadAll(must1(os.Open(path))))
-				must1(t.New(name).Parse(string(contents)))
-			}
-			return nil
-		})
-		var filename string
-		if r.URL.Path == "" || r.URL.Path == "/" {
-			filename = ""
-		} else {
-			filename = must1(filepath.Rel("/", r.URL.Path))
-		}
-
-		srcFilename, fileInfo, err := b.ResolveFile(filename)
-		if err != nil {
-			if errors.Is(err, os.ErrNotExist) {
-				w.WriteHeader(http.StatusNotFound)
-				t.ExecuteTemplate(w, "404.html", nil)
-				return
-			} else {
-				panic(err)
-			}
-		}
-
-		fileBytes := must1(os.ReadFile(srcFilename))
-		contentType := detectContentType(fileInfo, fileBytes)
-		switch contentType {
-		case "text/html", "text/css":
-			must1(t.Parse(string(fileBytes)))
-
-			if code, location := getRedirect(t, b.TemplateData); location != "" {
-				w.Header().Add("Location", location)
-				w.WriteHeader(code)
-				return
-			}
-
-			w.Header().Add("Content-Type", contentType)
-			must(t.Execute(w, b.TemplateData))
-		default:
-			must1(w.Write(fileBytes))
-		}
-	})
+	go func() {
+		// Start up private API for pprof
+		addr := ":9494"
+		fmt.Println("Private stuff listening on", addr)
+		log.Fatal(http.ListenAndServe(addr, nil))
+	}()
 
 	addr := ":8484"
 	fmt.Println("Listening on", addr)
-	log.Fatal(http.ListenAndServe(addr, nil))
+	log.Fatal(http.ListenAndServe(addr, b))
+}
+
+// Implements http.Handler. No mux necessary!
+func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("\nERROR: %v\n\n", r)
+			debug.PrintStack()
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	}()
+
+	proxyHeaders(r)
+	if r.URL.Scheme == "" {
+		r.URL.Scheme = "http"
+	}
+	if r.URL.Host == "" {
+		r.URL.Host = r.Host
+	}
+
+	t := must1(builtin.Clone())
+	b.addBuiltinFuncs(t, r)
+
+	bhpRequest := Request[UserData]{
+		T:    t,
+		R:    r,
+		User: b.UserData,
+	}
+	t.Funcs(b.Funcs(bhpRequest))
+
+	filepath.Walk(b.IncludeDir, func(path string, info fs.FileInfo, err error) error {
+		if !info.IsDir() {
+			name := must1(filepath.Rel(b.IncludeDir, path))
+			name = strings.ReplaceAll(name, "\\", "/")
+			contents := must1(io.ReadAll(must1(os.Open(path))))
+			must1(t.New(name).Parse(string(contents)))
+		}
+		return nil
+	})
+	var filename string
+	if r.URL.Path == "" || r.URL.Path == "/" {
+		filename = ""
+	} else {
+		filename = must1(filepath.Rel("/", r.URL.Path))
+	}
+
+	srcFilename, fileInfo, err := b.ResolveFile(filename)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			w.WriteHeader(http.StatusNotFound)
+			t.ExecuteTemplate(w, "404.html", nil)
+			return
+		} else {
+			panic(err)
+		}
+	}
+
+	fileBytes := must1(os.ReadFile(srcFilename))
+	contentType := detectContentType(fileInfo, fileBytes)
+	switch contentType {
+	case "text/html", "text/css":
+		must1(t.Parse(string(fileBytes)))
+
+		if code, location := getRedirect(t, b.UserData); location != "" {
+			w.Header().Add("Location", location)
+			w.WriteHeader(code)
+			return
+		}
+
+		w.Header().Add("Content-Type", contentType)
+		must(t.Execute(w, b.UserData))
+	default:
+		must1(w.Write(fileBytes))
+	}
 }
 
 func getRedirect(t *template.Template, data any) (int, string) {

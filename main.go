@@ -28,6 +28,7 @@ func init() {
 
 type Bvisness struct {
 	Articles []Article
+	Desmos   DesmosData
 }
 
 type BaseData struct {
@@ -46,10 +47,6 @@ type Article struct {
 	Date time.Time
 	Slug string
 	Url  string
-}
-
-type UserData struct {
-	Desmos DesmosData
 }
 
 type DesmosData struct {
@@ -92,12 +89,7 @@ var articles = []Article{
 func main() {
 	bhp.Run(
 		"site", "include",
-		UserData{
-			Desmos: DesmosData{
-				NextThreegraphID: 1,
-			},
-		},
-		func(r bhp.Request[UserData]) template.FuncMap {
+		func(r bhp.Request[Bvisness]) template.FuncMap {
 			return bhp.MergeFuncMaps(
 				images.TemplateFuncs,
 				markdown.TemplateFuncs,
@@ -147,6 +139,9 @@ func main() {
 		},
 		Bvisness{
 			Articles: articles,
+			Desmos: DesmosData{
+				NextThreegraphID: 1,
+			},
 		},
 	)
 }
