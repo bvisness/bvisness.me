@@ -1,6 +1,7 @@
 package markdown
 
 import (
+	"html/template"
 	"regexp"
 	"strings"
 	"unicode"
@@ -8,6 +9,13 @@ import (
 	gomarkdown "github.com/gomarkdown/markdown"
 	mdhtml "github.com/gomarkdown/markdown/html"
 )
+
+var TemplateFuncs = template.FuncMap{
+	"markdown": func(md string) template.HTML {
+		md = Unindent(md)
+		return template.HTML(ToHTML(md))
+	},
+}
 
 func ToHTML(md string) string {
 	renderer := mdhtml.NewRenderer(mdhtml.RendererOptions{

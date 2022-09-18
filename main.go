@@ -8,7 +8,8 @@ import (
 	"time"
 
 	"github.com/bvisness/bvisness.me/bhp"
-	"github.com/bvisness/bvisness.me/markdown"
+	"github.com/bvisness/bvisness.me/pkg/images"
+	"github.com/bvisness/bvisness.me/pkg/markdown"
 )
 
 var hash string = fmt.Sprintf("%d", time.Now().Unix())
@@ -97,52 +98,52 @@ func main() {
 			},
 		},
 		func(r bhp.Request[UserData]) template.FuncMap {
-			return template.FuncMap{
-				"article": func(slug string) Article {
-					for _, article := range articles {
-						if article.Slug == slug {
-							return article
+			return bhp.MergeFuncMaps(
+				images.TemplateFuncs,
+				markdown.TemplateFuncs,
+				template.FuncMap{
+					"article": func(slug string) Article {
+						for _, article := range articles {
+							if article.Slug == slug {
+								return article
+							}
 						}
-					}
-					panic(fmt.Errorf("No article found with slug %s", slug))
-				},
-				"markdown": func(md string) template.HTML {
-					md = markdown.Unindent(md)
-					return template.HTML(markdown.ToHTML(md))
-				},
-				"bust": func(resourceUrl string) string {
-					resUrlParsed, err := url.Parse(resourceUrl)
-					if err != nil {
-						panic(err)
-					}
-					q := resUrlParsed.Query()
-					q.Set("v", hash)
-					resUrlParsed.RawQuery = q.Encode()
-					return resUrlParsed.String()
-				},
-				"permalink": func() string {
-					return bhp.RelURL(r.R, "/")
-				},
+						panic(fmt.Errorf("No article found with slug %s", slug))
+					},
+					"bust": func(resourceUrl string) string {
+						resUrlParsed, err := url.Parse(resourceUrl)
+						if err != nil {
+							panic(err)
+						}
+						q := resUrlParsed.Query()
+						q.Set("v", hash)
+						resUrlParsed.RawQuery = q.Encode()
+						return resUrlParsed.String()
+					},
+					"permalink": func() string {
+						return bhp.RelURL(r.R, "/")
+					},
 
-				// Desmos article
-				"threegraph": func(js string) template.HTML {
-					result := template.HTML(bhp.Eval(r.T, "desmos/threegraph.html", Threegraph{
-						ID: r.User.Desmos.NextThreegraphID,
-						JS: template.JS(js),
-					}))
-					r.User.Desmos.NextThreegraphID++
-					return result
+					// Desmos article
+					"threegraph": func(js string) template.HTML {
+						result := template.HTML(bhp.Eval(r.T, "desmos/threegraph.html", Threegraph{
+							ID: r.User.Desmos.NextThreegraphID,
+							JS: template.JS(js),
+						}))
+						r.User.Desmos.NextThreegraphID++
+						return result
+					},
+					"desmos": func(opts template.JS, js string) template.HTML {
+						result := template.HTML(bhp.Eval(r.T, "desmos/desmos.html", Desmos{
+							ID:   r.User.Desmos.NextDesmosID,
+							Opts: opts,
+							JS:   template.JS(js),
+						}))
+						r.User.Desmos.NextDesmosID++
+						return result
+					},
 				},
-				"desmos": func(opts template.JS, js string) template.HTML {
-					result := template.HTML(bhp.Eval(r.T, "desmos/desmos.html", Desmos{
-						ID:   r.User.Desmos.NextDesmosID,
-						Opts: opts,
-						JS:   template.JS(js),
-					}))
-					r.User.Desmos.NextDesmosID++
-					return result
-				},
-			}
+			)
 		},
 		Bvisness{
 			Articles: articles,

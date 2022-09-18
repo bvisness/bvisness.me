@@ -34,13 +34,46 @@ func readFileString(fs embed.FS, name string) string {
 	return string(must1(fs.ReadFile(name)))
 }
 
+type AddFuncsFunc[UserData any] func(Request[UserData]) template.FuncMap
+
+type Instance[UserData any] struct {
+	SrcDir, IncludeDir string
+	Funcs              AddFuncsFunc[UserData]
+	UserData           UserData
+	TemplateData       any
+}
+
 type Request[UserData any] struct {
 	T    *template.Template
 	R    *http.Request
 	User UserData
 }
 
-func Run[UserData any](srcDir, includeDir string, userData UserData, funcs func(Request[UserData]) template.FuncMap, data any) {
+func New[UserData any](
+	srcDir, includeDir string,
+	userData UserData,
+	funcs AddFuncsFunc[UserData],
+	templateData any,
+) Instance[UserData] {
+	return Instance[UserData]{
+		SrcDir:       srcDir,
+		IncludeDir:   includeDir,
+		Funcs:        funcs,
+		UserData:     userData,
+		TemplateData: templateData,
+	}
+}
+
+func Run[UserData any](
+	srcDir, includeDir string,
+	userData UserData,
+	funcs AddFuncsFunc[UserData],
+	templateData any,
+) {
+	New(srcDir, includeDir, userData, funcs, templateData).Run()
+}
+
+func (b Instance[UserData]) Run() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if r := recover(); r != nil {
@@ -59,18 +92,18 @@ func Run[UserData any](srcDir, includeDir string, userData UserData, funcs func(
 		}
 
 		t := must1(builtin.Clone())
-		addBuiltinFuncs(t, r)
+		b.addBuiltinFuncs(t, r)
 
 		bhpRequest := Request[UserData]{
 			T:    t,
 			R:    r,
-			User: userData,
+			User: b.UserData,
 		}
-		t.Funcs(funcs(bhpRequest))
+		t.Funcs(b.Funcs(bhpRequest))
 
-		filepath.Walk(includeDir, func(path string, info fs.FileInfo, err error) error {
+		filepath.Walk(b.IncludeDir, func(path string, info fs.FileInfo, err error) error {
 			if !info.IsDir() {
-				name := must1(filepath.Rel(includeDir, path))
+				name := must1(filepath.Rel(b.IncludeDir, path))
 				name = strings.ReplaceAll(name, "\\", "/")
 				contents := must1(io.ReadAll(must1(os.Open(path))))
 				must1(t.New(name).Parse(string(contents)))
@@ -84,9 +117,7 @@ func Run[UserData any](srcDir, includeDir string, userData UserData, funcs func(
 			filename = must1(filepath.Rel("/", r.URL.Path))
 		}
 
-	findfile:
-		srcFilename := filepath.Join(srcDir, filename)
-		fileInfo, err := os.Stat(srcFilename)
+		srcFilename, fileInfo, err := b.ResolveFile(filename)
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
 				w.WriteHeader(http.StatusNotFound)
@@ -96,10 +127,6 @@ func Run[UserData any](srcDir, includeDir string, userData UserData, funcs func(
 				panic(err)
 			}
 		}
-		if fileInfo.IsDir() {
-			filename += "/index.html"
-			goto findfile // would be hilarious if you made a directory called index.html
-		}
 
 		fileBytes := must1(os.ReadFile(srcFilename))
 		contentType := detectContentType(fileInfo, fileBytes)
@@ -107,14 +134,14 @@ func Run[UserData any](srcDir, includeDir string, userData UserData, funcs func(
 		case "text/html", "text/css":
 			must1(t.Parse(string(fileBytes)))
 
-			if code, location := getRedirect(t, data); location != "" {
+			if code, location := getRedirect(t, b.TemplateData); location != "" {
 				w.Header().Add("Location", location)
 				w.WriteHeader(code)
 				return
 			}
 
 			w.Header().Add("Content-Type", contentType)
-			must(t.Execute(w, data))
+			must(t.Execute(w, b.TemplateData))
 		default:
 			must1(w.Write(fileBytes))
 		}
@@ -157,7 +184,7 @@ func getStatus(t *template.Template, data any) int {
 	return 0
 }
 
-func addBuiltinFuncs(t *template.Template, r *http.Request) {
+func (b Instance[UserData]) addBuiltinFuncs(t *template.Template, r *http.Request) {
 	t.Funcs(template.FuncMap{
 		"eval": func(name string, arg any) string {
 			return Eval(t, name, arg)
@@ -167,6 +194,9 @@ func addBuiltinFuncs(t *template.Template, r *http.Request) {
 		},
 		"request": func() *http.Request {
 			return r
+		},
+		"relpath": func(path string) string {
+			return RelPath(r, path)
 		},
 		"absurl": func(path string) string {
 			return AbsURL(r, path)
@@ -182,6 +212,17 @@ func addBuiltinFuncs(t *template.Template, r *http.Request) {
 		},
 		"safeJS": func(js string) template.JS {
 			return template.JS(js)
+		},
+		"addstr": func(strs ...string) string {
+			// how in the flying fuck does sprig not have this
+			return strings.Join(strs, "")
+		},
+		"path2file": func(abspath string) (string, error) {
+			srcFilename, _, err := b.ResolveFile(abspath)
+			if err != nil {
+				return "", err
+			}
+			return srcFilename, nil
 		},
 	})
 }
