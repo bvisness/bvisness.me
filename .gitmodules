@@ -6,3 +6,7 @@
 	path = ext/boggler
 	url = https://github.com/bvisness/boggler.git
 	branch = master
+[submodule "ext/columns-concept"]
+	path = ext/columns-concept
+	url = https://github.com/bvisness/columns-concept.git
+	branch = master
