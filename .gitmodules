@@ -1,0 +1,3 @@
+[submodule "ext/wasmaze"]
+	path = ext/wasmaze
+	url = https://github.com/bvisness/wasmaze.git
