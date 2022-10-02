@@ -140,8 +140,8 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	fileBytes := must1(os.ReadFile(srcFilename))
 	contentType := detectContentType(fileInfo, fileBytes)
-	switch contentType {
-	case "text/html", "text/css":
+	switch stripContentType(contentType) {
+	case "text/html", "text/css", "text/xml":
 		must1(t.Parse(string(fileBytes)))
 
 		if code, location := getRedirect(t, b.UserData); location != "" {
@@ -151,6 +151,10 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Add("Content-Type", contentType)
+
+		if contentType == "text/xml" {
+			w.Write([]byte("<?xml version=\"1.0\" standalone=\"yes\" ?>\n"))
+		}
 		must(t.Execute(w, b.UserData))
 	default:
 		must1(w.Write(fileBytes))
@@ -239,9 +243,15 @@ func detectContentType(fileInfo os.FileInfo, fileBytes []byte) string {
 		return "text/html"
 	case ".css":
 		return "text/css"
+	case ".xml":
+		return "text/xml"
 	default:
 		return http.DetectContentType(fileBytes)
 	}
+}
+
+func stripContentType(contentType string) string {
+	return strings.SplitN(contentType, ";", 2)[0]
 }
 
 // Takes an (error) return and panics if there is an error.
