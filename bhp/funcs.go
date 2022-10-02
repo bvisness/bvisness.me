@@ -40,16 +40,28 @@ func RelURL(r *http.Request, path string) string {
 	return newurl.String()
 }
 
-func (b Instance[any]) ResolveFile(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
-findfile:
+func (b Instance[any]) ResolveFileOrDir(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
 	srcFilename = filepath.Join(b.SrcDir, abspath)
 	fileInfo, err = os.Stat(srcFilename)
 	if err != nil {
 		return "", nil, fmt.Errorf("could not resolve file: %w", err)
 	}
+	return
+}
+
+func (b Instance[any]) ResolveDirectoryIndex(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
+	abspath += "/index.html" // who knows, maybe someday we could support other kinds of indexes
+	srcFilename, fileInfo, err = b.ResolveFileOrDir(abspath)
 	if fileInfo.IsDir() {
-		abspath += "/index.html"
-		goto findfile // would be hilarious if you made a directory called index.html
+		return "", nil, fmt.Errorf("expected valid index file at %s, but got a directory", abspath)
+	}
+	return
+}
+
+func (b Instance[any]) ResolveFile(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
+	srcFilename, fileInfo, err = b.ResolveFileOrDir(abspath)
+	if fileInfo.IsDir() {
+		return b.ResolveDirectoryIndex(abspath)
 	}
 	return
 }

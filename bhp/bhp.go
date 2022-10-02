@@ -127,7 +127,7 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		filename = must1(filepath.Rel("/", r.URL.Path))
 	}
 
-	srcFilename, fileInfo, err := b.ResolveFile(filename)
+	srcFilename, fileInfo, err := b.ResolveFileOrDir(filename)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			w.WriteHeader(http.StatusNotFound)
@@ -135,6 +135,29 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		} else {
 			panic(err)
+		}
+	}
+
+	// Resolve folders (either redirecting or finding an index)
+	if fileInfo.IsDir() {
+		// Redirect e.g. http://example.org/foo/bar to http://example.org/foo/bar/
+		// Only folders are subject to this behavior, and must be valid folders.
+		pathEndsInSlash := len(r.URL.Path) > 0 && r.URL.Path[len(r.URL.Path)-1] == '/'
+		if !pathEndsInSlash {
+			r.URL.Path += "/"
+			http.Redirect(w, r, r.URL.String(), http.StatusSeeOther)
+			return
+		}
+
+		srcFilename, fileInfo, err = b.ResolveDirectoryIndex(filename)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				w.WriteHeader(http.StatusNotFound)
+				t.ExecuteTemplate(w, "404.html", nil)
+				return
+			} else {
+				panic(err)
+			}
 		}
 	}
 
