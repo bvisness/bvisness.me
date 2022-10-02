@@ -39,8 +39,9 @@ type AddFuncsFunc[UserData any] func(Request[UserData]) template.FuncMap
 
 type Instance[UserData any] struct {
 	SrcDir, IncludeDir string
-	Funcs              AddFuncsFunc[UserData]
 	UserData           UserData
+	Funcs              AddFuncsFunc[UserData]
+	StaticPaths        []string
 }
 
 type Request[UserData any] struct {
@@ -49,25 +50,31 @@ type Request[UserData any] struct {
 	User UserData
 }
 
+type Options[UserData any] struct {
+	Funcs       AddFuncsFunc[UserData]
+	StaticPaths []string
+}
+
 func New[UserData any](
 	srcDir, includeDir string,
-	funcs AddFuncsFunc[UserData],
 	userData UserData,
+	opts Options[UserData],
 ) Instance[UserData] {
 	return Instance[UserData]{
-		SrcDir:     srcDir,
-		IncludeDir: includeDir,
-		Funcs:      funcs,
-		UserData:   userData,
+		SrcDir:      srcDir,
+		IncludeDir:  includeDir,
+		UserData:    userData,
+		Funcs:       opts.Funcs,
+		StaticPaths: opts.StaticPaths,
 	}
 }
 
 func Run[UserData any](
 	srcDir, includeDir string,
-	funcs AddFuncsFunc[UserData],
 	userData UserData,
+	opts Options[UserData],
 ) {
-	New(srcDir, includeDir, funcs, userData).Run()
+	New(srcDir, includeDir, userData, opts).Run()
 }
 
 func (b Instance[UserData]) Run() {
@@ -163,8 +170,19 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	fileBytes := must1(os.ReadFile(srcFilename))
 	contentType := detectContentType(fileInfo, fileBytes)
-	switch stripContentType(contentType) {
-	case "text/html", "text/css", "text/xml":
+
+	doTemplate := false
+	if b.pathIsStatic(filename) {
+		// nope, no template
+	} else {
+		switch stripContentType(contentType) {
+		case "text/html", "text/css", "text/xml":
+			doTemplate = true
+		}
+	}
+
+	w.Header().Add("Content-Type", contentType)
+	if doTemplate {
 		must1(t.Parse(string(fileBytes)))
 
 		if code, location := getRedirect(t, b.UserData); location != "" {
@@ -173,13 +191,12 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.Header().Add("Content-Type", contentType)
-
+		// Stupid hacks 😑
 		if contentType == "text/xml" {
 			w.Write([]byte("<?xml version=\"1.0\" standalone=\"yes\" ?>\n"))
 		}
 		must(t.Execute(w, b.UserData))
-	default:
+	} else {
 		must1(w.Write(fileBytes))
 	}
 }
@@ -268,6 +285,10 @@ func detectContentType(fileInfo os.FileInfo, fileBytes []byte) string {
 		return "text/css"
 	case ".xml":
 		return "text/xml"
+	case ".svg":
+		return "image/svg+xml"
+	case ".js":
+		return "text/javascript"
 	default:
 		return http.DetectContentType(fileBytes)
 	}
@@ -275,6 +296,15 @@ func detectContentType(fileInfo os.FileInfo, fileBytes []byte) string {
 
 func stripContentType(contentType string) string {
 	return strings.SplitN(contentType, ";", 2)[0]
+}
+
+func (b *Instance[UserData]) pathIsStatic(path string) bool {
+	for _, staticPath := range b.StaticPaths {
+		if strings.HasPrefix(path, staticPath) {
+			return true
+		}
+	}
+	return false
 }
 
 // Takes an (error) return and panics if there is an error.

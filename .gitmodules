@@ -10,3 +10,7 @@
 	path = ext/columns-concept
 	url = https://github.com/bvisness/columns-concept.git
 	branch = master
+[submodule "ext/incremental"]
+	path = ext/incremental
+	url = https://github.com/bvisness/incremental.git
+	branch = master
