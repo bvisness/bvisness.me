@@ -22,8 +22,3 @@ print('Updating boggler...')
 with dir('ext/boggler'):
     subprocess.run(['python3', 'buildwords.py'])
     subprocess.run(['python3', 'dist.py'])
-
-print('Updating hangar...')
-with dir('ext/hangar/src'):
-    subprocess.run(['make', '-e'])
-    subprocess.run(['make', 'dist'])
