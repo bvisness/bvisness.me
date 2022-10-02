@@ -4,8 +4,10 @@
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ with .Title }}{{ . }} | {{ end }}Ben Visness</title>
-
+    {{ define "title" }}{{ end }}
+    {{ $title := or .Title (eval "title" .) }}
+    <title>{{ with $title }}{{ . }} | {{ end }}Ben Visness</title>
+    
     <meta name="author" content="Ben Visness">
     {{ if .Description }}
         <meta name="description" content="{{ .Description | trunc 160 }}">
