@@ -29,9 +29,7 @@ func init() {
 }
 
 type Bvisness struct {
-	// shut up, errors
-	BaseData
-	CommonData
+	BaseData // shut up, errors
 
 	Articles []Article
 	Desmos   DesmosData
@@ -41,15 +39,11 @@ type BaseData struct {
 	Title          string
 	Description    string
 	OpenGraphImage string // Relative URL within site folder
-}
-
-type CommonData struct {
-	Banner string
+	Banner         string // Relative URL within site folder
 }
 
 type Article struct {
 	BaseData
-	CommonData
 	Date time.Time
 	Slug string
 	Url  string
@@ -94,9 +88,7 @@ var articles = []Article{
 		BaseData: BaseData{
 			Title:       "UE4: How to Make Awesome Buttons in VR",
 			Description: "Or: why the physics engine is not your friend.",
-		},
-		CommonData: CommonData{
-			Banner: "vr-buttons/mediamenu.jpg",
+			Banner:      "vr-buttons/mediamenu.jpg",
 		},
 		Slug: "vr-buttons",
 		Date: time.Date(2017, 8, 27, 0, 0, 0, 0, time.UTC),
@@ -113,9 +105,7 @@ var articles = []Article{
 		BaseData: BaseData{
 			Title:       "UE4: Controlling Spotify in-game",
 			Description: "And iTunes, Windows Media Player, and everything else, with just a little bit of Windows API magic.",
-		},
-		CommonData: CommonData{
-			Banner: "ue4-spotify/mediamenu.jpg",
+			Banner:      "ue4-spotify/mediamenu.jpg",
 		},
 		Slug: "ue4-spotify",
 		Date: time.Date(2017, 2, 12, 0, 0, 0, 0, time.UTC),
