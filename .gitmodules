@@ -1,3 +1,8 @@
 [submodule "ext/wasmaze"]
 	path = ext/wasmaze
 	url = https://github.com/bvisness/wasmaze.git
+	branch = master
+[submodule "ext/boggler"]
+	path = ext/boggler
+	url = https://github.com/bvisness/boggler.git
+	branch = master
