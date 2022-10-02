@@ -84,6 +84,15 @@ var articles = []Article{
 		Slug: "desmos",
 		Date: time.Date(2019, 4, 14, 0, 0, 0, 0, time.UTC),
 	},
+	{
+		BaseData: BaseData{
+			Title:       "UE4: How to Make Awesome Buttons in VR",
+			Description: "Or: why the physics engine is not your friend.",
+		},
+		// TODO: banner "/images/mediamenu.jpg"
+		Slug: "vr-buttons",
+		Date: time.Date(2017, 8, 27, 0, 0, 0, 0, time.UTC),
+	},
 }
 
 func main() {
