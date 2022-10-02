@@ -93,6 +93,14 @@ var articles = []Article{
 		Slug: "vr-buttons",
 		Date: time.Date(2017, 8, 27, 0, 0, 0, 0, time.UTC),
 	},
+	{
+		BaseData: BaseData{
+			Title:       "Blender masking layers: a quick tutorial",
+			Description: "A long response to a short StackExchange question.",
+		},
+		Slug: "blender-masking-layers",
+		Date: time.Date(2017, 4, 25, 0, 0, 0, 0, time.UTC),
+	},
 }
 
 func main() {

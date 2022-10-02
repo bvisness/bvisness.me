@@ -1,0 +1,75 @@
+{{ template "simplearticle.html" article "blender-masking-layers" }}
+
+{{ define "article content" }}
+
+{{ apply markdown }}
+  This is an archive of a [Blender StackExchange answer](https://blender.stackexchange.com/questions/10650/manually-make-it-look-like-an-object-is-going-through-the-floor-of-a-real-life/) that I posted back in 2014.
+
+  ## The Question
+
+  > I have a picture of a room including the floor and I want it to look like there is, for example, a cube going through the floor. Is there a way to do this, maybe by making it go through a plane that is transparent to the photograph but not to the cube?
+  > 
+  > If anyone knows how to do this, as I'm not very good at doing things from text, would you be able to explain with pictures or something? Is there is a tutorial for this sort of thing?
+
+  ## My Answer
+
+  Blender has a feature called Masking Layers, which nicely accomplish exactly what you're trying to do. Put your content cube on one layer and your masking plane on another, then set the Masking Layer for the plane's layer. I got my result to look like this:
+
+  ![Final render of a cube set into the floor]({{ relurl "finalcube.jpg" }})
+
+  Here's how to accomplish that effect:
+
+  ### 1. Set up your layers
+
+  Start by turning on transparent film. This makes your Cycles render layers use transparency instead of a background color. Go to the Render panel in the Properties window, scroll down to Film, and check Transparent.
+
+  Put your cube (or other content) on one layer and your masking plane on another. I had my cube on layer ![layer 1]({{ relurl "1.png" }}).
+
+  Make sure that both your cube and your plane are visible, then go over to the Render Layers tab and set the mask layer to the layer with your plane.
+
+  ![The correct setup for the render layers]({{ relurl "3.png" }})
+
+  To overlay the render on your image, you can use a compositing setup like this:
+
+  ![Simple composite setup to overlay the render on the image]({{ relurl "4.png" }})
+
+  Give it a render, and you'll get something like this:
+
+  ![First render, with pretty bad lighting]({{ relurl "5.jpg" }})
+
+  This technically answers your question, but it looks really bad, so I'm gonna keep going.
+
+  ### 2. Add shadows and AO
+
+  You can use your masking plane to capture shadows and AO as well. First add another render layer for just your masking plane. Go down into the "Passes" tab and make sure that Shadows and AO are checked.
+
+  ![Shadows and AO must be checked on the new render layer]({{ relurl "6.png" }})
+
+  Then, use a composite setup like this to mix the shadows and apply them to the original image:
+
+  ![A complicated composite setup]({{ relurl "7.png" }})
+
+  This will result in a render like this:
+
+  ![A much better render]({{ relurl "8.jpg" }})
+
+  Just one more step, if you want the lighting to be more accurate:
+
+  ### 3. Make the floor material match the picture
+
+  You can improve the lighting accuracy if you make the floor material match the picture. This will change the color of the light bounces, even though the plane itself is not actually visible.
+
+  Create a material with a node setup like this and assign it to the floor:
+
+  ![A good material node setup]({{ relurl "9.png" }})
+
+  This material will use the coordinates of the window to apply the picture to the floor. This means that there will be no distortion of the texture when it is rendered. This change will result in a subtly improved render:
+
+  ![The final render]({{ relurl "10.jpg" }})
+
+  This technique works for other objects too. Just replace the cube with whatever object you actually want in your scene.
+
+  ![Another final render, this time with a monkey]({{ relurl "finalmonkey.jpg" }})
+{{ end }}
+
+{{ end }}
