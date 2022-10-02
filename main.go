@@ -111,6 +111,15 @@ var articles = []Article{
 		Slug: "ue4-spotify",
 		Date: time.Date(2017, 2, 12, 0, 0, 0, 0, time.UTC),
 	},
+	{
+		BaseData: BaseData{
+			Title:       "Compiling and using libgit2",
+			Description: "How to build libgit2 from source, install it on your computer, and use it in a project without linker errors.",
+		},
+		// TODO: table of contents...?
+		Slug: "libgit2",
+		Date: time.Date(2017, 1, 2, 0, 0, 0, 0, time.UTC),
+	},
 }
 
 func main() {
