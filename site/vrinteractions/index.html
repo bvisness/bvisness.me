@@ -1,0 +1,45 @@
+{{ template "simplearticle.html" article "vrinteractions" }}
+
+{{ define "article content" }}
+
+{{ apply markdown }}
+  At some point in the development of every VR project, you will want to be able to pick things up. Sadly, this usually means a lot of boilerplate code, and in Unreal, Blueprints make boilerplate a huge chore. And there's all kinds of questions to worry about:
+
+  - Can the thing I'm holding read values from the correct controller?
+  - When I drop something, does everything get reset correctly?
+  - What if I grab something out of my other hand instead of picking it up off the ground?
+  - What if I don't want an object to attach to my hand when I grab it?
+  - What if I am already carrying something, then grab something else?
+
+  At some point I got fed up with copy-pasting the same crap everywhere, and decided to fix this problem. The result is [VRInteractions](https://github.com/bvisness/VRInteractions), an engine plugin that provides a simple foundation for common VR interactions.
+
+
+  ## The Concept
+  VRInteractions has three classes: `Hand`, `Grabbable`, and `Interactable`. A `Hand` is an Actor that is attached to a Motion Controller Component and handles the logic of grabbing stuff. `Grabbable` and `Interactable` are two classes for the objects themselves, each with a slightly different use case.
+
+  `Grabbables` are objects that attach to your hand when you grab them. Usually these are physics props that the player can pick up and inspect, but they don't have to be. Whenever a `Grabbable` is being held, it receives inputs from the correct motion controller.
+
+  `Interactables` are objects that you can interact with, but that don't necessarily attach to your hand. `Interactables` can get input events and button and axis values from the correct motion controller.
+
+  Which do you use in different situations? Here's a bunch of examples:
+
+  - **Gun:** `Grabbable`, since you want it solidly in the player's hand. It can fire whenever it receives a Trigger Pressed event from the `Hand` that is holding it.
+  - **Block:** `Grabbable`, since it is simply a physics prop that you want the player to be able to pick up and put down.
+  - **Doorknob:** `Interactable`, because it stays where it is and reads the rotation of the motion controller.
+  - **Kitchen drawer:** `Interactable`, because it needs to move along a constrained track. It can read the motion controller's position to update its own position.
+  - **That awesome arcade joystick on the Xortex machine in The Lab:** `Interactable`, since it stays in place, but it reads the motion controller's position and button values.
+
+
+  ## Why should I use it? (TL;DR)
+  **Your objects don't need to know which hand is holding them.** The `Hand` class takes care of sending the correct motion controller events along to whatever it's holding.
+
+  **It handles tricky situations with ease.** Grabbing an object out of your other hand doesn't leave any dangling references or messed-up variable state. Grabbing a new object when you already have one in your hand is also handled correctly.
+
+  **It's super easy to implement.** VRInteractions is an engine plugin, which means you can easily drop it into any project. Then all you have to do is make subclasses of `Grabbable` and `Interactable` and override the functions you want.
+
+
+  ## Download
+  You can find VRInteractions [on GitHub](https://github.com/bvisness/VRInteractions).
+{{ end }}
+
+{{ end }}

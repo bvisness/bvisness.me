@@ -120,6 +120,14 @@ var articles = []Article{
 		Slug: "libgit2",
 		Date: time.Date(2017, 1, 2, 0, 0, 0, 0, time.UTC),
 	},
+	{
+		BaseData: BaseData{
+			Title:       "Project spotlight: VRInteractions",
+			Description: "An engine plugin for Unreal Engine 4 that makes it easy to create interactive objects in VR.",
+		},
+		Slug: "vrinteractions",
+		Date: time.Date(2016, 11, 7, 0, 0, 0, 0, time.UTC),
+	},
 }
 
 func main() {
