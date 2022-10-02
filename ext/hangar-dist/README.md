@@ -1,0 +1,1 @@
+The Hangar build scripts were just totally screwed up. Here's an already-built version. Good enough, especially given that Hangar is a piece of garbage that I'm never touching again.
