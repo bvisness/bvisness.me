@@ -101,6 +101,16 @@ var articles = []Article{
 		Slug: "blender-masking-layers",
 		Date: time.Date(2017, 4, 25, 0, 0, 0, 0, time.UTC),
 	},
+	{
+		BaseData: BaseData{
+			Title:       "UE4: Controlling Spotify in-game",
+			Description: "And iTunes, Windows Media Player, and everything else, with just a little bit of Windows API magic.",
+		},
+		// TODO: banner "/images/mediamenu.jpg"
+		// TODO: banner_position = "center 70%"
+		Slug: "ue4-spotify",
+		Date: time.Date(2017, 2, 12, 0, 0, 0, 0, time.UTC),
+	},
 }
 
 func main() {
