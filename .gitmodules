@@ -24,9 +24,9 @@
 	branch = main
 [submodule "ext/Sandbox"]
 	path = ext/Sandbox
-	url = git@github.com:bvisness/Sandbox.git
+	url = https://github.com/bvisness/Sandbox.git
 	branch = master
 [submodule "ext/wordfight"]
 	path = ext/wordfight
-	url = git@github.com:bvisness/wordfight.git
+	url = https://github.com/bvisness/wordfight.git
 	branch = master
