@@ -14,3 +14,7 @@
 	path = ext/incremental
 	url = https://github.com/bvisness/incremental.git
 	branch = master
+[submodule "ext/LuaOnline"]
+	path = ext/LuaOnline
+	url = https://github.com/frc-2175/LuaOnline.git
+	branch = main
