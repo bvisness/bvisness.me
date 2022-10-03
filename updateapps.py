@@ -22,3 +22,7 @@ print('Updating boggler...')
 with dir('ext/boggler'):
     subprocess.run(['python3', 'buildwords.py'])
     subprocess.run(['python3', 'dist.py'])
+
+print('Updating netsim...')
+with dir('ext/netsim'):
+    subprocess.run(['python3', 'build.py'])

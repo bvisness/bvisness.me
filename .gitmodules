@@ -18,3 +18,7 @@
 	path = ext/LuaOnline
 	url = https://github.com/frc-2175/LuaOnline.git
 	branch = main
+[submodule "ext/netsim"]
+	path = ext/netsim
+	url = git@github.com:bvisness/netsim.git
+	branch = main
