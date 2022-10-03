@@ -52,6 +52,9 @@ func (b Instance[any]) ResolveFileOrDir(abspath string) (srcFilename string, fil
 func (b Instance[any]) ResolveDirectoryIndex(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
 	abspath += "/index.html" // who knows, maybe someday we could support other kinds of indexes
 	srcFilename, fileInfo, err = b.ResolveFileOrDir(abspath)
+	if err != nil {
+		return
+	}
 	if fileInfo.IsDir() {
 		return "", nil, fmt.Errorf("expected valid index file at %s, but got a directory", abspath)
 	}
