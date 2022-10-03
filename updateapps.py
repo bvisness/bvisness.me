@@ -16,6 +16,7 @@ class dir:
 
 print('Updating git stuff...')
 subprocess.run(['git', 'submodule', 'init'])
+subprocess.run(['git', 'submodule', 'update', '--init', '--recursive'])
 subprocess.run(['git', 'submodule', 'update', '--remote', '--recursive'])
 
 print('Updating boggler...')
