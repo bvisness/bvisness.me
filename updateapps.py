@@ -18,6 +18,10 @@ print('Updating git stuff...')
 subprocess.run(['git', 'submodule', 'init'])
 subprocess.run(['git', 'submodule', 'update', '--init', '--recursive'])
 subprocess.run(['git', 'submodule', 'update', '--remote', '--recursive'])
+subprocess.run(['git', 'submodule', 'foreach', '--recursive', 'git', 'clean', '-xfd'])
+subprocess.run(['git', 'submodule', 'foreach', '--recursive', 'git', 'reset', '--hard'])
+subprocess.run(['git', 'submodule', 'update', '--init', '--recursive'])
+# yes, this is the most paranoid series of commands of all time.
 
 print('Updating boggler...')
 with dir('ext/boggler'):
