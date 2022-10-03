@@ -22,3 +22,7 @@
 	path = ext/netsim
 	url = git@github.com:bvisness/netsim.git
 	branch = main
+[submodule "ext/Sandbox"]
+	path = ext/Sandbox
+	url = git@github.com:bvisness/Sandbox.git
+	branch = master
