@@ -52,11 +52,11 @@ func storeImage(path string) (image.Image, error) {
 	return img, nil
 }
 
-// Refresh the image cache every second. (Someday this could be less dumb.)
+// Refresh the image cache on a timer. (Someday this could be less dumb.)
 func init() {
 	go func() {
 		for {
-			time.Sleep(1 * time.Second)
+			time.Sleep(10 * time.Second)
 			imageCache.Range(func(key, value any) bool {
 				storeImage(key.(string))
 				return true
