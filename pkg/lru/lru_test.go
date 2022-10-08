@@ -2,6 +2,7 @@ package lru
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"sync"
 	"testing"
@@ -90,7 +91,8 @@ func TestLRU(t *testing.T) {
 					c.Store(key, in) // then store the new thing
 
 					out, ok := c.Get(key) // then get it again (should hit)
-					if assert.True(t, ok, "key was not present after storing") {
+					if ok {
+						// It might have been evicted in between the store and get.
 						assert.Equal(t, in, out, "got unexpected value from stored entry")
 					}
 				}
@@ -101,7 +103,20 @@ func TestLRU(t *testing.T) {
 		wg.Wait()
 
 		stats := c.Stats()
-		_ = numInserts
-		t.Errorf("%+v", stats)
+		// stores and evictions are predictable...
+		assert.Equal(t, numInserts, stats.TotalStores)
+		assert.Equal(t, numInserts-size, stats.TotalEvictions)
+		// but hits and misses are not. See if they're close.
+		assertWithinPercentage(t, stats.TotalHits, numInserts, 0.1)
+		assertWithinPercentage(t, stats.TotalMisses, numInserts, 0.1)
+		t.Logf("%+v", stats)
 	})
+}
+
+func assertWithinPercentage(t *testing.T, actual, expected int, pct float32) bool {
+	t.Helper()
+
+	allowedSlop := int(float32(expected) * pct)
+	actualSlop := int(math.Abs(float64(actual - expected)))
+	return assert.Less(t, actualSlop, allowedSlop, "%v was not within %v%% of %v (off by %v, must be off by less than %v)", actual, pct*100, expected, actualSlop, allowedSlop)
 }
