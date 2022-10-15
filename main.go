@@ -68,6 +68,15 @@ type Desmos struct {
 var articles = []Article{
 	{
 		BaseData: BaseData{
+			Title:       "Essential complexity does not exist",
+			Description: "TODO TODO TODO",
+			// OpenGraphImage: "chrome-wasm-crash/ogimage.png",
+		},
+		Slug: "essential-complexity",
+		Date: time.Date(2022, 10, 15, 0, 0, 0, 0, time.UTC),
+	},
+	{
+		BaseData: BaseData{
 			Title:          "Untangling a bizarre WASM crash in Chrome",
 			Description:    "How we solved a strange issue involving the guts of Chrome and the Go compiler.",
 			OpenGraphImage: "chrome-wasm-crash/ogimage.png",
