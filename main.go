@@ -69,7 +69,7 @@ var articles = []Article{
 	{
 		BaseData: BaseData{
 			Title:       "Essential complexity does not exist",
-			Description: "TODO TODO TODO",
+			Description: "Trying to define \"essential complexity\" is a waste of time, but maybe not for the reason you think.",
 			// OpenGraphImage: "chrome-wasm-crash/ogimage.png",
 		},
 		Slug: "essential-complexity",
