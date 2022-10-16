@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"image"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"os"
 
-	"image/jpeg"
-	"image/png"
-
 	"github.com/bvisness/bvisness.me/pkg/lru"
+	"github.com/chai2010/webp"
 	"github.com/nfnt/resize"
 )
 
@@ -30,6 +30,11 @@ type Variant struct {
 }
 
 var AllFormats = []string{"image/jpeg", "image/png", "image/webp"}
+var DefaultFormats = map[string][]string{
+	"image/jpeg": {"image/jpeg"},
+	"image/png":  {"image/png", "image/webp"},
+	"image/webp": {"image/png", "image/webp"},
+}
 
 var stdimgType2MimeType = map[string]string{
 	"jpeg": "image/jpeg",
@@ -40,10 +45,17 @@ var stdimgType2MimeType = map[string]string{
 type encoder func(w io.Writer, img image.Image) error
 
 var mimeType2Encoder = map[string]encoder{
-	"image/png": png.Encode,
 	"image/jpeg": func(w io.Writer, img image.Image) error {
 		return jpeg.Encode(w, img, nil)
 	},
+	"image/png": png.Encode,
+	"image/webp": func(w io.Writer, img image.Image) error {
+		return webp.Encode(w, img, nil)
+	},
+}
+
+type ImageOptions struct {
+	Formats []string
 }
 
 func ProcessImage(filepath string, originalScale int, opts ImageOptions) (ProcessedImage, error) {
@@ -76,7 +88,7 @@ func ProcessImage(filepath string, originalScale int, opts ImageOptions) (Proces
 
 	formats := opts.Formats
 	if len(formats) == 0 {
-		formats = []string{mimeType} // use only the current encoding
+		formats = DefaultFormats[mimeType]
 	}
 
 	for scale := originalScale; scale >= 1; scale-- {
@@ -121,10 +133,6 @@ func intendedSize(actualSize image.Point, scale int) image.Point {
 		X: actualSize.X / scale,
 		Y: actualSize.Y / scale,
 	}
-}
-
-type ImageOptions struct {
-	Formats []string // If not provided, only the image's current format will be used.
 }
 
 // Refresh the image cache on a timer. (Someday this could be less dumb.)

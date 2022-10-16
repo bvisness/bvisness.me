@@ -33,8 +33,7 @@ func Middleware[T any](b bhp.Instance[T], r bhp.Request[T], w http.ResponseWrite
 	if err1 != nil || err2 != nil {
 		return false
 	}
-
-	// TODO: alternate encodings
+	format := r.R.URL.Query().Get("fmt")
 
 	key := fmt.Sprintf("%s:orig(%d)", m.FilePath, origScale)
 	processed, err := imageCache.GetOrStore(key, func() (ProcessedImage, error) {
@@ -45,7 +44,15 @@ func Middleware[T any](b bhp.Instance[T], r bhp.Request[T], w http.ResponseWrite
 	}
 
 	for _, variant := range processed.Variants {
-		if variant.Scale == scale {
+		scaleOk := variant.Scale == scale
+		var formatOk bool
+		if format == "" {
+			// Accept only the original content type
+			formatOk = variant.ContentType == processed.Source.ContentType
+		} else {
+			formatOk = variant.ContentType == format
+		}
+		if scaleOk && formatOk {
 			w.Header().Set("Content-Type", variant.ContentType)
 			w.Write(variant.Data)
 			return true
