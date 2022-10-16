@@ -7,8 +7,10 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"log"
 	"os"
 
+	"github.com/bvisness/bvisness.me/pkg/job"
 	"github.com/bvisness/bvisness.me/pkg/lru"
 	"github.com/chai2010/webp"
 	"github.com/nfnt/resize"
@@ -91,6 +93,16 @@ func ProcessImage(filepath string, originalScale int, opts ImageOptions) (Proces
 		formats = DefaultFormats[mimeType]
 	}
 
+	// It seems that resizing is relatively fast but encoding is slow.
+	// So, we do the encoding concurrently. (Why is encoding so slow???)
+
+	type Job struct {
+		Resized image.Image
+		Scale   int
+		Format  string
+	}
+
+	var jobs []Job
 	for scale := originalScale; scale >= 1; scale-- {
 		resized := img
 		if scale != originalScale {
@@ -100,28 +112,44 @@ func ProcessImage(filepath string, originalScale int, opts ImageOptions) (Proces
 		}
 
 		for _, format := range formats {
-			var outData []byte
-			if format == mimeType && scale == originalScale {
-				// Use the original image data with no further processing.
-				outData = imgData
-			} else {
-				// Encode the resized data to the new output format.
-				var outBuf bytes.Buffer
-				encoder := mimeType2Encoder[format]
-				err := encoder(&outBuf, resized)
-				if err != nil {
-					return ProcessedImage{}, fmt.Errorf("failed to encode resized image: %w", err)
-				}
-				outData = outBuf.Bytes()
-			}
-
-			res.Variants = append(res.Variants, Variant{
-				Data:         outData,
-				ContentType:  format,
-				Scale:        scale,
-				ActualSize:   resized.Bounds().Size(),
-				IntendedSize: intendedSize(resized.Bounds().Size(), scale),
+			jobs = append(jobs, Job{
+				Resized: resized,
+				Scale:   scale,
+				Format:  format,
 			})
+		}
+	}
+
+	variantResults := job.Dispatch(jobs, func(job Job) (Variant, error) {
+		var outData []byte
+		if job.Format == mimeType && job.Scale == originalScale {
+			// Use the original image data with no further processing.
+			outData = imgData
+		} else {
+			// Encode the resized data to the new output format.
+			var outBuf bytes.Buffer
+			encoder := mimeType2Encoder[job.Format]
+			err := encoder(&outBuf, job.Resized)
+			if err != nil {
+				return Variant{}, fmt.Errorf("failed to encode resized image: %w", err)
+			}
+			outData = outBuf.Bytes()
+		}
+
+		return Variant{
+			Data:         outData,
+			ContentType:  job.Format,
+			Scale:        job.Scale,
+			ActualSize:   job.Resized.Bounds().Size(),
+			IntendedSize: intendedSize(job.Resized.Bounds().Size(), job.Scale),
+		}, nil
+	})
+
+	for variantResult := range variantResults {
+		if variantResult.Err == nil {
+			res.Variants = append(res.Variants, variantResult.Result)
+		} else {
+			log.Printf("Error when processing images: %v", variantResult.Err)
 		}
 	}
 
