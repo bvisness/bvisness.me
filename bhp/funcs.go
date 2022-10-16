@@ -78,3 +78,15 @@ func MergeFuncMaps(funcMaps ...template.FuncMap) template.FuncMap {
 	}
 	return result
 }
+
+func ChainMiddleware[UserData any](middlewares ...Middleware[UserData]) Middleware[UserData] {
+	return func(b Instance[UserData], r Request[UserData], w http.ResponseWriter, m MiddlewareData[UserData]) bool {
+		for _, middleware := range middlewares {
+			didHandle := middleware(b, r, w, m)
+			if didHandle {
+				return true
+			}
+		}
+		return false
+	}
+}

@@ -17,13 +17,10 @@ var TemplateFuncs = template.FuncMap{
 	"markdown": func(md string) template.HTML {
 		md = Unindent(md)
 
-		if cachedHTML, ok := markdownCache.Get(md); ok {
-			return cachedHTML
-		} else {
-			html := template.HTML(ToHTML(md))
-			markdownCache.Store(md, html)
-			return html
-		}
+		html, _ := markdownCache.GetOrStore(md, func() (template.HTML, error) {
+			return template.HTML(ToHTML(md)), nil
+		})
+		return html
 	},
 }
 

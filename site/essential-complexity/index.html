@@ -1,6 +1,11 @@
 {{ template "simplearticle.html" article "essential-complexity" }}
 
 {{ define "article content" }}
+
+<p>
+    <img srcset="{{ srcset (relpath "gears.png") 3 }}">
+</p>
+
 {{ apply markdown }}
 
 It is not possible to define the “essence” of a problem.

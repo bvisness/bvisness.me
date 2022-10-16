@@ -35,13 +35,21 @@ func readFileString(fs embed.FS, name string) string {
 	return string(must1(fs.ReadFile(name)))
 }
 
-type AddFuncsFunc[UserData any] func(Request[UserData]) template.FuncMap
+type AddFuncsFunc[UserData any] func(Instance[UserData], Request[UserData]) template.FuncMap
+
+type Middleware[UserData any] func(b Instance[UserData], r Request[UserData], w http.ResponseWriter, m MiddlewareData[UserData]) bool
+type MiddlewareData[UserData any] struct {
+	FilePath    string
+	FileData    []byte
+	ContentType string
+}
 
 type Instance[UserData any] struct {
 	SrcDir, IncludeDir string
 	UserData           UserData
 	Funcs              AddFuncsFunc[UserData]
 	StaticPaths        []string
+	Middleware         Middleware[UserData]
 }
 
 type Request[UserData any] struct {
@@ -53,6 +61,7 @@ type Request[UserData any] struct {
 type Options[UserData any] struct {
 	Funcs       AddFuncsFunc[UserData]
 	StaticPaths []string
+	Middleware  Middleware[UserData]
 }
 
 func New[UserData any](
@@ -66,6 +75,7 @@ func New[UserData any](
 		UserData:    userData,
 		Funcs:       opts.Funcs,
 		StaticPaths: opts.StaticPaths,
+		Middleware:  opts.Middleware,
 	}
 }
 
@@ -116,7 +126,7 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		R:    r,
 		User: b.UserData,
 	}
-	t.Funcs(b.Funcs(bhpRequest))
+	t.Funcs(b.Funcs(b, bhpRequest))
 
 	filepath.Walk(b.IncludeDir, func(path string, info fs.FileInfo, err error) error {
 		if !info.IsDir() {
@@ -170,6 +180,17 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	fileBytes := must1(os.ReadFile(srcFilename))
 	contentType := detectContentType(fileInfo, fileBytes)
+
+	if b.Middleware != nil {
+		didHandle := b.Middleware(b, bhpRequest, w, MiddlewareData[UserData]{
+			FilePath:    srcFilename,
+			FileData:    fileBytes,
+			ContentType: contentType,
+		})
+		if didHandle {
+			return
+		}
+	}
 
 	doTemplate := false
 	if b.pathIsStatic(filename) {

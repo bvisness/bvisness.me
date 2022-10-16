@@ -68,6 +68,10 @@ func (c *LRU[V]) Get(key string) (V, bool) {
 	bucket.m.Lock()
 	defer bucket.m.Unlock()
 
+	return c.bucketGet(bucket, key)
+}
+
+func (c *LRU[V]) bucketGet(bucket *bucket[V], key string) (V, bool) {
 	for i := range bucket.entries {
 		entry := &bucket.entries[i]
 		if !entry.set {
@@ -90,6 +94,10 @@ func (c *LRU[V]) Store(key string, value V) {
 	bucket.m.Lock()
 	defer bucket.m.Unlock()
 
+	c.bucketStore(bucket, key, value)
+}
+
+func (c *LRU[V]) bucketStore(bucket *bucket[V], key string, value V) {
 	// scan the bucket
 	var firstEmpty, oldest *entry[V]
 	for i := range bucket.entries {
@@ -125,21 +133,38 @@ func (c *LRU[V]) Store(key string, value V) {
 	}
 }
 
+func (c *LRU[V]) GetOrStore(key string, init func() (V, error)) (V, error) {
+	bucket := c.bucketForKey(key)
+	bucket.m.Lock()
+	defer bucket.m.Unlock()
+
+	if v, ok := c.bucketGet(bucket, key); ok {
+		return v, nil
+	} else {
+		if v, err := init(); err == nil {
+			c.bucketStore(bucket, key, v)
+			return v, nil
+		} else {
+			var zero V
+			return zero, err
+		}
+	}
+}
+
 type Stats struct {
 	TotalHits, TotalMisses      int
 	TotalStores, TotalEvictions int
 }
 
 func (c *LRU[V]) Stats() Stats {
+	var stats Stats
+
 	// lock all buckets
 	for i := range c.buckets {
 		bucket := &c.buckets[i]
 		bucket.m.Lock()
 		defer bucket.m.Unlock()
-	}
 
-	var stats Stats
-	for _, bucket := range c.buckets {
 		stats.TotalHits += bucket.hits
 		stats.TotalMisses += bucket.misses
 		stats.TotalStores += bucket.stores

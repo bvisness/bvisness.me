@@ -147,10 +147,11 @@ func main() {
 			},
 		},
 		bhp.Options[Bvisness]{
-			StaticPaths: []string{"apps/"},
-			Funcs: func(r bhp.Request[Bvisness]) template.FuncMap {
+			// TODO: Dunno if this is necessary any more.
+			// StaticPaths: []string{"apps/"},
+			Funcs: func(b bhp.Instance[Bvisness], r bhp.Request[Bvisness]) template.FuncMap {
 				return bhp.MergeFuncMaps(
-					images.TemplateFuncs,
+					images.TemplateFuncs(b, r),
 					markdown.TemplateFuncs,
 					template.FuncMap{
 						"article": func(slug string) Article {
@@ -196,6 +197,7 @@ func main() {
 					},
 				)
 			},
+			Middleware: bhp.ChainMiddleware(images.Middleware[Bvisness]),
 		},
 	)
 }
