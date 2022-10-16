@@ -18,6 +18,10 @@ import (
 
 var imageCache = lru.New[ProcessedImage](1000)
 
+func cacheKey(filepath string, originalScale int) string {
+	return fmt.Sprintf("%s:orig(%d)", filepath, originalScale)
+}
+
 type ProcessedImage struct {
 	Source   Variant
 	Variants []Variant
@@ -48,7 +52,9 @@ type encoder func(w io.Writer, img image.Image) error
 
 var mimeType2Encoder = map[string]encoder{
 	"image/jpeg": func(w io.Writer, img image.Image) error {
-		return jpeg.Encode(w, img, nil)
+		return jpeg.Encode(w, img, &jpeg.Options{
+			Quality: 85,
+		})
 	},
 	"image/png": png.Encode,
 	"image/webp": func(w io.Writer, img image.Image) error {
@@ -122,19 +128,13 @@ func ProcessImage(filepath string, originalScale int, opts ImageOptions) (Proces
 
 	variantResults := job.Dispatch(jobs, func(job Job) (Variant, error) {
 		var outData []byte
-		if job.Format == mimeType && job.Scale == originalScale {
-			// Use the original image data with no further processing.
-			outData = imgData
-		} else {
-			// Encode the resized data to the new output format.
-			var outBuf bytes.Buffer
-			encoder := mimeType2Encoder[job.Format]
-			err := encoder(&outBuf, job.Resized)
-			if err != nil {
-				return Variant{}, fmt.Errorf("failed to encode resized image: %w", err)
-			}
-			outData = outBuf.Bytes()
+		var outBuf bytes.Buffer
+		encoder := mimeType2Encoder[job.Format]
+		err := encoder(&outBuf, job.Resized)
+		if err != nil {
+			return Variant{}, fmt.Errorf("failed to encode resized image: %w", err)
 		}
+		outData = outBuf.Bytes()
 
 		return Variant{
 			Data:         outData,

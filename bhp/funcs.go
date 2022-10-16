@@ -63,6 +63,9 @@ func (b Instance[any]) ResolveDirectoryIndex(abspath string) (srcFilename string
 
 func (b Instance[any]) ResolveFile(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
 	srcFilename, fileInfo, err = b.ResolveFileOrDir(abspath)
+	if err != nil {
+		return
+	}
 	if fileInfo.IsDir() {
 		return b.ResolveDirectoryIndex(abspath)
 	}

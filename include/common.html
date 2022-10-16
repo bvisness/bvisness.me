@@ -10,7 +10,7 @@
     <div class="container">
         <main>
             {{ if .Banner }}
-                <div class="banner" style="background-image: url('{{ .Banner | absurl }}');"></div>
+                <div class="banner" style="background-image: -webkit-image-set({{ imageset .Banner .BannerScale }}); background-image: image-set({{ imageset .Banner .BannerScale }})"></div>
             {{ end }}
 
             {{ block "common content" . }}You need to define "common content".{{ end }}

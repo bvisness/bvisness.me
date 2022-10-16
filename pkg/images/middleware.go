@@ -1,7 +1,6 @@
 package images
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -25,6 +24,7 @@ func Middleware[T any](b bhp.Instance[T], r bhp.Request[T], w http.ResponseWrite
 	if origScaleStr == "" || scaleStr == "" {
 		return false
 	}
+
 	origScale, err1 := strconv.Atoi(origScaleStr)
 	scale, err2 := strconv.Atoi(scaleStr)
 	if err1 != nil || err2 != nil {
@@ -32,8 +32,7 @@ func Middleware[T any](b bhp.Instance[T], r bhp.Request[T], w http.ResponseWrite
 	}
 	format := r.R.URL.Query().Get("fmt")
 
-	key := fmt.Sprintf("%s:orig(%d)", m.FilePath, origScale)
-	processed, err := imageCache.GetOrStore(key, func() (ProcessedImage, error) {
+	processed, err := imageCache.GetOrStore(cacheKey(m.FilePath, origScale), func() (ProcessedImage, error) {
 		return ProcessImage(m.FilePath, origScale, ImageOptions{})
 	})
 	if err != nil {

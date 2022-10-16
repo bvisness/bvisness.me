@@ -40,6 +40,7 @@ type BaseData struct {
 	Description    string
 	OpenGraphImage string // Relative URL within site folder
 	Banner         string // Relative URL within site folder
+	BannerScale    int    // e.g. 2 for a 2x resolution source image
 }
 
 type Article struct {
@@ -70,7 +71,8 @@ var articles = []Article{
 		BaseData: BaseData{
 			Title:       "Essential complexity does not exist",
 			Description: "Trying to define \"essential complexity\" is a waste of time, but maybe not for the reason you think.",
-			// OpenGraphImage: "chrome-wasm-crash/ogimage.png",
+			Banner:      "essential-complexity/gears.png",
+			BannerScale: 3,
 		},
 		Slug: "essential-complexity",
 		Date: time.Date(2022, 10, 15, 0, 0, 0, 0, time.UTC),
@@ -98,6 +100,7 @@ var articles = []Article{
 			Title:       "UE4: How to Make Awesome Buttons in VR",
 			Description: "Or: why the physics engine is not your friend.",
 			Banner:      "vr-buttons/mediamenu.jpg",
+			BannerScale: 2,
 		},
 		Slug: "vr-buttons",
 		Date: time.Date(2017, 8, 27, 0, 0, 0, 0, time.UTC),
@@ -115,6 +118,7 @@ var articles = []Article{
 			Title:       "UE4: Controlling Spotify in-game",
 			Description: "And iTunes, Windows Media Player, and everything else, with just a little bit of Windows API magic.",
 			Banner:      "ue4-spotify/mediamenu.jpg",
+			BannerScale: 2,
 		},
 		Slug: "ue4-spotify",
 		Date: time.Date(2017, 2, 12, 0, 0, 0, 0, time.UTC),
