@@ -3,6 +3,7 @@ package images
 import (
 	"fmt"
 	"html/template"
+	"image"
 	"net/url"
 	"strconv"
 	"strings"
@@ -123,6 +124,22 @@ func TemplateFuncs[T any](b bhp.Instance[T], r bhp.Request[T]) template.FuncMap 
 			b.WriteString(fmt.Sprintf(`<img src="%s">`, bhp.AbsURL(r.R, abspath)))
 
 			return template.HTML(b.String()), nil
+		},
+
+		"imgsize": func(abspath string) (image.Point, error) {
+			filepath, _, err := b.ResolveFile(abspath)
+			if err != nil {
+				return image.Point{}, err
+			}
+
+			processed, err := imageCache.GetOrStore(cacheKey(filepath, 1), func() (ProcessedImage, error) {
+				return ProcessImage(filepath, 1, ImageOptions{})
+			})
+			if err != nil {
+				return image.Point{}, err
+			}
+
+			return processed.Source.ActualSize, nil
 		},
 	}
 }

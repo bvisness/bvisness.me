@@ -29,7 +29,7 @@
 {{ end }}
 
 {{ define "drawing" -}}
-{{- $size := relpath . | path2file | imgsize -}}
+{{- $size := relpath . | imgsize -}}
 <div class="full-width-container">
   <div class="full-width">
     <div class="drawing">
