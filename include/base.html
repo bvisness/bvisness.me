@@ -45,6 +45,39 @@
         <meta name="twitter:description" content="{{ .Description }}">
     {{ end }}
 
+    <style>
+        :root {
+            --blockquote-bar: #dfe2e5;
+            --body-background: white;
+            --code-background: #f5f5f5;
+            --codeblock-background: #272822;
+            --footer-text-color: #999;
+            --hr-color: #ccc;
+            --text-color: black;
+
+            {{ if not .LightOnly }}
+                color-scheme: light dark;
+            {{ end }}
+        }
+
+        {{ if not .LightOnly }}
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --blockquote-bar: #424242;
+                    --body-background: #222;
+                    --code-background: #0f0f0f;
+                    --codeblock-background: #171717;
+                    --hr-color: #525252;
+                    --text-color: white;
+                }
+
+                a {
+                    color: white;
+                }
+            }
+        {{ end }}
+    </style>
+
     {{ block "head" . }}{{ end }}
 </head>
 

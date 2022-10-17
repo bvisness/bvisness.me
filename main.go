@@ -41,6 +41,7 @@ type BaseData struct {
 	OpenGraphImage string // Relative URL within site folder
 	Banner         string // Relative URL within site folder
 	BannerScale    int    // e.g. 2 for a 2x resolution source image
+	LightOnly      bool
 }
 
 type Article struct {
@@ -91,6 +92,7 @@ var articles = []Article{
 			Title:          "How to make a 3D renderer in Desmos",
 			Description:    "Learn about the math of 3D rendering, and how to convince a 2D graphing calculator to produce 3D images.",
 			OpenGraphImage: "desmos/opengraph.png",
+			LightOnly:      true,
 		},
 		Slug: "desmos",
 		Date: time.Date(2019, 4, 14, 0, 0, 0, 0, time.UTC),

@@ -614,6 +614,8 @@ template {
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   /* Thanks, GitHub! */
+  background-color: var(--body-background);
+  color: var(--text-color);
 }
 
 h1, h2, h3 {
@@ -634,16 +636,16 @@ code {
 
 hr {
   border: 0;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid var(--hr-color);
   margin: 2em 0;
 }
 
 footer {
   margin: 40px 0;
-  color: #999;
+  color: var(--footer-text-color);
 }
 footer a {
-  color: #999;
+  color: inherit;
   text-decoration: none;
 }
 footer svg {
@@ -665,7 +667,7 @@ footer svg {
 
 h1 a {
   text-decoration: none;
-  color: black;
+  color: inherit;
 }
 
 .banner img {
@@ -704,7 +706,7 @@ article p, article ol, article ul {
   line-height: 1.5;
 }
 article p code, article ol code, article ul code {
-  background-color: #f5f5f5;
+  background-color: var(--code-background);
   padding: 0.2em 0;
   border-radius: 3px;
   white-space: nowrap;
@@ -727,7 +729,7 @@ article blockquote {
   margin-left: 0;
   margin-right: 0;
   padding: 0 1em;
-  border-left: 0.25em solid #dfe2e5;
+  border-left: 0.25em solid var(--blockquote-bar);
 }
 article table {
   border-collapse: collapse;
@@ -785,7 +787,7 @@ article .chroma {
   line-height: 1.25;
   margin: 1em 0;
   padding: 0.7em 25px;
-  background-color: #272822;
+  background-color: var(--codeblock-background);
   border-radius: 4px;
   overflow-x: auto;
   color: #f8f8f2;
