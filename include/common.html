@@ -10,7 +10,9 @@
     <div class="container">
         <main>
             {{ if .Banner }}
-                <div class="banner" style="background-image: -webkit-image-set({{ imageset .Banner .BannerScale }}); background-image: image-set({{ imageset .Banner .BannerScale }})"></div>
+                <picture class="banner">
+                    {{ picturesource .Banner .BannerScale }}
+                </picture>
             {{ end }}
 
             {{ block "common content" . }}You need to define "common content".{{ end }}

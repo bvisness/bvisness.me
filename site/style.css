@@ -668,7 +668,7 @@ h1 a {
   color: black;
 }
 
-.banner {
+.banner img {
   width: 100%;
   height: 340px;
   max-width: 880px;
@@ -678,9 +678,10 @@ h1 a {
   background-size: cover;
   background-position: center center;
   border-radius: 4px;
+  object-fit: cover;
 }
 @media screen and (max-width: 880px) {
-  .banner {
+  .banner img {
     border-radius: 0;
   }
 }
