@@ -1,0 +1,89 @@
+{{ template "simplearticle.html" article "code-style" }}
+
+{{ define "article content" }}
+{{ apply markdown }}
+
+A couple years ago one of my robotics students wrote this code:
+
+```java
+import java.util.Scanner;
+public class moreCodeLesson {
+
+public static void main(final String[] args) {
+Scanner scanA = new Scanner(System.in);
+Scanner scanB = new Scanner(System.in);
+int a = scanA.nextInt();
+int b = scanA.nextInt();
+boolean testing = a < b;
+boolean backup = a > b;
+boolean equal = a == b;
+
+if(testing) {
+System.out.println("This code is so smart, " + a + " Is smaller than " + b + "." );
+} else if(backup) {
+System.out.println("This code is so smart, " + a + " Is larger than " + b + ".");
+} else if(equal) {
+System.out.println("This code is so smart, " + a + " Is the same as " + a + " silly!");
+}
+}
+}
+```
+
+This code works fine, but the formatting is all wrong.
+
+I used to tell my students to "fix" code like this. **Don't do that.** Don't tell students to "fix" their formatting. For one, it doesn't matter - the code works, and they have enough to worry about already. But more importantly, **formatting mistakes are a window into a student's mind.**
+
+Experienced programmers look at this and see structure. We instinctively know that the `System.out.println` calls are _inside_ the cases of the if statement. We know that the if statement is _inside_ the main function. We see this structure and get annoyed that the code doesn't reflect that structure.
+
+My student didn't see that structure. Up until this point, he had only written prose. He knew the rules - the left braces have to match the right braces - but he hadn't internalized the structure yet.
+
+- If students are indenting their code wrong, then they don't yet understand the structure.
+- If students are naming their variables poorly, then they don't have enough experience to reason about a whole program and a specific variable's role in it. Remember, names aren't required for the program to work - get their program working first, then you can suggest more meaningful names.
+- If students are copy-pasting a lot, then they aren't comfortable with functions yet.
+
+Students learn by seeing what the computer does. If their code runs, that's enough. It isn't helpful to say "your code works, but it's still 'wrong'". Engage with the students on their level.
+
+You don't _need_ to tell students to format their code. Just set an example. Eventually they will see why you format your code that way, and will start doing it themselves.
+
+Stories about confused students
+
+## Magic names
+
+I did some CS tutoring in college. One professor would frequently write examples like this:
+
+```java
+String name = "Ben";
+
+// elsewhere...
+
+void greet(String name) {
+  System.out.println("Hello, " + name);
+}
+```
+
+Multiple students that I tutored thought that the variable name and parameter name had to match. I would use a different variable like `String otherName = "Bob"`, and pass it to `greet`, and they would be confused.
+
+## `int bulbasaur`
+
+write about `int bulbasaur`
+
+Part of me also thinks that nonsense names are a fun way to communicate that the computer does not magically understand your problem
+and it's fun regardless for students to just make up random words when they don't yet know what variables are even for
+I used to get on my students' case about all this stuff, but just stopped outright a couple years ago, and they're no worse off for it
+
+
+
+
+With my robotics students, I tell them not to worry about how pretty their code is, or if students are trying to tell other students how to organize their code or indent it or whatever, I encourage them not to worry about it. Your code is an expression of the way you think about the problem, and as you get better at thinking about it, your code will naturally get cleaner.
+Not to say that I won't give advice if they ask for it, but ultimately they just need to learn how to think about things
+
+
+
+telling beginners to indent their code correctly is the same problem as telling students that "improper fractions" are "wrong"
+
+students who don't get it are confused 
+
+students who do get it are mad that you are being pedantic when they did the right thing
+
+{{ end }}
+{{ end }}
