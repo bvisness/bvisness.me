@@ -70,6 +70,16 @@ type Desmos struct {
 var articles = []Article{
 	{
 		BaseData: BaseData{
+			Title: "I did Advent of Code on a PlayStation",
+			// Description: "Trying to define \"essential complexity\" is a waste of time, but maybe not for the reason you think.",
+			// Banner:      "essential-complexity/gears.png",
+			// BannerScale: 3,
+		},
+		Slug: "advent-of-dreams",
+		Date: time.Date(2022, 12, 30, 0, 0, 0, 0, time.UTC),
+	},
+	{
+		BaseData: BaseData{
 			Title:       "Essential complexity does not exist",
 			Description: "Trying to define \"essential complexity\" is a waste of time, but maybe not for the reason you think.",
 			Banner:      "essential-complexity/gears.png",

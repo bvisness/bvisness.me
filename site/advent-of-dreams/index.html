@@ -1,0 +1,136 @@
+{{ template "simplearticle.html" article "advent-of-dreams" }}
+
+{{ define "head" }}
+<link rel="stylesheet" href="{{ relurl "tachyons.min.css" }}">
+<style>
+    :root {
+        --spacing-0: 0;
+        --spacing-1: .25rem;
+        --spacing-2: .5rem;
+        --spacing-3: 1rem;
+        --spacing-4: 2rem;
+        --spacing-5: 4rem;
+        --spacing-6: 8rem;
+        --spacing-7: 16rem;
+    }
+
+    .flex-fair {
+        flex-basis: 1px;
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
+
+    .g1 { gap: var(--spacing-1); }
+    .g2 { gap: var(--spacing-2); }
+    .g3 { gap: var(--spacing-3); }
+
+    .youtube {
+        width: 100%;
+    }
+
+    .twitter-tweet.twitter-tweet-rendered {
+        margin: 0 !important;
+    }
+
+    .wide > * {
+        width: 100%;
+    }
+
+    .footnote-container {
+        position: relative;
+    }
+
+    .footnote {
+        --shadow-color: #ccc;
+        position: relative;
+        width: 100vw;
+        left: calc(50% - 50vw);
+        box-shadow: inset 0 20px 16px -20px var(--shadow-color), inset 0 -20px 16px -20px var(--shadow-color);
+        color: #666;
+    }
+
+    .footnote .container > p:first-child {
+        margin-top: 0;
+    }
+
+    .footnote .container > p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* not small */
+    @media screen and (min-width: 30em) {
+        .flex-fair-ns {
+            flex-basis: 1px;
+            flex-grow: 1;
+            flex-shrink: 1;
+        }
+        
+        .wide {
+            --wideness: 10rem;
+            margin-left: calc(var(--wideness) * -1);
+            margin-right: calc(var(--wideness) * -1);
+            display: flex;
+            justify-content: center;
+        }
+
+        .wide > * {
+            max-width: calc(100vw - calc(2 * var(--spacing-3)));
+        }
+    }
+</style>
+{{ end }}
+
+{{ define "youtube" }}
+<div class="relative aspect-ratio--16x9">
+    <iframe class="youtube aspect-ratio--object" src="https://www.youtube-nocookie.com/embed/{{ . }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+{{ end }}
+
+{{ define "article content" }}
+{{ apply markdown }}
+I did a very stupid challenge this December - I did Advent of Code in Dreams.
+
+(Video of either the crane problem or rope problem)
+
+[Dreams](https://indreams.me/) is a PlayStation game creation platform by Media Molecule, the studio most famous for the LittleBigPlanet games. Users can create and share everything from games to animations to interactive art. It’s truly amazing what these tools can do - I mean, just look at [this](https://youtu.be/2HBBh8O1xpk) [stuff](https://twitter.com/LeorProject/status/1604128725414600711).
+{{ end }}
+
+<!-- 
+<div class="wide flex justify-center mv4">
+    <div class="flex flex-column flex-row-ns g3 items-center">
+        <div class="w-100 flex-fair-ns overflow-hidden">
+            {{ template "youtube" "2HBBh8O1xpk" }}
+        </div>
+        <div class="w-100 flex-fair-ns overflow-hidden">
+            <blockquote class="twitter-tweet" data-dnt="true"><p lang="en" dir="ltr">Everything loads so fast😱<a href="https://twitter.com/hashtag/MadeInDreams?src=hash&amp;ref_src=twsrc%5Etfw">#MadeInDreams</a> <a href="https://twitter.com/hashtag/DreamsPS4?src=hash&amp;ref_src=twsrc%5Etfw">#DreamsPS4</a> <a href="https://twitter.com/hashtag/DreamsPS5?src=hash&amp;ref_src=twsrc%5Etfw">#DreamsPS5</a> <a href="https://t.co/VhmInBBcAE">https://t.co/VhmInBBcAE</a> <a href="https://t.co/DMEHeLxHSo">pic.twitter.com/DMEHeLxHSo</a></p>&mdash; Yungfel aka Ethel Enjoyer 💖 (@LeorProject) <a href="https://twitter.com/LeorProject/status/1604128725414600711?ref_src=twsrc%5Etfw">December 17, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+        </div>
+    </div>
+</div> -->
+      
+
+{{ apply markdown }}
+Unfortunately I am no artist. But I am a programmer, and Dreams has a robust “logic” system designed for game scripting. When I bought Dreams a couple years ago, I discovered that this logic system is a capable visual scripting engine with a very thoughtful design, and I was quickly able to produce some fun results, culminating in my magnum opus: a toy LISP interpreter.
+
+{{ template "youtube" "MiCbA3JuaWk" }}
+
+This proved to me that Dreams was capable of just about anything. And as the leader of the [Handmade Network](https://handmade.network/), I’ve heard a lot of discussion over the years about <a href="javascript:footnote('vp')">“visual programming”</a>. So this year, I decided to give visual programming a serious try. And what better way to experiment with a new programming system than [Advent of Code](https://adventofcode.com/)?
+{{ end }}
+
+<div class="footnote-container dn" data-footnote="vp">
+    <div class="footnote">
+        <div class="container ph2 pv3">
+            {{ apply markdown }}
+            By “discussion” I mean “I am a Vim neckbeard who doesn’t understand why anyone would ever use a mouse”, or “I have only seen visual programming systems for children, therefore all visual programming systems are toys”, or “actually Fred Brooks said that programs cannot be visualized”. Brilliant programmers all, but come on, have some imagination!
+            {{ end }}
+        </div>
+    </div>
+</div>
+
+<script>
+    function footnote(name) {
+        const fn = document.querySelector(`[data-footnote="${name}"]`);
+        fn.classList.toggle('dn');
+    }
+</script>
+
+{{ end }}
