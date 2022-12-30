@@ -110,6 +110,11 @@
             flex-grow: 1;
             flex-shrink: 1;
         }
+
+        .g1-l { gap: var(--spacing-1); }
+        .g2-l { gap: var(--spacing-2); }
+        .g3-l { gap: var(--spacing-3); }
+        .g4-l { gap: var(--spacing-4); }
         
         .wide {
             --wideness: 10rem;
@@ -199,12 +204,12 @@
 {{ end }}
 
 {{ define "preview-start" }}
-<div class="preview flex-row-l items-center g4 dn" data-day="{{ . }}">
-    <div class="flex-fair">
+<div class="preview flex-column flex-row-l items-center g4 ph3 pv4 dn" data-day="{{ . }}">
+    <div class="flex-fair-l w-100">
 {{ end }}
 {{ define "preview-middle" }}
     </div>
-    <div class="flex-fair">
+    <div class="flex-fair-l w-100">
 {{ end }}
 {{ define "preview-end" }}
     </div>
@@ -256,21 +261,15 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         flex-direction: column;
     }
 
-    .week {
-        display: flex;
-    }
-
     .day {
         /* border: 1px solid var(--border-color); */
         padding: var(--spacing-3);
 
-        /* flex-fair */
-        flex-basis: 1px;
-        flex-grow: 1;
-        flex-shrink: 1;
-
         position: relative;
         cursor: pointer;
+
+        width: 10rem;
+        flex-shrink: 0;
     }
 
     .day::before {
@@ -330,6 +329,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
 
     .previews {
         position: relative;
+        display: none;
     }
 
     .preview-container {
@@ -340,7 +340,6 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         box-shadow: inset 0 20px 16px -20px var(--shadow-color), inset 0 -20px 16px -20px var(--shadow-color);
         background-color: var(--footnote-background);
         transition: all 200ms ease-in-out;
-        height: 0;
         margin: 0;
         overflow: hidden;
 
@@ -348,8 +347,11 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         justify-content: center;
     }
 
+    .previews.open {
+        display: block;
+    }
+
     .previews.open .preview-container {
-        height: 25rem;
         margin-bottom: var(--spacing-3);
     }
 
@@ -427,11 +429,64 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         content: "JavaScript solve time";
         --width: 10rem;
     }
+
+    .mobile-days-container {
+        position: relative;
+    }
+
+    .mobile-days {
+        --shadow-color: rgba(0, 0, 0, 0.5);
+        position: relative;
+        width: 100vw;
+        left: calc(50% - 50vw);
+    }
+
+    @media screen and (min-width: 60em) {
+        .day {
+            /* flex-fair */
+            flex-basis: 1px;
+            flex-grow: 1;
+            flex-shrink: 1;
+        }
+
+        .previews {
+            display: block;
+        }
+
+        .preview-container {
+            height: 0;
+        }
+
+        .previews.open .preview-container {
+            height: 25rem;
+        }
+    }
 </style>
 
 <div class="wide mv5">
     <div class="calendar">
-        <div class="week mb3">
+        <!-- Mobile stuff -->
+        <div class="mobile-days overflow-hidden">
+            <div class="week flex dn-l overflow-x-scroll ph3">
+                {{ template "day" "1/Calorie Counting" }}
+                {{ template "day" "2/Rock Paper Scissors" }}
+                {{ template "day" "3/Rucksack Reorganization" }}
+                {{ template "day" "4/Camp Cleanup/*" }}
+                {{ template "day" "5/Supply Stacks/*" }}
+                {{ template "day" "6/Tuning Trouble" }}
+                {{ template "day" "7/No Space Left On Device" }}
+                {{ template "day" "8/Treetop Tree House/*" }}
+                {{ template "day" "9/Rope Bridge/*" }}
+                {{ template "day" "10/Cathode-Ray Tube" }}
+                {{ template "day" "11/Monkey in the Middle" }}
+                {{ template "day" "12/Hill Climbing Algorithm/*" }}
+                {{ template "day" "13/Distress Signal" }}
+                {{ template "day" "14/Regolith Reservoir/*" }}
+                {{ template "day" "15/Beacon Exclusion Zone" }}
+            </div>
+        </div>
+
+        <div class="week mb3 dn flex-l">
             <div class="heading">Sunday</div>
             <div class="heading">Monday</div>
             <div class="heading">Tuesday</div>
@@ -440,7 +495,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
             <div class="heading">Friday</div>
             <div class="heading">Saturday</div>
         </div>
-        <div class="week">
+        <div class="week dn flex-l">
             <div class="day"></div>
             <div class="day"></div>
             <div class="day"></div>
@@ -464,7 +519,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=5s55Ks7wdcc"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         As expected, I spent a lot of time on Day 1 getting my bearings. Rather than figure out double iteration on my first day, I manually walked from elf to elf to compute the final answer.
 
@@ -488,7 +543,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=07GstsK8Aos"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         I put in a tiny amount of visual polish, and I think it paid off. This one is still quite simple, and some changes I made to iteration were an improvement, but I still ran into a lot of issues. (More on that later.)
                         {{ end }}
@@ -510,7 +565,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=KyioOX7_5oU"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         This stream went for a grueling five full hours. I spent about half the time just fixing bugs in my iterator and weird suppressed-behavior / bad-cycle bugs in the larger program. I also spent at least an hour just inputting the example data, which was unusually large. It took me a staggering 4 hours and 45 minutes to get the right answer on this one.
 
@@ -524,7 +579,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                 {{ template "preview-end" }}
             </div>
         </div>
-        <div class="week">
+        <div class="week dn flex-l">
             {{ template "day" "4/Camp Cleanup/*" }}
             {{ template "day" "5/Supply Stacks/*" }}
             {{ template "day" "6/Tuning Trouble" }}
@@ -551,7 +606,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=83Qy8xZlXmA"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         I opened this stream saying that “my goal is to solve this problem in less than five hours”. Luckily, this one took me literally just a half hour. In fact, it went so fast that I decided to do part 2 as well - which only took another half hour. The iterator worked fine, which was a huge blessing.
 
@@ -578,7 +633,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=-Q7v_M2aOS4"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         I love this problem. It exemplifies everything that is great about Dreams, as well as all the issues I had throughout the challenge. The result is a literal simulation of the problem; the program is also so fragile that it breaks if you breathe on it. All the highs and lows are in one place.
 
@@ -607,7 +662,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=afdC-HxvCTs"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         I don't even remember this one tbh. It went really fast. I guess it all worked fine right away?
                         {{ end }}
@@ -632,7 +687,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=afdC-HxvCTs"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         This was the first problem that required me to "allocate memory", that is, spawn objects in the world to store data and run logic of their own. This thankfully went pretty well, in part thanks to my experience two years ago with the LISP thing.
 
@@ -659,7 +714,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=ZGpTPE-RD60"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         This is one of my favorite simulation problems from this year. When the problem described trees occluding other trees, I couldn't help but think "RAYCASTS!!" (or, Laser Scopes, as Dreams calls them). Iteration was working pretty reliably at this point; although this problem took three hours to solve, most of that time was spent learning how to properly use Laser Scopes.
 
@@ -686,7 +741,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=2V9ujq92fOU"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         This one turned out great as well. If you imagine a rope between the two elves, you can imagine the back elf being tugged around only when the front elf is at least two tiles away.
 
@@ -713,7 +768,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=2V9ujq92fOU"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         I spent SO LONG entering the example data for this one. It is just cruel to give a Dreams programmer sample input that is 146 lines long.
                         
@@ -727,7 +782,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                 {{ template "preview-end" }}
             </div>
         </div>
-        <div class="week">
+        <div class="week dn flex-l">
             {{ template "day" "11/Monkey in the Middle" }}
             {{ template "day" "12/Hill Climbing Algorithm/*" }}
             {{ template "day" "13/Distress Signal" }}
@@ -754,7 +809,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=5Ku8A6q5TNU"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         This problem was really incredibly difficult. I spent at least an hour just figuring out how to make monkeys toss objects to each other, and at least an hour debugging sync issues again. Some days are just like that.
 
@@ -784,7 +839,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=Rv3_Sn5ljnA"><span class="icon icon--uiplay"></span> VOD 2</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         This is, without a doubt, the most technically challenging problem I completed. It took two days and six hours total, and required both recursion and wireless communication between adjacent tiles. It recursively flood-fills the scene by spawning elves to go to each unvisited tile - whoever gets there fastest took the shortest path.
 
@@ -811,7 +866,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=9kDqbqzsVQw"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         This problem was a welcome reprieve. I'm proud of the solution here; I came up with a way to transform the obvious recursive solution into an iterative one, dramatically reducing the complexity of my Dreams logic. More info in <a href="https://twitter.com/its_bvisness/status/1603851835047088153?s=20">this follow-up tweet</a>.
                         {{ end }}
@@ -836,7 +891,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=CLzvTgFa0Ic"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         I am so happy with this one. It directly simulates the problem, has great visuals I found on the Dreamiverse, and I even verified that it works with other inputs too (skip to 3:23:39 for an example). Cellular automata turn out to be really fun in Dreams!
 
@@ -863,7 +918,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <a href="https://www.youtube.com/watch?v=2oVMMIhE-0k"><span class="icon icon--uiplay"></span> VOD</a>
                         </div>
                     </div>
-                    <div class="desc">
+                    <div class="desc mt3 p-dumb">
                         {{ apply markdown }}
                         This one looked cool at the end but was quite a grind. Taxicab / Manhattan distance stuff was fun to work with, though. I didn't really bother to actually produce a legit answer for real, but I did get the simulation stuff working.
                         
