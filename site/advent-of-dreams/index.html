@@ -192,12 +192,12 @@
 {{ end }}
 
 {{ define "preview-start" }}
-<div class="preview flex-row-l g4 dn" data-day="{{ . }}">
+<div class="preview flex-row-l items-center g4 dn" data-day="{{ . }}">
     <div class="flex-fair">
 {{ end }}
 {{ define "preview-middle" }}
     </div>
-    <div class="flex-fair self-center">
+    <div class="flex-fair">
 {{ end }}
 {{ define "preview-end" }}
     </div>
@@ -334,6 +334,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
     }
     
     .preview h2 {
+        margin-top: 0;
         margin-bottom: var(--spacing-2);
     }
 
@@ -350,6 +351,11 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
 
     .preview .info a {
         text-decoration: none;
+    }
+
+    .preview .info svg {
+        height: 0.9em;
+        transform: translateY(1px);
     }
 
     .icon {
@@ -387,7 +393,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
 
     .solve.dreams::after {
         content: "Dreams solve time";
-        --width: 9rem;
+        --width: 8.4rem;
     }
 
     .solve.js::after {
@@ -509,6 +515,9 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <span class="solve dreams">35:00</span> vs. <span class="solve js">4:57</span>
                         </div> /
                         <div>
+                            <a href="https://twitter.com/its_bvisness/status/1599551861757186049">{{ eval "svg/twitter.svg" . | safeHTML }} Tweet</a>
+                        </div> /
+                        <div>
                             <a href="https://indreams.me/scene/dEhxyCpJJnK"><span class="icon icon--uiimp"></span> Dreams</a>
                         </div> /
                         <div>
@@ -533,6 +542,9 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                             <span class="solve dreams">2:08:40</span> vs. <span class="solve js">~15:00</span>
                         </div> /
                         <div>
+                            <a href="https://twitter.com/its_bvisness/status/1600010187494006785">{{ eval "svg/twitter.svg" . | safeHTML }} Tweet</a>
+                        </div> /
+                        <div>
                             <a href="https://indreams.me/scene/dUXkDcqEwAc"><span class="icon icon--uiimp"></span> Dreams</a>
                         </div> /
                         <div>
@@ -550,6 +562,139 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                     </div>
                 {{ template "preview-middle" }}
                     {{ template "youtube" "-Q7v_M2aOS4?start=12314" }}
+                {{ template "preview-end" }}
+
+                {{ template "preview-start" "6" }}
+                    <h2>Day 6: Tuning Trouble</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">0:56:15</span> vs. <span class="solve js">~15:00</span>
+                        </div> /
+                        <div>
+                            <a href="https://twitter.com/its_bvisness/status/1600741462500675584">{{ eval "svg/twitter.svg" . | safeHTML }} Tweet</a>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dCbGJbJguec"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=afdC-HxvCTs"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        I don't even remember this one tbh. It went really fast. I guess it all worked fine right away?
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "afdC-HxvCTs?start=3967" }}
+                {{ template "preview-end" }}
+
+                {{ template "preview-start" "7" }}
+                    <h2>Day 7: No Space Left On Device</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">3:46:00</span> vs. <span class="solve js">13:02</span>
+                        </div> /
+                        <div>
+                            <a href="https://twitter.com/its_bvisness/status/1600741462500675584">{{ eval "svg/twitter.svg" . | safeHTML }} Tweet</a>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/diAJLRKJTCS"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=afdC-HxvCTs"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        This was the first problem that required me to "allocate memory", that is, spawn objects in the world to store data and run logic of their own. This thankfully went pretty well, in part thanks to my experience two years ago with the LISP thing.
+
+                        I took what I think are some justified shortcuts in this program - it seems that the input always follows a depth-first traversal of the file data, so I hardcoded a depth-first traversal in my implementation.
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "afdC-HxvCTs?start=18060" }}
+                {{ template "preview-end" }}
+
+                {{ template "preview-start" "8" }}
+                    <h2>Day 8: Treetop Tree House</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">3:00:00</span> vs. <span class="solve js">8:17</span>
+                        </div> /
+                        <div>
+                            <a href="https://twitter.com/its_bvisness/status/1601066115865915392">{{ eval "svg/twitter.svg" . | safeHTML }} Tweet</a>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dCNquYmNbjY"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=ZGpTPE-RD60"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        This is one of my favorite simulation problems from this year. When the problem described trees occluding other trees, I couldn't help but think "RAYCASTS!!" (or, Laser Scopes, as Dreams calls them). Iteration was working pretty reliably at this point; although this problem took three hours to solve, most of that time was spent learning how to properly use Laser Scopes.
+
+                        It is just absolutely delightful to me that I can push a little guy around using a Follower and he actually does a run animation. That would never work in any other engine but it saves me so much effort here.
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "ZGpTPE-RD60?start=10438" }}
+                {{ template "preview-end" }}
+
+                {{ template "preview-start" "9" }}
+                    <h2>Day 9: Rope Bridge</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">3:10:00</span> vs. <span class="solve js">12:51</span>
+                        </div> /
+                        <div>
+                            <a href="https://twitter.com/its_bvisness/status/1601449174490308611">{{ eval "svg/twitter.svg" . | safeHTML }} Tweet</a>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dqGcyfZTvtr"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=2V9ujq92fOU"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        This one turned out great as well. If you imagine a rope between the two elves, you can imagine the back elf being tugged around only when the front elf is at least two tiles away.
+
+                        Amusing fact: I originally had the elves face in the direction they were walking, but disabled it because the code was attached to the elves, and when they turned around, the code would turn around. How many other programmers have ever had their code run away from them?
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "2V9ujq92fOU?start=10638" }}
+                {{ template "preview-end" }}
+
+                {{ template "preview-start" "10" }}
+                    <h2>Day 10: Cathode-Ray Tube</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">3:00:00</span> vs. <span class="solve js">~5:00</span>
+                        </div> /
+                        <div>
+                            <a href="https://twitter.com/its_bvisness/status/1601813672166363137">{{ eval "svg/twitter.svg" . | safeHTML }} Tweet</a>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dqGcyfZTvtr"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=2V9ujq92fOU"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        I spent SO LONG entering the example data for this one. It is just cruel to give a Dreams programmer sample input that is 146 lines long.
+                        
+                        Worse yet, I realized later than the _actual_ input was only 140 lines. So, I spent another half hour entering the _actual_ input, and managed to produce my [first and only](https://twitter.com/its_bvisness/status/1601822981587697664) legitimate Advent of Code answer from Dreams.
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "2V9ujq92fOU?start=10638" }}
                 {{ template "preview-end" }}
             </div>
         </div>
@@ -620,7 +765,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         });
     }
 
-    previewDay(5);
+    previewDay(10);
 </script>
 
 <h1>A whirlwind tour of Dreams logic</h1>
