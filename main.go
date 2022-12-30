@@ -74,6 +74,7 @@ var articles = []Article{
 			// Description: "Trying to define \"essential complexity\" is a waste of time, but maybe not for the reason you think.",
 			// Banner:      "essential-complexity/gears.png",
 			// BannerScale: 3,
+			OpenGraphImage: "advent-of-dreams/imp.png",
 		},
 		Slug: "advent-of-dreams",
 		Date: time.Date(2022, 12, 30, 0, 0, 0, 0, time.UTC),

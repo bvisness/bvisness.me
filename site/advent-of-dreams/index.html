@@ -2,6 +2,7 @@
 
 {{ define "head" }}
 <link rel="stylesheet" href="{{ relurl "tachyons.min.css" }}">
+<link rel="stylesheet" href="{{ relurl "dreams-icons.css" }}"/>
 <style>
     @font-face {
         font-family: "Fela";
@@ -37,6 +38,11 @@
 
     h1, h2, h3, h4, h5, h6 {
         font-family: var(--fela);
+    }
+
+    article > h1 {
+        text-align: center;
+        margin-top: var(--spacing-4);
     }
 
     .flex-fair {
@@ -158,23 +164,52 @@
 {{ end }}
 
 {{ define "video" }}
-<video src="{{ relurl (addstr "vids/" . ".mp4") }}" poster="{{ relurl (addstr "vids/"  . ".jpg") }}" autoplay muted loop controls preload="metadata">
+<div class="relative aspect-ratio--16x9">
+    <video
+        class="aspect-ratio--object"
+        src="{{ relurl (addstr "vids/" . ".mp4") }}"
+        poster="{{ relurl (addstr "vids/"  . ".jpg") }}"
+        autoplay muted loop controls
+        preload="metadata"
+    >
+</div>
 {{ end }}
 
 {{ define "day" }}
-<div class="day" data-day="{{ . }}">
+{{ $parts := splitList "/" . }}
+{{ $num := index $parts 0 }}
+{{ $name := index $parts 1 }}
+<div class="day" data-day="{{ $num }}">
     <picture>
-        {{ picturesource (relpath (addstr "days/day" . ".jpg")) 3 }}
+        {{ picturesource (relpath (addstr "days/day" $num ".jpg")) 3 }}
     </picture>
+    <h2>{{ $name }}</h2>
+</div>
+{{ end }}
+
+{{ define "preview-start" }}
+<div class="preview flex flex-row-l g4" data-day="{{ . }}">
+    <div class="flex-fair">
+{{ end }}
+{{ define "preview-middle" }}
+    </div>
+    <div class="flex-fair self-center">
+{{ end }}
+{{ define "preview-end" }}
+    </div>
 </div>
 {{ end }}
 
 {{ define "article content" }}
 {{ apply markdown }}
 I did a very stupid challenge this December - I did Advent of Code in Dreams.
+{{ end }}
 
-{{ template "video" "crane" }}
+<div class="wide mv4">
+    {{ template "video" "crane" }}
+</div>
 
+{{ apply markdown }}
 [Dreams](https://indreams.me/) is a PlayStation game creation platform by Media Molecule, the studio most famous for the LittleBigPlanet games. Users can create and share everything from games to animations to interactive art. It’s truly amazing what these tools can do - I mean, just look at [this](https://youtu.be/2HBBh8O1xpk) [stuff](https://twitter.com/LeorProject/status/1604128725414600711).
 {{ end }}      
 
@@ -205,7 +240,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
 <style>
     .calendar {
         --border-color: #333;
-        border: 1px solid var(--border-color);
+        /* border: 1px solid var(--border-color); */
         display: flex;
         flex-direction: column;
     }
@@ -215,7 +250,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
     }
 
     .day {
-        border: 1px solid var(--border-color);
+        /* border: 1px solid var(--border-color); */
         padding: var(--spacing-3);
 
         /* flex-fair */
@@ -238,6 +273,18 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
 
     .day img {
         border-radius: 50%;
+        transition: all 200ms ease-in-out;
+    }
+
+    .day h2 {
+        font-size: 1rem;
+        text-align: center;
+        margin-top: 1rem;
+        margin-bottom: 0;
+    }
+
+    .day:hover img {
+        transform: scale(1.05);
     }
 
     .week .heading {
@@ -250,11 +297,103 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         flex-grow: 1;
         flex-shrink: 1;
     }
+
+    .previews {
+        position: relative;
+    }
+
+    .preview-container {
+        --shadow-color: rgba(0, 0, 0, 0.5);
+        position: relative;
+        width: 100vw;
+        left: calc(50% - 50vw);
+        box-shadow: inset 0 20px 16px -20px var(--shadow-color), inset 0 -20px 16px -20px var(--shadow-color);
+        background-color: var(--footnote-background);
+        transition: all 200ms ease-in-out;
+        height: 0;
+        margin: 0;
+        overflow: hidden;
+
+        display: flex;
+        justify-content: center;
+    }
+
+    .previews.open .preview-container {
+        height: 20rem;
+        margin-bottom: var(--spacing-3);
+    }
+
+    .calendar .preview {
+        flex-grow: 1;
+        max-width: 60rem;
+    }
+    
+    .preview h2 {
+        margin-bottom: var(--spacing-2);
+    }
+
+    .preview .info {
+        font-family: var(--fela);
+        display: flex;
+        gap: 0.6rem;
+        color: #999;
+    }
+
+    .preview .info span {
+        color: white;
+    }
+
+    .preview .info a {
+        text-decoration: none;
+    }
+
+    .icon {
+        font-family: DreamsIcons;
+    }
+
+    .icon--uiimp::before {
+        content: "";
+    }
+
+    .icon--uiplay::before {
+        content: "";
+    }
+
+    .solve {
+        position: relative;
+    }
+
+    .solve::after {
+        display: none;
+        position: absolute;
+        bottom: -2.5rem;
+        left: 50%;
+        width: var(--width);
+        padding: var(--spacing-2);
+        margin-left: calc(calc(var(--width) / -2) - var(--spacing-2));
+        text-align: center;
+        background-color: black;
+        border-radius: 4px;
+    }
+
+    .solve:hover::after {
+        display: block;
+    }
+
+    .solve.dreams::after {
+        content: "Dreams solve time";
+        --width: 9rem;
+    }
+
+    .solve.js::after {
+        content: "JavaScript solve time";
+        --width: 10rem;
+    }
 </style>
 
 <div class="wide mv5">
     <div class="calendar">
-        <div class="week">
+        <div class="week mb3">
             <div class="heading">Sunday</div>
             <div class="heading">Monday</div>
             <div class="heading">Tuesday</div>
@@ -268,39 +407,64 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
             <div class="day"></div>
             <div class="day"></div>
             <div class="day"></div>
-            {{ template "day" "1" }}
-            {{ template "day" "2" }}
-            {{ template "day" "3" }}
+            {{ template "day" "1/Calorie Counting" }}
+            {{ template "day" "2/Rock Paper Scissors" }}
+            {{ template "day" "3/Rucksack Reorganization" }}
+        </div>
+        <div class="previews open">
+            <div class="preview-container">
+                {{ template "preview-start" "1" }}
+                    <h2>Day 1: Calorie Counting</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">1:45:00</span> vs. <span class="solve js">15:00</span>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dAFfSQkZJKq"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=5s55Ks7wdcc"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        As expected, I spent a lot of time on Day 1 getting my bearings. Rather than figure out double iteration on my first day, I manually walked from elf to elf to compute the final answer.
+
+                        I hadn't yet learned about some newer features in Dreams, like scope (which was added sometime in the last couple years.) Those features would make subsequent days considerably easier.
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "5s55Ks7wdcc?start=6862" }}
+                {{ template "preview-end" }}
+            </div>
         </div>
         <div class="week">
-            {{ template "day" "4" }}
-            {{ template "day" "5" }}
-            {{ template "day" "6" }}
-            {{ template "day" "7" }}
-            {{ template "day" "8" }}
-            {{ template "day" "9" }}
-            {{ template "day" "10" }}
+            {{ template "day" "4/Camp Cleanup" }}
+            {{ template "day" "5/Supply Stacks" }}
+            {{ template "day" "6/Tuning Trouble" }}
+            {{ template "day" "7/No Space Left On Device" }}
+            {{ template "day" "8/Treetop Tree House" }}
+            {{ template "day" "9/Rope Bridge" }}
+            {{ template "day" "10/Cathode-Ray Tube" }}
         </div>
         <div class="week">
-            {{ template "day" "11" }}
-            {{ template "day" "12" }}
-            {{ template "day" "13" }}
-            {{ template "day" "14" }}
-            {{ template "day" "15" }}
+            {{ template "day" "11/Monkey in the Middle" }}
+            {{ template "day" "12/Hill Climbing Algorithm" }}
+            {{ template "day" "13/Distress Signal" }}
+            {{ template "day" "14/Regolith Reservoir" }}
+            {{ template "day" "15/Beacon Exclusion Zone" }}
             <div class="day"></div>
             <div class="day"></div>
         </div>
     </div>
 </div>
 
-{{ apply markdown }}
-# A whirlwind tour of Dreams logic
-
-Before we go further, let me introduce you to programming in Dreams.
-{{ end }}
+<h1>A whirlwind tour of Dreams logic</h1>
 
 {{ template "wide-start" }}
     {{ apply markdown }}
+    Before we go further, let me introduce you to programming in Dreams.
+
     Dreams code is made up of nodes and wires, superficially similar to some other visual programming systems. However, it is very tightly designed and elegantly integrated into the game world. In this example, a Trigger Zone widget is wired to the Glow property of this lightbulb, causing it to light up whenever the player walks into the zone.
     {{ end }}
 {{ template "wide-middle" . }}
@@ -328,14 +492,12 @@ Before we go further, let me introduce you to programming in Dreams.
     The only data type is decimal numbers. All wires are just decimal numbers. “Boolean” signals are typically communicated with the number 0 or the number 1.
 
     For convenience, there are several types of “fat wires” that are just common bundles of other wires. (These are basically structs.) All the nodes in Dreams interact with fat wires in pleasant ways, such as the Calculator node working component-wise (allowing for both vector and scalar arithmetic). Each fat wire type can decay to a single number if necessary.
+
+    There is no explicit execution flow like you might see in Unreal Blueprints.<a href="javascript:footnote('exec')"><sup>[2]</sup></a> It’s usually best to think about Dreams logic as independent actors sending signals to each other. In practice, this is often literally true, since logic is usually attached to physical objects in the game world.
     {{ end }}
 {{ template "wide-middle" . }}
     {{ template "video" "wires" }}
 {{ template "wide-end" . }}
-
-{{ apply markdown }}
-There is no explicit execution flow like you might see in Unreal Blueprints.<a href="javascript:footnote('exec')"><sup>[2]</sup></a> It’s usually best to think about Dreams logic as independent actors sending signals to each other. In practice, this is often literally true, since logic is usually attached to physical objects in the game world.
-{{ end }}
 
 {{ template "footnote-start" "exec" }}
     {{ apply markdown }}
@@ -355,7 +517,7 @@ Every problem required me to iterate through a list in some way. Every problem h
     {{ apply markdown }}
     ## Day 1: Simple and messy
 
-    My intuition for any list or sequence in Dreams is to use a Selector. It has up to 10 output ports, can step from one state to the next. Sounds like what I need! By using the selector to power other nodes, I can use this to step through a list of values. This structure worked well and I used it every day, but the challenge is stepping to the next item.
+    My intuition for any list or sequence in Dreams was to use a Selector. It has up to 10 output ports, and can step from one state to the next. Sounds like what I need! By using the selector to power other nodes, I can use this to step through a list of values. This structure worked well and I used it every day, but the challenge is automatically stepping to the next item.
 
     I originally structured my logic like so: do stuff with the current values, and then send a wire back around to “Move to Next Output” to continue. The problem, though, is that Next Output is never powered off - and when the signal is always high, we don’t keep stepping.
 
@@ -424,7 +586,9 @@ My iterator had a Total, a Next, and a Reset. The Counter has a Target Value, a 
 
 On Day 10, I started with a Counter and added a tiny amount of wrapper logic. In minutes, I had perfectly recreated my old Iterator with none of the bugs:
 
-{{ template "youtube" "mJE1MYBw4eY?start=623" }}
+<div class="mv4">
+    {{ template "youtube" "mJE1MYBw4eY?start=623" }}
+</div>
 
 I made zero modifications to this iterator for the rest of the challenge. It was perfect. And I was so annoyed with myself.
 
@@ -438,6 +602,8 @@ In the end, there were two good ideas that I had to discover:
 - Drive the logic manually instead of using an internal clock. Timers belong at the highest level of your logic, never hidden inside other widgets.
 
 Both of these ideas apply broadly to programming in Dreams, so let’s break them down.
+
+# Lessons learned
 
 ## Lesson 1: Make logic mutually exclusive
 
@@ -491,15 +657,29 @@ At first, I wrote my logic without timers. But this led to same-frame execution 
 
 I’m really glad I did this challenge. My overall impressions of Dreams are still very positive. I’m genuinely delighted by how easy it is to kit-bash beautiful scenes together. I’m amazed by the quality and variety of material on the Dreamiverse. And I still think the logic system is brilliant.
 
-Here’s what I like about programming in Dreams: it’s very *tangible*. And not because the code sprawls across my screen, but because it’s associated with the data it manipulates in a very real way. It’s *embodied*. There is really no boundary between the code and the world, and this allows for some wonderful workflows. For example, there is no boundary between programming and debugging - if something is acting weird, you can simply pause time, open the logic, and probe widgets and wires to see what state they’re in. Tweak the logic on the fly and resume again. It’s blissfully iterative and doesn’t require you to learn any additional tools, e.g. a time-travel debugger or a [Whitebox](https://whitebox.systems/). This is exactly how scripting should be.
+But obviously I struggled to do things that would be simple in a “real” programming environment. I put together a [spreadsheet](https://docs.google.com/spreadsheets/d/1OxQt5dfEQDIFmq0UrSU165OSiUTbr-DVdft1_naV9ms/edit?usp=sharing) tracking my times in Dreams vs. my times in JavaScript<a href="javascript:footnote('js')"><sup>[5]</sup></a>, and I was generally about 15x faster in JS. Even if you account for the time spent just thinking about the problem, and the time spent fixing bugs instead of “really programming”, this is still a staggering difference.
+
+{{ template "footnote-start" "js" }}
+    {{ apply markdown }}
+    I just chose JS because I know it well and it was on my computer. I think it's pretty representative of "normal programming" these days, both in terms of general language capability and execution speed.
+    {{ end }}
+{{ template "footnote-end" }}
+
+So let's break down what I liked, what I disliked, and what I think Dreams is good at.
+
+<b>What I like:</b> Programming in Dreams is very *tangible*. And not because the code sprawls across my screen, but because it’s associated with the data it manipulates in a very real way. It’s *embodied*. There is really no boundary between the code and the world, and this allows for some wonderful workflows. For example, there is no boundary between programming and debugging - if something is acting weird, you can simply pause time, open the logic, and probe widgets and wires to see what state they’re in. Tweak the logic on the fly and resume again. It’s blissfully iterative and doesn’t require you to learn any additional tools, e.g. a time-travel debugger or a [Whitebox](https://whitebox.systems/). This is exactly how scripting should be.
 
 Plus, every feature of Dreams is just so tightly designed. It’s one of the most thoughtful systems I’ve ever used. The logic system can be simple because the rest of the engine is so carefully designed. It’s an incredibly coherent experience.
 
-But obviously I struggled to do things that would be simple in a “real” programming environment. I put together a [spreadsheet](https://docs.google.com/spreadsheets/d/1OxQt5dfEQDIFmq0UrSU165OSiUTbr-DVdft1_naV9ms/edit?usp=sharing) tracking my times in Dreams vs. my times in JavaScript, and I was generally about 15x faster in JS. Even if you account for the time spent just thinking about the problem, and the time spent fixing bugs instead of “really programming”, this is still a staggering difference. I don’t think anything would ever close that gap.
+<b>What I dislike:</b> Like I said, I'm horribly unproductive compared to traditional programming, and it's hard to imagine ever closing a 15x productivity gap. The logic system is great for orchestrating high-level game behaviors but bad for building systems. Advanced Dreams programming feels like working with electronics - instead of high-level programming constructs, I've got a bunch of wires, transistors, and an oscilloscope. (I mean, units of logic are literally called Microchips.) This is not the level of abstraction I like to work at.
 
-On the other hand, I was able to go from a working implementation to a great visualization in *minutes*. The connection between Dreams logic and Dreams objects is so seamless that it’s trivial to visualize your program in pleasant ways. And this is the whole pitch of Dreams; it is working as intended.
+On the other hand, I was able to go from a working implementation to a great visualization in *minutes*. The connection between Dreams logic and Dreams objects is so seamless that it’s trivial to visualize your program in pleasant ways. This part of Dreams works extremely well.
 
-In an ideal world, I think I would like to write my own nodes. Instead of making my state machines with a bunch of wires and logic gates (faux electronics), I’d like to actually write them in a more powerful language. Then I could tie them together with Dreams’s lovely scripting system and game engine. I legitimately think that this could be an *incredibly* powerful way to program.
+So in an ideal world, I think I would like to write my own nodes. Instead of making my state machines with faux electronics, I’d like to actually write them in a more powerful language. Then I could tie them together with Dreams’s lovely scripting system and game engine. I legitimately think that this could be an *incredibly* powerful way to program.
+
+<b>What is Dreams good at?</b> Simulation. All the best programs were the ones that could take advantage of the 3D, physical world the code lives in. The ones that work more abstractly with data, e.g. navigating a filesystem or solving optimization problems, are hard to represent in Dreams at all. It's possible that things would be different if the system somehow supported lists, and recursion, and more advanced forms of data, but Dreams is fundamentally built for simulation, not number-crunching.
+
+<b>Do I recommend Dreams?</b> Absolutely yes! It's just so much fun. I did this challenge because I wanted to find the boundaries of Dreams's logic system. I think I found those boundaries. I certainly won't boot up my PlayStation next time I need to solve a dynamic programming problem. But I have come away really inspired about _scripting_, and concurrent programming, and the things you can achieve with a tightly-integrated system. This is where Dreams shines, and I cannot recommend it enough.
 {{ end }}
 
 <div class="mt5 mb3 ml-auto mr-auto w4">
