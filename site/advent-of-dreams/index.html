@@ -876,11 +876,12 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         }
     }
 
+    let currentDay;
     function previewDay(num) {
         const preview = document.querySelector(`.preview[data-day="${ num }"]`);
         const previews = preview.closest('.previews');
 
-        const justCollapse = preview.classList.contains('flex');
+        const justCollapse = num === currentDay;
 
         for (const otherPreview of previews.querySelectorAll('.preview')) {
             otherPreview.classList.toggle('flex', false);
@@ -890,9 +891,14 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
             otherPreviews.classList.toggle('open', false);
         }
 
-        if (!justCollapse) {
-            preview.classList.toggle('flex', true);
-            preview.classList.toggle('dn', false);
+        preview.classList.toggle('flex', true);
+        preview.classList.toggle('dn', false);
+        if (justCollapse) {
+            history.pushState(null, null, ' ');
+            currentDay = undefined;
+            return;
+        } else {
+            currentDay = num;
             previews.classList.toggle('open', true);
         }
 
