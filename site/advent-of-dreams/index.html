@@ -184,12 +184,15 @@
 {{ $num := index $parts 0 }}
 {{ $name := index $parts 1 }}
 <div class="day" id="day-{{ $num }}" data-day="{{ $num }}">
-    <div class="relative aspect-ratio--1x1">
+    <div class="thumbnail relative aspect-ratio--1x1">
         <div class="aspect-ratio--object">
             <picture>
                 {{ picturesource (relpath (addstr "days/day" $num ".jpg")) 3 }}
             </picture>
         </div>
+        {{ if gt (len $parts) 2 }}
+            <div class="favorite"><img class="no-glow" src="{{ relurl (addstr "days/star" $num ".png") }}"></div>
+        {{ end }}
     </div>
     <h2>{{ $name }}</h2>
 </div>
@@ -285,10 +288,13 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
             color: #555;
         }
     }
-
-    .day img {
-        border-radius: 50%;
+    
+    .day .thumbnail {
         transition: all 200ms ease-in-out;
+    }
+    
+    .day .thumbnail picture img {
+        border-radius: 50%;
     }
 
     .day h2 {
@@ -298,8 +304,17 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         margin-bottom: 0;
     }
 
-    .day:hover img {
+    .day:hover .thumbnail {
         transform: scale(1.05);
+    }
+
+    .day .favorite {
+        position: absolute;
+        right: -0.3rem;
+        top: -0.5rem;
+        font-size: 2rem;
+        z-index: 101;
+        width: 3rem;
     }
 
     .week .heading {
@@ -510,12 +525,12 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
             </div>
         </div>
         <div class="week">
-            {{ template "day" "4/Camp Cleanup" }}
-            {{ template "day" "5/Supply Stacks" }}
+            {{ template "day" "4/Camp Cleanup/*" }}
+            {{ template "day" "5/Supply Stacks/*" }}
             {{ template "day" "6/Tuning Trouble" }}
             {{ template "day" "7/No Space Left On Device" }}
-            {{ template "day" "8/Treetop Tree House" }}
-            {{ template "day" "9/Rope Bridge" }}
+            {{ template "day" "8/Treetop Tree House/*" }}
+            {{ template "day" "9/Rope Bridge/*" }}
             {{ template "day" "10/Cathode-Ray Tube" }}
         </div>
         <div class="previews">
@@ -703,6 +718,8 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                         I spent SO LONG entering the example data for this one. It is just cruel to give a Dreams programmer sample input that is 146 lines long.
                         
                         Worse yet, I realized later than the _actual_ input was only 140 lines. So, I spent another half hour entering the _actual_ input, and managed to produce my [first and only](https://twitter.com/its_bvisness/status/1601822981587697664) legitimate Advent of Code answer from Dreams.
+
+                        At least this one was pretty!
                         {{ end }}
                     </div>
                 {{ template "preview-middle" }}
@@ -712,9 +729,9 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         </div>
         <div class="week">
             {{ template "day" "11/Monkey in the Middle" }}
-            {{ template "day" "12/Hill Climbing Algorithm" }}
+            {{ template "day" "12/Hill Climbing Algorithm/*" }}
             {{ template "day" "13/Distress Signal" }}
-            {{ template "day" "14/Regolith Reservoir" }}
+            {{ template "day" "14/Regolith Reservoir/*" }}
             {{ template "day" "15/Beacon Exclusion Zone" }}
             <div class="day"></div>
             <div class="day"></div>
