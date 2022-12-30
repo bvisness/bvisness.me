@@ -37,9 +37,13 @@
     .g1 { gap: var(--spacing-1); }
     .g2 { gap: var(--spacing-2); }
     .g3 { gap: var(--spacing-3); }
+    .g4 { gap: var(--spacing-4); }
 
     .youtube {
         width: 100%;
+    }
+
+    .youtube, picture, video, img {
         border-radius: 4px;
     }
 
@@ -51,11 +55,11 @@
         width: 100%;
     }
 
-    .dumb-p > p:first-child {
+    .p-dumb > :first-child {
         margin-top: 0;
     }
 
-    .dumb-p > p:last-child {
+    .p-dumb > :last-child {
         margin-bottom: 0;
     }
 
@@ -73,9 +77,9 @@
         background-color: var(--footnote-background);
     }
 
-    /* not small */
-    @media screen and (min-width: 30em) {
-        .flex-fair-ns {
+    /* large */
+    @media screen and (min-width: 60em) {
+        .flex-fair-l {
             flex-basis: 1px;
             flex-grow: 1;
             flex-shrink: 1;
@@ -90,7 +94,7 @@
         }
 
         .wide > * {
-            max-width: calc(100vw - calc(3 * var(--spacing-3)));
+            max-width: calc(100vw - calc(calc(2 * var(--spacing-3)) + var(--spacing-4)));
         }
     }
 </style>
@@ -105,14 +109,14 @@
 {{/* witness the wideness! */}}
 
 {{ define "wide-start" }}
-<div class="wide flex justify-center mv3">
-    <div class="flex flex-column flex-row-ns {{ if not . }}items-center{{ else }}{{ . }}{{ end }} g3">
-        <div class="w-100 flex-fair-ns overflow-hidden dumb-p">
+<div class="wide flex justify-center mv4">
+    <div class="flex flex-column flex-row-l {{ if not . }}items-center{{ else }}{{ . }}{{ end }} g4">
+        <div class="w-100 flex-fair-l overflow-hidden p-dumb">
 {{ end }}
 
 {{ define "wide-middle" }}
         </div>
-        <div class="w-100 flex-fair-ns overflow-hidden dumb-p">
+        <div class="w-100 flex-fair-l overflow-hidden p-dumb">
 {{ end }}
 
 {{ define "wide-end" }}
@@ -124,7 +128,7 @@
 {{ define "footnote-start" }}
 <div class="footnote-container dn" data-footnote="{{ . }}">
     <div class="footnote">
-        <div class="container ph2 pv3 dumb-p">
+        <div class="container ph2 pv3 p-dumb">
 {{ end }}
 
 {{ define "footnote-end" }}
@@ -226,32 +230,30 @@ There is no explicit execution flow like you might see in Unreal Blueprints.<a h
 One piece of logic is a perfect microcosm of everything I learned from this challenge: the Iterator.
 
 Every problem required me to iterate through a list in some way. Every problem had some number of lines of input, which I would loop through. My logic for this started off simple and messy, then became complicated and messy, then finally became simple and clean. Let’s go through those steps:
-
-## Day 1: Simple and messy
 {{ end }}
 
-{{ template "wide-start" }}
+{{ template "wide-start" "items-center" }}
     {{ apply markdown }}
+    ## Day 1: Simple and messy
+
     My intuition for any list or sequence in Dreams is to use a Selector. It has up to 10 output ports, can step from one state to the next. Sounds like what I need! By using the selector to power other nodes, I can use this to step through a list of values. This structure worked well and I used it every day, but the challenge is stepping to the next item.
 
-    I originally structured my logic like so: do stuff with the current values, and then send a wire back around to “Next Port” (TODO: name?) to continue. The problem, though, is that Next Port is never powered off - and when the signal is always high, we don’t keep stepping.
+    I originally structured my logic like so: do stuff with the current values, and then send a wire back around to “Move to Next Output” to continue. The problem, though, is that Next Output is never powered off - and when the signal is always high, we don’t keep stepping.
 
-    I fixed this on Day 1 by wedging a timer onto Next Port. The logic for resetting this was annoying and fragile, but I got by.
+    I fixed this on Day 1 by wedging a timer onto Next Output. The logic for resetting this was annoying and fragile, but I got by.
+
+    I also had issues where I would step to the next port *before* the current port had finished processing. Dreams doesn’t have a clear notion of execution order, so when you have cycles in the graph, execution doesn’t always start where you want it to start. In this case, I wasn’t reliably processing the first item in the list.
+
+    I hacked my way through Day 1, but after sleeping on it, I had some good ideas that would help me in Day 2.
     {{ end }}
 {{ template "wide-middle" . }}
     {{ template "video" "iter1" }}
 {{ template "wide-end" . }}
 
-{{ apply markdown }}
-I also had issues where I would step to the next port *before* the current port had finished processing. Dreams doesn’t have a clear notion of execution order, so when you have cycles in the graph, execution doesn’t always start where you want it to start. In this case, I wasn’t reliably processing the first item in the list.
-
-I hacked my way through Day 1, but after sleeping on it, I had some good ideas that would help me in Day 2.
-
-## Day 2: Complex and messy
-{{ end }}
-
-{{ template "wide-start" }}
+{{ template "wide-start" "items-center flex-row-reverse-l" }}
     {{ apply markdown }}
+    ## Day 2: Complex and messy
+
     My core insight for Day 2 was to have two distinct phases when iterating: *using* a value, and *stepping* to the next value. In a system with unclear execution order, it’s dangerous to process an item and step to the next item on the same frame. It’s not *exactly* a race condition, but it feels like one.
 
     My idea was to have a clock ticking high, low, high, low on some interval - when it’s high, use the current value, when it’s low, step to the next. I implemented this with a Signal Generator like so.
@@ -262,39 +264,35 @@ I hacked my way through Day 1, but after sleeping on it, I had some good ideas t
     {{ template "video" "iter2" }}
 {{ template "wide-end" . }}
 
-{{ apply markdown }}
-## Day 3: More complex, more messy
-{{ end }}
-
-{{ template "wide-start" }}
+{{ template "wide-start" "items-center" }}
     {{ apply markdown }}
+    ## Day 3: More complex, more messy
+
     Day 3 introduced a new wrinkle: nested iterators.
 
     Suddenly my clock-based scheme started to break down. The outer iterator needed to step only when the inner one finished. Furthermore, I needed to reset the inner one when the outer one stepped. To accommodate this, I pulled the Signal Generator out of the iterator and replaced it with a Next input. When high, step, when low, use. I also made the iterator aware of the total number of items so it could output a Done signal; this was necessary for the inner iterator to tell the outer iterator to step.
+
+    This added a lot of complexity, and it took two solid hours of debugging to get the inner iterator to reset correctly. Functionally, though, this was an improvement. The iterator was now more “pure”, a state machine with no internal timers, whose behavior depended entirely on the signals fed into it.
     {{ end }}
 {{ template "wide-middle" . }}
     {{ template "video" "iter3" }}
 {{ template "wide-end" . }}
 
-{{ apply markdown }}
-This added a lot of complexity, and it took two solid hours of debugging to get the inner iterator to reset correctly. Functionally, though, this was an improvement. The iterator was now more “pure”, a state machine with no internal timers, whose behavior depended entirely on the signals fed into it.
-
-## Day 5: Execution order interlude
-{{ end }}
-
-{{ template "wide-start" }}
+{{ template "wide-start" "items-center flex-row-reverse-l" }}
     {{ apply markdown }}
+    ## Day 5: Execution order interlude
+
     My iterator would serve me reasonably well for the next several days. The one big exception was when Day 5’s solution was plagued by heisenbugs, and were eventually “fixed” by…removing a single wire.
 
     Basically, I had put myself in cycle hell. As mentioned, Dreams doesn’t have a clear execution order, especially when you have cycles in your graph. As my program got more complicated, and my cycles got larger, my logic became more likely to start execution “in the middle”, yielding seemingly impossible results. At one point, I replaced one wire with a hardcoded value slider of the same value - and all my problems fixed themselves. This led to a rant (see video).
+
+    My fix for this was to use Wireless Transmitters to send the Next signal to my iterator. Wireless Transmitters do not cause cycles in the graph, and according to someone in my Twitch chat, always incur a one-frame delay. This is good for me; it allows me to suggest an execution order. I would use this technique every day going forward, and it did reduce the number of cycle-based heisenbugs.
     {{ end }}
 {{ template "wide-middle" . }}
     {{ template "youtube" "-Q7v_M2aOS4?start=7685" }}
 {{ template "wide-end" . }}
 
 {{ apply markdown }}
-My fix for this was to use Wireless Transmitters to send the Next signal to my iterator. Wireless Transmitters do not cause cycles in the graph, and according to someone in my Twitch chat, always incur a one-frame delay. This is good for me; it allows me to suggest an execution order. I would use this technique every day going forward, and it did reduce the number of cycle-based heisenbugs.
-
 ## Day 10: Simple and clean
 
 I struggled through several more days with my iterator, and kept running into problems. Resetting in particular was a huge headache - I discovered that my logic would break if I fired Reset while Next was high. The internal “memory cell” that was storing the current iteration value also occasionally heisenbugged, storing nonsensical values. These issues regularly lost me at least an hour a day, and I was getting pretty demoralized.
@@ -302,19 +300,13 @@ I struggled through several more days with my iterator, and kept running into pr
 The Iterator was also so complex that I could hardly understand it. At one point, Eric Wastl (the creator of Advent of Code) remarked in my chat that I needed a [logic analyzer](https://en.wikipedia.org/wiki/Logic_analyzer), like you would use with real electronics.
 
 Sometime between Day 9 and Day 10, though, I had a horrifying realization: I had basically just reinvented the built-in Counter widget.
-{{ end }}
 
-{{ template "wide-start" }}
-    {{ apply markdown }}
-    My iterator had a Total, a Next, and a Reset. The Counter has a Target Value, a Next, and a Reset. My Iterator output Done when the count reached the Total. The Counter outputs Done when the count reaches the Target Value. The only thing the Counter didn’t have was the Use/Next split.
+My iterator had a Total, a Next, and a Reset. The Counter has a Target Value, a Next, and a Reset. My Iterator output Done when the count reached the Total. The Counter outputs Done when the count reaches the Target Value. The only thing the Counter didn’t have was the Use/Next split.
 
-    On Day 10, I started with a Counter and added a tiny amount of wrapper logic. In minutes, I had perfectly recreated my old Iterator with none of the bugs.
-    {{ end }}
-{{ template "wide-middle" . }}
-    {{ template "youtube" "mJE1MYBw4eY?start=623" }}
-{{ template "wide-end" . }}
+On Day 10, I started with a Counter and added a tiny amount of wrapper logic. In minutes, I had perfectly recreated my old Iterator with none of the bugs:
 
-{{ apply markdown }}
+{{ template "youtube" "mJE1MYBw4eY?start=623" }}
+
 I made zero modifications to this iterator for the rest of the challenge. It was perfect. And I was so annoyed with myself.
 
 ## How did this happen?
@@ -336,19 +328,21 @@ Tons of bugs boiled down to two nodes being active at the same time, when they s
 {{ template "wide-start" }}
     {{ apply markdown }}
     Putting logic in Microchips allows you to power entire chunks of your program on and off. Instead of running logic and then randomly suppressing some results, you can simply *not run the logic*. I think this actually fixes a lot of heisenbugs by ensuring that all the wires are zero on the first frame each widget is active. The more I used power in this way, the more I liked my logic and the fewer bugs I encountered. I developed a mantra: “don’t use an AND gate, use power instead”.
+
+    This way of thinking is probably old news to those more experienced with Dreams, and here’s why: the Timeline node, which is used for all animation, sound, and fancy sequencing in Dreams, literally just powers nodes on and off. Someone on Mastodon [remarked to me](https://mastodon.nz/@flashmedallion/109539143131376443) that “timelines = scripts”, and it blew my mind.<a href="javascript:footnote('timeline')"><sup>[3]</sup></a>
     {{ end }}
 {{ template "wide-middle" . }}
     {{ template "video" "power" }}
 {{ template "wide-end" . }}
 
+{{ template "footnote-start" "timeline" }}
+    {{ apply markdown }}
+    I’ve never done animation. I’ve never done sound design. I’ve really never tried to *make a game* in Dreams; that’s not my thing. But this led to an enormous blind spot, because I never used Timelines, and therefore never understood how important power is in Dreams. Instead of chaining Selectors to get lists of more than 10 items, I could have used Timelines. Instead of using mazes of logic gates to power things on and off, I could have used Timelines (with multiple tracks). Instead of awkwardly sequencing things with Selectors and Timers, I could have used Timelines. The list goes on.
+    {{ end }}
+{{ template "footnote-end" "timeline" }}
+
 {{ apply markdown }}
-(TODO: Talking about timelines here seems to break flow)
-
-This way of thinking is probably old news to those more experienced with Dreams, and here’s why: the Timeline node, which is used for all animation, sound, and fancy sequencing in Dreams, literally just powers nodes on and off. Someone on Mastodon [remarked to me](https://mastodon.nz/@flashmedallion/109539143131376443) that “timelines = scripts”, and it blew my mind.
-
-I’ve never done animation. I’ve never done sound design. I’ve really never tried to *make a game* in Dreams; that’s not my thing. But this led to an enormous blind spot, because I never used Timelines, and therefore never understood how important power is in Dreams. Instead of chaining Selectors to get lists of more than 10 items, I could have used Timelines. Instead of using mazes of logic gates to power things on and off, I could have used Timelines (with multiple tracks). Instead of awkwardly sequencing things with Selectors and Timers, I could have used Timelines. The list goes on.
-
-In the end, though, what matters is making major chunks of logic mutually exclusive. Whether you use Timelines or power things manually, you will benefit from isolating them in this way. Your logic will be easier to follow and you will avoid heisenbugs. It takes practice, but Dreams is well-designed, so well-structured logic actually does feel better. You’ll know it when you see it.
+In the end, what matters is making major chunks of logic mutually exclusive. Whether you use Timelines or power things manually, you will benefit from isolating them in this way. Your logic will be easier to follow and you will avoid heisenbugs. It takes practice, but Dreams is well-designed, so well-structured logic actually does feel better. You’ll know it when you see it.
 
 ## Lesson 2: Use timers, but keep them out of core logic
 
@@ -358,7 +352,7 @@ In retrospect, that advice applies to Dreams just as much as any other programmi
 
 At first, I wrote my logic without timers. But this led to same-frame execution issues, and it was difficult to visualize my logic in the world. Then I put timers all over the place, but every time I put a timer inside some “reusable” logic, it would later blow up on me. My iterator is the perfect example; first it did all the work at once (and was buggy), then I gave it an internal clock (which was buggy), and eventually it was a pure state machine (that worked reliably).
 
-“Purity” in Dreams logic isn’t exactly the same as “pure functions” in programming; I don’t know if functional programmers would consider any state machine to be “pure”. But Dreams is, at its heart, a bunch of state machines talking to each other<a href="javascript:footnote('state')"><sup>[3]</sup></a>. If you want something to be reusable, keep side effects out of it.
+“Purity” in Dreams logic isn’t exactly the same as “pure functions” in programming; I don’t know if functional programmers would consider any state machine to be “pure”. But Dreams is, at its heart, a bunch of state machines talking to each other<a href="javascript:footnote('state')"><sup>[4]</sup></a>. If you want something to be reusable, keep side effects out of it.
 {{ end }}
 
 {{ template "footnote-start" "state" }}
@@ -366,6 +360,12 @@ At first, I wrote my logic without timers. But this led to same-frame execution 
     I’ve described Dreams before as “the best object-oriented programming system I’ve ever used”, and this is why. I’m not claiming that Alan Kay’s vision is *the* vision for OOP, but I have to say, Dreams is pretty close to Alan Kay’s pseudo-biological, simulational description of OOP. It’s the “actor model” writ large. It’s a concurrent, stateful, message-passing system.
     {{ end }}
 {{ template "footnote-end" }}
+
+<div class="wide mv4 mv5-l">
+    <picture>
+        {{ picturesource (relpath "calendar.jpg") 3 }}
+    </picture>
+</div>
 
 {{ apply markdown }}
 # Final thoughts
@@ -381,7 +381,15 @@ But obviously I struggled to do things that would be simple in a “real” prog
 On the other hand, I was able to go from a working implementation to a great visualization in *minutes*. The connection between Dreams logic and Dreams objects is so seamless that it’s trivial to visualize your program in pleasant ways. And this is the whole pitch of Dreams; it is working as intended.
 
 In an ideal world, I think I would like to write my own nodes. Instead of making my state machines with a bunch of wires and logic gates (faux electronics), I’d like to actually write them in a more powerful language. Then I could tie them together with Dreams’s lovely scripting system and game engine. I legitimately think that this could be an *incredibly* powerful way to program.
+{{ end }}
 
+<div class="mt5 mb3 ml-auto mr-auto w4">
+    <picture>
+        {{ picturesource (relpath "imp.png") 2 }}
+    </picture>
+</div>
+
+{{ apply markdown }}
 # Thanks
 
 Obviously a huge thanks to Media Molecule for dedicating the last 15 years to this weird, wonderful system. It’s a miracle that Dreams exists at all, and it’s all because of the LittleBigPlanet series, the studio’s technical prowess, and their incredible dedication to user-created content.
