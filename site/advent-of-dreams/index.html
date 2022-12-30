@@ -128,7 +128,11 @@
 
 {{ define "youtube" }}
 <div class="relative aspect-ratio--16x9">
-    <iframe class="youtube aspect-ratio--object" src="https://www.youtube-nocookie.com/embed/{{ . }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    {{ $sep := "?" }}
+    {{ if contains "?" . }}
+        {{ $sep = "&" }}
+    {{ end }}
+    <iframe class="youtube aspect-ratio--object" src="https://www.youtube-nocookie.com/embed/{{ . }}{{ $sep }}enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </div>
 {{ end }}
 
@@ -188,7 +192,7 @@
 {{ end }}
 
 {{ define "preview-start" }}
-<div class="preview flex flex-row-l g4" data-day="{{ . }}">
+<div class="preview flex-row-l g4 dn" data-day="{{ . }}">
     <div class="flex-fair">
 {{ end }}
 {{ define "preview-middle" }}
@@ -259,6 +263,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         flex-shrink: 1;
 
         position: relative;
+        cursor: pointer;
     }
 
     .day::before {
@@ -319,7 +324,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
     }
 
     .previews.open .preview-container {
-        height: 20rem;
+        height: 25rem;
         margin-bottom: var(--spacing-3);
     }
 
@@ -411,13 +416,13 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
             {{ template "day" "2/Rock Paper Scissors" }}
             {{ template "day" "3/Rucksack Reorganization" }}
         </div>
-        <div class="previews open">
+        <div class="previews">
             <div class="preview-container">
                 {{ template "preview-start" "1" }}
                     <h2>Day 1: Calorie Counting</h2>
                     <div class="info">
                         <div>
-                            <span class="solve dreams">1:45:00</span> vs. <span class="solve js">15:00</span>
+                            <span class="solve dreams">1:45:00</span> vs. <span class="solve js">~15:00</span>
                         </div> /
                         <div>
                             <a href="https://indreams.me/scene/dAFfSQkZJKq"><span class="icon icon--uiimp"></span> Dreams</a>
@@ -436,6 +441,54 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                 {{ template "preview-middle" }}
                     {{ template "youtube" "5s55Ks7wdcc?start=6862" }}
                 {{ template "preview-end" }}
+
+                {{ template "preview-start" "2" }}
+                    <h2>Day 2: Rock Paper Scissors</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">1:30:00</span> vs. <span class="solve js">~15:00</span>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dSUxZKAedNS"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=07GstsK8Aos"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        I put in a tiny amount of visual polish, and I think it paid off. This one is still quite simple, and some changes I made to iteration were an improvement, but I still ran into a lot of issues. (More on that later.)
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "07GstsK8Aos?start=6890" }}
+                {{ template "preview-end" }}
+
+                {{ template "preview-start" "3" }}
+                    <h2>Day 3: Rucksack Reorganization</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">4:44:32</span> vs. <span class="solve js">~15:00</span>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dqFhNYeMwNx"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=KyioOX7_5oU"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        This stream went for a grueling five full hours. I spent about half the time just fixing bugs in my iterator and weird suppressed-behavior / bad-cycle bugs in the larger program. I also spent at least an hour just inputting the example data, which was unusually large. It took me a staggering 4 hours and 45 minutes to get the right answer on this one.
+
+                        I ended up abandoning the internal timer on the iterator on this day. This was the right decision.
+
+                        I didn't have the energy to make this one pretty. Not sure how I would have anyway.
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "KyioOX7_5oU?start=16795" }}
+                {{ template "preview-end" }}
             </div>
         </div>
         <div class="week">
@@ -446,6 +499,59 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
             {{ template "day" "8/Treetop Tree House" }}
             {{ template "day" "9/Rope Bridge" }}
             {{ template "day" "10/Cathode-Ray Tube" }}
+        </div>
+        <div class="previews">
+            <div class="preview-container">
+                {{ template "preview-start" "4" }}
+                    <h2>Day 4: Camp Cleanup</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">35:00</span> vs. <span class="solve js">4:57</span>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dEhxyCpJJnK"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=83Qy8xZlXmA"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        I opened this stream saying that “my goal is to solve this problem in less than five hours”. Luckily, this one took me literally just a half hour. In fact, it went so fast that I decided to do part 2 as well - which only took another half hour. The iterator worked fine, which was a huge blessing.
+
+                        This is a fun one to watch if you want to see a speedrun of the process. No other day would be so easy.
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "83Qy8xZlXmA?start=2167" }}
+                {{ template "preview-end" }}
+
+                {{ template "preview-start" "5" }}
+                    <h2>Day 5: Supply Stacks</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">2:08:40</span> vs. <span class="solve js">~15:00</span>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dUXkDcqEwAc"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=-Q7v_M2aOS4"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        I love this problem. It exemplifies everything that is great about Dreams, as well as all the issues I had throughout the challenge. The result is a literal simulation of the problem; the program is also so fragile that it breaks if you breathe on it. All the highs and lows are in one place.
+
+                        If I could revisit this one, I would probably save a full hour due to better handling of iteration and of large cycles in the graph. I talk about cycle issues later on.
+
+                        (Skip back a bit in the video if you want to see some shenanigans)
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "-Q7v_M2aOS4?start=12314" }}
+                {{ template "preview-end" }}
+            </div>
         </div>
         <div class="week">
             {{ template "day" "11/Monkey in the Middle" }}
@@ -458,6 +564,64 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         </div>
     </div>
 </div>
+
+<script>
+    function initYoutube() {
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+    initYoutube();
+
+    const youtubes = [];
+    function onYouTubeIframeAPIReady() {
+        let i = 0;
+        for (const iframe of document.querySelectorAll('iframe')) {
+            if (iframe.src.indexOf('youtube-nocookie.com') < 0) {
+                continue;
+            }
+
+            i += 1;
+            iframe.id = 'embeddedvideoiframe' + i;
+            youtubes.push(new YT.Player(iframe.id));
+        }
+    }
+
+    function previewDay(num) {
+        const preview = document.querySelector(`.preview[data-day="${ num }"]`);
+        const previews = preview.closest('.previews');
+
+        for (const otherPreview of previews.querySelectorAll('.preview')) {
+            otherPreview.classList.toggle('flex', false);
+            otherPreview.classList.toggle('dn', true);
+        }
+        preview.classList.toggle('flex', true);
+        preview.classList.toggle('dn', false);
+
+        for (const otherPreviews of document.querySelectorAll('.previews')) {
+            otherPreviews.classList.toggle('open', false);
+        }
+        previews.classList.toggle('open', true);
+
+        for (const youtube of youtubes) {
+            if (youtube.pauseVideo) {
+                youtube.pauseVideo();
+            }
+        }
+    }
+
+    const days = document.querySelectorAll('.calendar .day');
+    for (const day of days) {
+        day.addEventListener('click', e => {
+            const day = e.target.closest('.day');
+            const num = day.getAttribute('data-day');
+            previewDay(num);
+        });
+    }
+
+    previewDay(5);
+</script>
 
 <h1>A whirlwind tour of Dreams logic</h1>
 
