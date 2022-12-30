@@ -3,6 +3,11 @@
 {{ define "head" }}
 <link rel="stylesheet" href="{{ relurl "tachyons.min.css" }}">
 <style>
+    @font-face {
+        font-family: "Fela";
+        src: url("Fela-Regular.otf") format("opentype") font;
+    }
+
     :root {
         --spacing-0: 0;
         --spacing-1: .25rem;
@@ -15,6 +20,8 @@
 
         --footnote-color: #666;
         --footnote-background: #fff;
+
+        --fela: Fela, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     }
 
     @media (prefers-color-scheme: dark) {
@@ -26,6 +33,10 @@
 
     body {
         overflow-x: hidden; /* lol */
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--fela);
     }
 
     .flex-fair {
@@ -44,7 +55,7 @@
     }
 
     .youtube, picture, video, img {
-        border-radius: 4px;
+        border-radius: 8px;
     }
 
     .twitter-tweet.twitter-tweet-rendered {
@@ -75,6 +86,15 @@
         box-shadow: inset 0 20px 16px -20px var(--shadow-color), inset 0 -20px 16px -20px var(--shadow-color);
         color: var(--footnote-color);
         background-color: var(--footnote-background);
+    }
+
+    .glow, img:not(.no-glow), video:not(.no-glow), .youtube:not(.no-glow) {
+        --glow-color: #2d60bf;
+        box-shadow: 0 0 6px 2px var(--glow-color);
+    }
+
+    picture.no-glow img {
+        box-shadow: none;
     }
 
     /* large */
@@ -111,12 +131,12 @@
 {{ define "wide-start" }}
 <div class="wide flex justify-center mv4">
     <div class="flex flex-column flex-row-l {{ if not . }}items-center{{ else }}{{ . }}{{ end }} g4">
-        <div class="w-100 flex-fair-l overflow-hidden p-dumb">
+        <div class="w-100 flex-fair-l p-dumb">
 {{ end }}
 
 {{ define "wide-middle" }}
         </div>
-        <div class="w-100 flex-fair-l overflow-hidden p-dumb">
+        <div class="w-100 flex-fair-l p-dumb">
 {{ end }}
 
 {{ define "wide-end" }}
@@ -139,6 +159,14 @@
 
 {{ define "video" }}
 <video src="{{ relurl (addstr "vids/" . ".mp4") }}" poster="{{ relurl (addstr "vids/"  . ".jpg") }}" autoplay muted loop controls preload="metadata">
+{{ end }}
+
+{{ define "day" }}
+<div class="day" data-day="{{ . }}">
+    <picture>
+        {{ picturesource (relpath (addstr "days/day" . ".jpg")) 3 }}
+    </picture>
+</div>
 {{ end }}
 
 {{ define "article content" }}
@@ -172,12 +200,103 @@ I completed 15 of the 25 days of Advent of Code. By “completed” I mean “go
 In the end, Day 16 was too much - an optimization problem that requires recursion, Dijkstra’s algorithm, and N! runs to determine the optimal path. I spent three days trying to solve it and eventually had to admit defeat.
 
 You can see videos of each solution on the calendar below. I’ve highlighted my favorite results!
+{{ end }}
 
-TODO: CALENDAR HERE
+<style>
+    .calendar {
+        --border-color: #333;
+        border: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+    }
 
+    .week {
+        display: flex;
+    }
+
+    .day {
+        border: 1px solid var(--border-color);
+        padding: var(--spacing-3);
+
+        /* flex-fair */
+        flex-basis: 1px;
+        flex-grow: 1;
+        flex-shrink: 1;
+
+        position: relative;
+    }
+
+    .day::before {
+        content: attr(data-day);
+        position: absolute;
+        left: 0.4rem;
+        top: 0.4rem;
+        color: #555;
+        font-family: var(--fela);
+        font-size: 1.4rem;
+    }
+
+    .day img {
+        border-radius: 50%;
+    }
+
+    .week .heading {
+        font-family: var(--fela);
+        font-size: 1.8rem;
+        text-align: center;
+
+        /* flex-fair */
+        flex-basis: 1px;
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
+</style>
+
+<div class="wide mv5">
+    <div class="calendar">
+        <div class="week">
+            <div class="heading">Sunday</div>
+            <div class="heading">Monday</div>
+            <div class="heading">Tuesday</div>
+            <div class="heading">Wednesday</div>
+            <div class="heading">Thursday</div>
+            <div class="heading">Friday</div>
+            <div class="heading">Saturday</div>
+        </div>
+        <div class="week">
+            <div class="day"></div>
+            <div class="day"></div>
+            <div class="day"></div>
+            <div class="day"></div>
+            {{ template "day" "1" }}
+            {{ template "day" "2" }}
+            {{ template "day" "3" }}
+        </div>
+        <div class="week">
+            {{ template "day" "4" }}
+            {{ template "day" "5" }}
+            {{ template "day" "6" }}
+            {{ template "day" "7" }}
+            {{ template "day" "8" }}
+            {{ template "day" "9" }}
+            {{ template "day" "10" }}
+        </div>
+        <div class="week">
+            {{ template "day" "11" }}
+            {{ template "day" "12" }}
+            {{ template "day" "13" }}
+            {{ template "day" "14" }}
+            {{ template "day" "15" }}
+            <div class="day"></div>
+            <div class="day"></div>
+        </div>
+    </div>
+</div>
+
+{{ apply markdown }}
 # A whirlwind tour of Dreams logic
 
-Let me introduce you to programming in Dreams.
+Before we go further, let me introduce you to programming in Dreams.
 {{ end }}
 
 {{ template "wide-start" }}
@@ -289,7 +408,7 @@ Every problem required me to iterate through a list in some way. Every problem h
     My fix for this was to use Wireless Transmitters to send the Next signal to my iterator. Wireless Transmitters do not cause cycles in the graph, and according to someone in my Twitch chat, always incur a one-frame delay. This is good for me; it allows me to suggest an execution order. I would use this technique every day going forward, and it did reduce the number of cycle-based heisenbugs.
     {{ end }}
 {{ template "wide-middle" . }}
-    {{ template "youtube" "-Q7v_M2aOS4?start=7685" }}
+    {{ template "youtube" "-Q7v_M2aOS4?start=7725" }}
 {{ template "wide-end" . }}
 
 {{ apply markdown }}
@@ -384,13 +503,13 @@ In an ideal world, I think I would like to write my own nodes. Instead of making
 {{ end }}
 
 <div class="mt5 mb3 ml-auto mr-auto w4">
-    <picture>
+    <picture class="no-glow">
         {{ picturesource (relpath "imp.png") 2 }}
     </picture>
 </div>
 
 {{ apply markdown }}
-# Thanks
+# Thanks!
 
 Obviously a huge thanks to Media Molecule for dedicating the last 15 years to this weird, wonderful system. It’s a miracle that Dreams exists at all, and it’s all because of the LittleBigPlanet series, the studio’s technical prowess, and their incredible dedication to user-created content.
 
@@ -398,7 +517,7 @@ Thanks to various members of the Dreams community for hanging out in my stream, 
 
 Thanks to the Handmade community for the years of discussion about visual programming, in particular [d7](https://gist.github.com/d7samurai) for his imagination and relentless dissatisfaction with the status quo.
 
-And thank you for reading 🙂
+And thank you for reading! 🙂
 {{ end }}
 
 <script>
