@@ -70,10 +70,8 @@ type Desmos struct {
 var articles = []Article{
 	{
 		BaseData: BaseData{
-			Title: "I did Advent of Code on a PlayStation",
-			// Description: "Trying to define \"essential complexity\" is a waste of time, but maybe not for the reason you think.",
-			// Banner:      "essential-complexity/gears.png",
-			// BannerScale: 3,
+			Title:          "I did Advent of Code on a PlayStation",
+			Description:    "How far can I get in Advent of Code if I do all the problems in Dreams?",
 			OpenGraphImage: "advent-of-dreams/imp.png",
 		},
 		Slug: "advent-of-dreams",
