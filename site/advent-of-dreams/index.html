@@ -183,10 +183,14 @@
 {{ $parts := splitList "/" . }}
 {{ $num := index $parts 0 }}
 {{ $name := index $parts 1 }}
-<div class="day" data-day="{{ $num }}">
-    <picture>
-        {{ picturesource (relpath (addstr "days/day" $num ".jpg")) 3 }}
-    </picture>
+<div class="day" id="day-{{ $num }}" data-day="{{ $num }}">
+    <div class="relative aspect-ratio--1x1">
+        <div class="aspect-ratio--object">
+            <picture>
+                {{ picturesource (relpath (addstr "days/day" $num ".jpg")) 3 }}
+            </picture>
+        </div>
+    </div>
     <h2>{{ $name }}</h2>
 </div>
 {{ end }}
@@ -707,6 +711,145 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
             <div class="day"></div>
             <div class="day"></div>
         </div>
+        <div class="previews">
+            <div class="preview-container">
+                {{ template "preview-start" "11" }}
+                    <h2>Day 11: Monkey in the Middle</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">3:00:00</span> vs. <span class="solve js">~10:00</span>
+                        </div> /
+                        <div>
+                            <a href="https://twitter.com/its_bvisness/status/1602061466806456322">{{ eval "svg/twitter.svg" . | safeHTML }} Tweet</a>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dZSiafCcEhv"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=5Ku8A6q5TNU"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        This problem was really incredibly difficult. I spent at least an hour just figuring out how to make monkeys toss objects to each other, and at least an hour debugging sync issues again. Some days are just like that.
+
+                        I ran out of time at the end of the stream, so I wasn't quite able to make it as pretty as I would like. Despite that, and despite all the grueling bugs, I think this is one of the most technically impressive simulation problems I completed.
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "5Ku8A6q5TNU?start=17232" }}
+                {{ template "preview-end" }}
+
+                {{ template "preview-start" "12" }}
+                    <h2>Day 12: Hill Climbing Algorithm</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">6:00:00</span>
+                        </div> /
+                        <div>
+                            <a href="https://twitter.com/its_bvisness/status/1603251146340159490">{{ eval "svg/twitter.svg" . | safeHTML }} Tweet</a>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dgCpxpGGYqE"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=PPBMRLtO7fY"><span class="icon icon--uiplay"></span> VOD 1</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=Rv3_Sn5ljnA"><span class="icon icon--uiplay"></span> VOD 2</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        This is, without a doubt, the most technically challenging problem I completed. It took two days and six hours total, and required both recursion and wireless communication between adjacent tiles. It recursively flood-fills the scene by spawning elves to go to each unvisited tile - whoever gets there fastest took the shortest path.
+
+                        (The elves ascend to heaven because otherwise Dreams yells about having too many entities.)
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "Rv3_Sn5ljnA?start=8523" }}
+                {{ template "preview-end" }}
+
+                {{ template "preview-start" "13" }}
+                    <h2>Day 13: Distress Signal</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">3:00:00</span>
+                        </div> /
+                        <div>
+                            <a href="https://twitter.com/its_bvisness/status/1603644554376318978">{{ eval "svg/twitter.svg" . | safeHTML }} Tweet</a>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dSgFuiorUsM"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=9kDqbqzsVQw"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        This problem was a welcome reprieve. I'm proud of the solution here; I came up with a way to transform the obvious recursive solution into an iterative one, dramatically reducing the complexity of my Dreams logic. More info in <a href="https://twitter.com/its_bvisness/status/1603851835047088153?s=20">this follow-up tweet</a>.
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "9kDqbqzsVQw?start=11005" }}
+                {{ template "preview-end" }}
+
+                {{ template "preview-start" "14" }}
+                    <h2>Day 14: Regolith Reservoir</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">3:00:00</span>
+                        </div> /
+                        <div>
+                            <a href="https://twitter.com/its_bvisness/status/1603987010322038785">{{ eval "svg/twitter.svg" . | safeHTML }} Tweet</a>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dsdPQDWndRs"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=CLzvTgFa0Ic"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        I am so happy with this one. It directly simulates the problem, has great visuals I found on the Dreamiverse, and I even verified that it works with other inputs too (skip to 3:23:39 for an example). Cellular automata turn out to be really fun in Dreams!
+
+                        There were a couple weird issues, like trigger zones not detecting anything on the first frame they're active. Iteration was still difficult. But the end result is just wonderful.
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "CLzvTgFa0Ic?start=11927" }}
+                {{ template "preview-end" }}
+
+                {{ template "preview-start" "15" }}
+                    <h2>Day 15: Beacon Exclusion Zone</h2>
+                    <div class="info">
+                        <div>
+                            <span class="solve dreams">2:30:00</span>
+                        </div> /
+                        <div>
+                            <a href="https://twitter.com/its_bvisness/status/1604342436502933504">{{ eval "svg/twitter.svg" . | safeHTML }} Tweet</a>
+                        </div> /
+                        <div>
+                            <a href="https://indreams.me/scene/dQzdiPRHVDk"><span class="icon icon--uiimp"></span> Dreams</a>
+                        </div> /
+                        <div>
+                            <a href="https://www.youtube.com/watch?v=2oVMMIhE-0k"><span class="icon icon--uiplay"></span> VOD</a>
+                        </div>
+                    </div>
+                    <div class="desc">
+                        {{ apply markdown }}
+                        This one looked cool at the end but was quite a grind. Taxicab / Manhattan distance stuff was fun to work with, though. I didn't really bother to actually produce a legit answer for real, but I did get the simulation stuff working.
+                        
+                        This would be the final problem I completed; Day 16 was ludicrously difficult, and I had to admit defeat.
+                        {{ end }}
+                    </div>
+                {{ template "preview-middle" }}
+                    {{ template "youtube" "2oVMMIhE-0k?start=8696" }}
+                {{ template "preview-end" }}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -737,23 +880,29 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         const preview = document.querySelector(`.preview[data-day="${ num }"]`);
         const previews = preview.closest('.previews');
 
+        const justCollapse = preview.classList.contains('flex');
+
         for (const otherPreview of previews.querySelectorAll('.preview')) {
             otherPreview.classList.toggle('flex', false);
             otherPreview.classList.toggle('dn', true);
         }
-        preview.classList.toggle('flex', true);
-        preview.classList.toggle('dn', false);
-
         for (const otherPreviews of document.querySelectorAll('.previews')) {
             otherPreviews.classList.toggle('open', false);
         }
-        previews.classList.toggle('open', true);
+
+        if (!justCollapse) {
+            preview.classList.toggle('flex', true);
+            preview.classList.toggle('dn', false);
+            previews.classList.toggle('open', true);
+        }
 
         for (const youtube of youtubes) {
             if (youtube.pauseVideo) {
                 youtube.pauseVideo();
             }
         }
+
+        history.pushState(null, null, `#day-${ num }`);
     }
 
     const days = document.querySelectorAll('.calendar .day');
@@ -765,7 +914,10 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         });
     }
 
-    previewDay(10);
+    if (window.location.hash.startsWith('#day-')) {
+        const num = window.location.hash.substring(5);
+        previewDay(num);
+    }
 </script>
 
 <h1>A whirlwind tour of Dreams logic</h1>
