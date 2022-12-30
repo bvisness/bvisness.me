@@ -275,9 +275,15 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         position: absolute;
         left: 0.4rem;
         top: 0.4rem;
-        color: #555;
+        color: #aaa;
         font-family: var(--fela);
         font-size: 1.4rem;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .day::before {
+            color: #555;
+        }
     }
 
     .day img {
@@ -350,10 +356,11 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
     }
 
     .preview .info span {
-        color: white;
+        color: var(--text-color);
     }
 
     .preview .info a {
+        color: var(--text-color);
         text-decoration: none;
     }
 
@@ -387,6 +394,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         padding: var(--spacing-2);
         margin-left: calc(calc(var(--width) / -2) - var(--spacing-2));
         text-align: center;
+        color: white;
         background-color: black;
         border-radius: 4px;
     }
@@ -561,7 +569,7 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
 
                         If I could revisit this one, I would probably save a full hour due to better handling of iteration and of large cycles in the graph. I talk about cycle issues later on.
 
-                        (Skip back a bit in the video if you want to see some shenanigans)
+                        (Skip back a bit in the video if you want to see some shenanigans.)
                         {{ end }}
                     </div>
                 {{ template "preview-middle" }}
