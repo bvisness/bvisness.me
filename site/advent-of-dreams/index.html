@@ -178,7 +178,7 @@
         class="aspect-ratio--object"
         src="{{ relurl (addstr "vids/" . ".mp4") }}"
         poster="{{ relurl (addstr "vids/"  . ".jpg") }}"
-        autoplay muted loop controls
+        autoplay muted loop
         preload="metadata"
     ></video>
 </div>
@@ -188,7 +188,7 @@
 {{ $parts := splitList "/" . }}
 {{ $num := index $parts 0 }}
 {{ $name := index $parts 1 }}
-<div class="day" id="day-{{ $num }}" data-day="{{ $num }}">
+<div class="day" data-day="{{ $num }}">
     <div class="thumbnail relative aspect-ratio--1x1">
         <div class="aspect-ratio--object">
             <picture>
@@ -974,7 +974,6 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
         preview.classList.toggle('flex', true);
         preview.classList.toggle('dn', false);
         if (justCollapse) {
-            history.pushState(null, null, ' ');
             currentDay = undefined;
             return;
         } else {
@@ -987,8 +986,6 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
                 youtube.pauseVideo();
             }
         }
-
-        history.pushState(null, null, `#day-${ num }`);
     }
 
     const days = document.querySelectorAll('.calendar .day');
@@ -998,11 +995,6 @@ You can see videos of each solution on the calendar below. I’ve highlighted my
             const num = day.getAttribute('data-day');
             previewDay(num);
         });
-    }
-
-    if (window.location.hash.startsWith('#day-')) {
-        const num = window.location.hash.substring(5);
-        previewDay(num);
     }
 </script>
 
