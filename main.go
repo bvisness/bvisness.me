@@ -75,7 +75,7 @@ var articles = []Article{
 			OpenGraphImage: "advent-of-dreams/vids/crane.jpg",
 		},
 		Slug: "advent-of-dreams",
-		Date: time.Date(2022, 12, 30, 0, 0, 0, 0, time.UTC),
+		Date: time.Date(2022, 12, 31, 0, 0, 0, 0, time.UTC),
 	},
 	{
 		BaseData: BaseData{
