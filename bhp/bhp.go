@@ -40,7 +40,6 @@ type AddFuncsFunc[UserData any] func(Instance[UserData], Request[UserData]) temp
 type Middleware[UserData any] func(b Instance[UserData], r Request[UserData], w http.ResponseWriter, m MiddlewareData[UserData]) bool
 type MiddlewareData[UserData any] struct {
 	FilePath    string
-	FileData    []byte
 	ContentType string
 }
 
@@ -178,13 +177,15 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fileBytes := must1(os.ReadFile(srcFilename))
-	contentType := detectContentType(fileInfo, fileBytes)
+	file := must1(os.Open(srcFilename))
+	var opening [512]byte
+	file.Read(opening[:])
+	file.Seek(0, io.SeekStart)
+	contentType := detectContentType(fileInfo, opening[:])
 
 	if b.Middleware != nil {
 		didHandle := b.Middleware(b, bhpRequest, w, MiddlewareData[UserData]{
 			FilePath:    srcFilename,
-			FileData:    fileBytes,
 			ContentType: contentType,
 		})
 		if didHandle {
@@ -204,6 +205,7 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Content-Type", contentType)
 	if doTemplate {
+		fileBytes := must1(io.ReadAll(file))
 		must1(t.Parse(string(fileBytes)))
 
 		if code, location := getRedirect(t, b.UserData); location != "" {
@@ -218,7 +220,7 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		must(t.Execute(w, b.UserData))
 	} else {
-		must1(w.Write(fileBytes))
+		http.ServeContent(w, r, fileInfo.Name(), fileInfo.ModTime(), file)
 	}
 }
 
