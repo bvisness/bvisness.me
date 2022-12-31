@@ -238,7 +238,9 @@ I did a very stupid challenge this December - I did Advent of Code in Dreams.
 {{ end }}
 
 <div class="wide mv4">
-    {{ template "video" "crane" }}
+    <div>
+        {{ template "video" "crane" }}
+    </div>
 </div>
 
 {{ apply markdown }}
@@ -248,7 +250,9 @@ I did a very stupid challenge this December - I did Advent of Code in Dreams.
 {{ apply markdown }}
 Unfortunately I am no artist. But I am a programmer, and Dreams has a robust “logic” system designed for game scripting. When I bought Dreams a couple years ago, I discovered that this logic system is a capable visual scripting engine with a very thoughtful design, and I was quickly able to produce some fun results, culminating in my magnum opus: a toy LISP interpreter.
 
-{{ template "youtube" "MiCbA3JuaWk" }}
+<div class="mv4">
+    {{ template "youtube" "MiCbA3JuaWk" }}
+</div>
 
 This proved to me that Dreams was capable of just about anything. And as the leader of the [Handmade Network](https://handmade.network/), I’ve heard a lot of discussion over the years about “visual programming”.<a href="javascript:footnote('vp')"><sup>[1]</sup></a> So this year, I decided to give visual programming a serious try. And what better way to experiment with a new programming system than [Advent of Code](https://adventofcode.com/)?
 {{ end }}
