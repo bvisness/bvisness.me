@@ -2,6 +2,7 @@ package images
 
 import (
 	"fmt"
+	"html"
 	"html/template"
 	"image"
 	"net/url"
@@ -79,7 +80,7 @@ func TemplateFuncs[T any](b bhp.Instance[T], r bhp.Request[T]) template.FuncMap 
 			return template.CSS(strings.Join(options, ", ")), nil
 		},
 
-		"picturesource": func(abspath string, scale int) (template.HTML, error) {
+		"picturesource": func(abspath string, scale int, opts ...PictureOpt) (template.HTML, error) {
 			if scale < 1 {
 				scale = 1
 			}
@@ -114,6 +115,13 @@ func TemplateFuncs[T any](b bhp.Instance[T], r bhp.Request[T]) template.FuncMap 
 				))
 			}
 
+			var altAttr string
+			for _, opt := range opts {
+				if opt.ImgAlt != "" {
+					altAttr = fmt.Sprintf("alt=\"%s\"", html.EscapeString(opt.ImgAlt))
+				}
+			}
+
 			var b strings.Builder
 			for contentType, options := range optionsByType {
 				b.WriteString(fmt.Sprintf(
@@ -121,7 +129,7 @@ func TemplateFuncs[T any](b bhp.Instance[T], r bhp.Request[T]) template.FuncMap 
 					strings.Join(options, ", "), contentType,
 				))
 			}
-			b.WriteString(fmt.Sprintf(`<img src="%s">`, bhp.AbsURL(r.R, abspath)))
+			b.WriteString(fmt.Sprintf(`<img src="%s"%s>`, bhp.AbsURL(r.R, abspath), altAttr))
 
 			return template.HTML(b.String()), nil
 		},
@@ -141,5 +149,13 @@ func TemplateFuncs[T any](b bhp.Instance[T], r bhp.Request[T]) template.FuncMap 
 
 			return processed.Source.ActualSize, nil
 		},
+
+		"alt": func(alt string) PictureOpt {
+			return PictureOpt{ImgAlt: alt}
+		},
 	}
+}
+
+type PictureOpt struct {
+	ImgAlt string
 }

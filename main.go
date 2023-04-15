@@ -70,6 +70,14 @@ type Desmos struct {
 var articles = []Article{
 	{
 		BaseData: BaseData{
+			Title:       "\"It's always a tradeoff\"",
+			Description: "Programmers love to say things like \"it all depends\" or \"it's always a tradeoff\". This makes them sound very wise, but it's usually a cop-out.",
+		},
+		Slug: "tradeoffs",
+		Date: time.Date(2023, 4, 15, 0, 0, 0, 0, time.UTC),
+	},
+	{
+		BaseData: BaseData{
 			Title:          "I did Advent of Code on a PlayStation",
 			Description:    "How far can I get in Advent of Code if I do all the problems in Dreams?",
 			OpenGraphImage: "advent-of-dreams/vids/crane.jpg",

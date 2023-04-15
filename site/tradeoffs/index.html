@@ -1,0 +1,100 @@
+{{ template "simplearticle.html" article "tradeoffs" }}
+
+{{ define "article content" }}
+{{ apply markdown }}
+
+Programmers love to say things like "it all depends" or "it's always a tradeoff". This makes them sound very wise, but it's usually a cop-out.
+
+## Your choices need to be mutually exclusive.
+
+Let's look at a fun example from a Content Creator:
+
+<picture>
+    {{
+        picturesource (relpath "triangle.png") 1
+        (alt "A tradeoff triangle with three corners: Performance, Velocity, and Adaptability")
+    }}
+</picture>
+
+I'll let my friend simp break this down:
+
+<picture>
+    {{
+        picturesource (relpath "simp1.png") 2
+        (alt "Discord message: It's intended to be a \"tradeoff triangle\". If adaptability is \"how quickly you can change to new requirements\" and velocity is \"how fast you can add new features\" these seem like obviously not mutually exclusive nor even really a tradeoff. They're practically the same thing.")
+    }}
+</picture>
+<picture>
+    {{
+        picturesource (relpath "simp2.png") 2
+        (alt "I think you could say pretty decently that there's a tradeoff with genericism and specificity wrt performance. But the idea that if I get more adaptable I lose velocity is especially nonsensical.")
+    }}
+</picture>
+
+I'm not sure anyone would take this seriously in the first place, but since it's so extreme, it's a nice place to start. As simp says, "velocity" and "adaptability" are basically the same thing, so they are clearly not a tradeoff. The performance vs. velocity/adaptability tradeoff is more understandable, since quickly-written code often has poor performance and highly-optimized code can be highly specialized - but even these aren't mutually exclusive.
+
+At my last company, we had a backend codebase that was massively overarchitected. Everything was designed to use an "event bus" that could seamlessly switch between synchronous and asynchronous execution of "commands", whose "handlers" were all defined through a maze of dependency injection configured with yaml files. Keep in mind, a "synchronous command" is for all intents and purposes a function call - the "command" is the arguments and the "handler" is the body. But this "event bus" added multiple layers of indirection that made it impossible for us to follow control flow. The asynchronous commands were even worse, and every so often they would basically forkbomb us by spawning copies of themselves.
+
+This system was **bad on all three metrics.** It had terrible performance. It was a nightmare to adapt to new requirements. And it was impossible for us to work with because we couldn't even debug anything.
+
+But it's all tradeoffs, you know. It all depends. There's costs and benefits to everything. I am very wise.
+
+## The code can just suck.
+
+For "tradeoffs" to mean anything, you also have to achieve the best version of each option. This usually doesn't happen. You can talk about "tradeoffs" between architectures, but "tradeoffs" don't matter when you end up writing code like this:
+
+```js
+import { memoize } from 'lodash';
+
+// This definitely caches things, for sure, trust me bro
+const getShiftsForUser = startDate => endDate => memoize(userID => {
+	let shifts = [];
+	// keep in mind there are like 10k shifts in here
+	for (const shift of getState().shifts) {
+		if (
+			startDate.before(shift.start) && shift.end.before(endDate)
+			&& shift.user = userID
+		) {
+			shifts = [...shifts, shift]; // yeah! copies! we love copies!
+		}
+	}
+	return shifts;
+}
+
+// elsewhere...
+const userShifts = getShiftsForUser(start)(end)(123);
+```
+
+It's always a tradeoff, you know? Memoizing is a tradeoff between computation time and memory use. Or maybe developer time and computation time? I forget, but it all depends, you know?
+
+This example is not hypothetical and not a joke; this was a very common antipattern at my last job. (Although the comments are mine, obviously.) In case it wasn't clear, [`memoize`](https://lodash.com/docs/#memoize) is a utility function that caches results based on inputs, in order to cache expensive work. But when it's used this way, every single call creates a new cache, does the work, saves the result…and throws the cache away.
+
+This code did not make any tradeoffs. It is just bad. Lots of code is just bad, and you can make it better without trading anything away.
+
+## What problem are you actually solving?
+
+"Should I use React or Svelte? React is more established, has lots of libraries, and has tons of resources online. But Svelte is more performant and has a better developer experience."
+
+Or you could just write your 20 lines of JS in a script tag, which would be more efficient and avoid all the build tooling.
+
+"Should I use a [service locator or dependency injection](https://martinfowler.com/articles/injection.html#ServiceLocatorVsDependencyInjection)? DI reduces coupling and makes my classes more modular, but it makes things harder to understand."
+
+Or you could recognize that you only have one implementation of everything, and you didn't need all the interfaces and polymorphism in the first place.
+
+If you're solving a problem you don't need to solve, there is no tradeoff. All the options are wrong.
+
+## Conclusion
+
+It's good to recognize that no solution is perfect. It's good to think about costs and benefits. But don't delude yourself into thinking everything is a tradeoff. That's a cop-out. That's analysis paralysis.
+
+<picture>
+    {{
+        picturesource (relpath "opinion.png") 2
+        (alt "Discord message from bvisness: If you believe something is a tradeoff, you need to explain situations where one would be better than the other. People sometimes say \"it's a tradeoff\" when they mean \"I have no opinion\".")
+    }}
+</picture>
+
+Some things are just better than other things. Try to recognize them.
+
+{{ end }}
+{{ end }}
