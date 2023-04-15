@@ -67,7 +67,7 @@ const userShifts = getShiftsForUser(start)(end)(123);
 
 This example is not hypothetical and not a joke; this was a very common antipattern at my last job. (Although the comments are mine, obviously.) In case it wasn't clear, [`memoize`](https://lodash.com/docs/#memoize) is a utility function that caches results based on inputs, in order to cache expensive work. But when it's used this way, every single call creates a new cache, does the work, saves the result…and throws the cache away.
 
-"It's always a tradeoff, you know? Memoizing is a tradeoff between computation time and memory use. Or maybe developer time and computation time? I forget, but it all depends, you know?""
+"It's always a tradeoff, you know? Memoizing is a tradeoff between computation time and memory use. Or maybe developer time and computation time? I forget, but it all depends, you know?"
 
 This code did not make any tradeoffs. It is just bad. Lots of code is just bad, and you can make it better without trading anything away.
 
