@@ -70,6 +70,14 @@ type Desmos struct {
 var articles = []Article{
 	{
 		BaseData: BaseData{
+			Title:       "How (not) to write a manifesto",
+			Description: "The Handmade Manifesto is on its third revision now. Let's look back at old versions of the manifesto and see how our messaging has shifted over time.",
+		},
+		Slug: "manifesto",
+		Date: time.Date(2023, 5, 19, 0, 0, 0, 0, time.UTC),
+	},
+	{
+		BaseData: BaseData{
 			Title:       "\"It's always a tradeoff\"",
 			Description: "Programmers love to say things like \"it all depends\" or \"it's always a tradeoff\". This makes them sound very wise, but it's usually a cop-out.",
 		},
