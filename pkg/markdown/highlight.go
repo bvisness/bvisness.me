@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/alecthomas/chroma"
-	"github.com/alecthomas/chroma/formatters/html"
-	"github.com/alecthomas/chroma/lexers"
-	"github.com/alecthomas/chroma/styles"
+	"github.com/alecthomas/chroma/v2"
+	"github.com/alecthomas/chroma/v2/formatters/html"
+	"github.com/alecthomas/chroma/v2/lexers"
+	"github.com/alecthomas/chroma/v2/styles"
 	"github.com/gomarkdown/markdown/ast"
 	mdhtml "github.com/gomarkdown/markdown/html"
 )
@@ -55,7 +55,7 @@ func makeRenderHookCodeBlock(defaultLang string) mdhtml.RenderNodeFunc {
 		}
 		lang := string(codeBlock.Info)
 		if false {
-			fmt.Printf("lang: '%s', code: %s\n", lang, string(codeBlock.Literal[:16]))
+			fmt.Printf("lang: '%s', code: %s\n", lang, string(codeBlock.Literal))
 			io.WriteString(w, "\n<pre class=\"chroma\"><code>")
 			mdhtml.EscapeHTML(w, codeBlock.Literal)
 			io.WriteString(w, "</code></pre>\n")

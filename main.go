@@ -70,6 +70,14 @@ type Desmos struct {
 var articles = []Article{
 	{
 		BaseData: BaseData{
+			Title:       "Coroutines are a godsend for high school robotics",
+			Description: "Our FIRST Robotics team struggled with autonomous code for years. Coroutines were the missing piece.",
+		},
+		Slug: "coroutines",
+		Date: time.Date(2023, 6, 19, 0, 0, 0, 0, time.UTC),
+	},
+	{
+		BaseData: BaseData{
 			Title:       "How (not) to write a manifesto",
 			Description: "The Handmade Manifesto is on its third revision now. Let's look back at old versions of the manifesto and see how our messaging has shifted over time.",
 		},
