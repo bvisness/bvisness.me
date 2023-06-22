@@ -70,7 +70,7 @@ type Desmos struct {
 var articles = []Article{
 	{
 		BaseData: BaseData{
-			Title:       "Coroutines are a godsend for high school robotics",
+			Title:       "Coroutines make robot code easy",
 			Description: "Our FIRST Robotics team struggled with autonomous code for years. Coroutines were the missing piece.",
 		},
 		Slug: "coroutines",
