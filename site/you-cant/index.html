@@ -1,0 +1,124 @@
+{{ template "simplearticle.html" article "you-cant" }}
+
+{{ define "article content" }}
+{{ apply markdown }}
+
+This is the truest tweet ever written:
+
+> If you don't enjoy programming, don't worry, it is not your fault. Thousands of people around the world work hard day and night to make programming as miserable for you as possible. It's not suppose to be like that, really. 🫂
+>
+> [@tsoding](https://twitter.com/tsoding) ([original](https://twitter.com/tsoding/status/1682226717048422400))
+
+Now, you might think this isn’t true. Programmers aren’t *really* making programming miserable on purpose, right? Wrong.
+
+Sometimes software is missing a feature you want. That’s understandable. But sometimes the devs *know* you want that feature, get your hopes up, and then let you down.
+
+# Exiting Python
+
+Let’s start with Python. Every Python user has seen this message:
+
+```
+>>> exit
+Use exit() or Ctrl-D (i.e. EOF) to exit
+```
+
+There are two reasonable things that Python could do here:
+
+- Print `<function exit>`.
+- Exit.
+
+But it does neither. It acknowledges your intent and refuses it. It’s saying “I know exactly what you want to do, but you’re doing it wrong. Do it right next time.”
+
+I understand that `<function exit>` might be confusing for newcomers, and exiting might be too destructive. But denying you the normal REPL behavior *and* denying you the ability to exit is just insulting.
+
+# Formatting Rust files
+
+I will never understand why people like Rust’s tooling so much. Every time I have to touch it, it’s like the devs are mocking me.
+
+Today I had a Rust file that I wanted to autoformat. I wanted to tidy things up and wrap comments to 80 characters. So I ran `cargo fmt`. Nothing.
+
+I tried `cargo fmt -v`. It wasn’t seeing my file, despite it absolutely being part of the project. It even found the lib.rs in my crate but not this particular source file. I have no idea why, but I figured no worries, I can just do `cargo fmt src/myfile.rs`.
+
+But you can’t. `cargo fmt` doesn’t have an option for that. How is even possible for your format command to not let you format an individual file?
+
+So I went to Google. I found a [GitHub issue](https://github.com/rust-lang/rustfmt/issues/4485) where one of the devs said “You’re supposed to use `rustfmt`, not `cargo fmt`. Obviously these are very different tools and `cargo fmt` is not intended to be used in that way.” Problem is, I had never even heard of `rustfmt`. There is no indication that `cargo fmt` is merely a wrapper around `rustfmt`, much less that `rustfmt` would have *extra* options that the high-level wrapper does not have.
+
+Responses like this from devs are just maddening. Their tooling gives no indication of the “correct” thing to do, and rather than change their tooling to help users out, they act as if users are already supposed to know the “correct” thing.
+
+But fine. I can use `rustfmt`. So I ran `rustfmt src/myfile.rs`. It worked, but didn’t wrap comments. Ok fine, maybe it just doesn’t do that by default. So I went to Google again, and I found the official `rustfmt` documentation and the `wrap_comments` property. Great!
+
+I created a `.rustfmt.toml` file and added `wrap_comments = true`. Time to give it another go:
+
+```
+% rustfmt crates/wast/src/core/expr.rs
+Warning: can't set `wrap_comments = true`, unstable features are only available in nightly channel.
+```
+
+“Unstable features”???? How is wrapping text an unstable feature *in a code formatter?* What would it possibly take to “stabilize” such a feature? It is a completely trivial feature!
+
+But fine. I had nightly Rust installed, and I saw that the docs say you can include `unstable_features = true` to opt into unstable features. So I updated the config file and tried again:
+
+```
+% rustfmt crates/wast/src/core/expr.rs
+Warning: can't set `wrap_comments = true`, unstable features are only available in nightly channel.
+Warning: can't set `unstable_features = true`, unstable features are only available in nightly channel.
+```
+
+At this point I was just hopping mad. It *knew* that I wanted to wrap comments. But it refused, because this was “unstable”. It knew that I wanted to opt into experimental features, but refused again.
+
+It would literally have been better if they had not shipped this `wrap_comments` feature at all. Instead they just keep dangling it in front of my face and snatching it away as soon as I try to use it. Because they hate me.
+
+# Conflicts when vendoring Rust dependencies
+
+I’m not done with Rust just yet.
+
+I recently tried updating one of my cargo dependencies (`wast`) to use my own fork for testing. Running `cargo vendor` after updating suddenly gave me this error:
+
+```
+error: failed to sync
+Caused by:
+  found duplicate version of package wasm-encoder v0.31.0' vendored from two sources:
+
+        source 1: registry 'crates-io'
+        source 2: https://github.com/bvisness/wasm-tools.git?rev=128f3a4#128f3a47
+ 0:25.74 E Cargo vendor failed.
+```
+
+This was…weird. Why would there be a conflict? I just changed one dependency to my fork, and some other package started complaining.
+
+So I Googled it. I found a [GitHub issue](https://github.com/NixOS/nixpkgs/issues/30742) that described the same problem, and someone said that there was a `--no-merge-sources` flag that fixed the issue. Sounded good, so I gave it a try:
+
+```
+error: the crates.io 'cargo vendor' command has now been merged into Cargo itself
+and does not support the flag '--no-merge-sources' currently; to continue using the flag you
+can execute 'cargo-vendor vendor ...' and if you would like to see this flag
+supported in Cargo itself please feel free to file an issue at
+https://github.com/rust-lang/cargo/issues/new
+```
+
+I was *stunned*. They deprecated a tool, deleted a flag, and *kept documentation for the flag* that just says “yeah, we got rid of it, make a GitHub issue if you actually wanted that feature :)”
+
+But ok…they gave me a workaround. So I tried with `cargo-vendor`. And it *absolutely exploded*.
+
+Not only did `cargo-vendor --no-merge-sources` fail with a ton of errors, but it dumped a bunch of extra files into my project that were clearly wrong somehow. Evidently you’re not actually supposed to use `cargo-vendor` any more, period. I found another GitHub comment that corroborated this.
+
+So let’s summarize what happened here:
+
+- The tooling gave me an opaque error with no context to help me understand.
+- The flag that could fix it was removed by the devs and replaced with a passive-aggressive message and a workaround.
+- The workaround *didn’t work* and blew up my project even more.
+
+So where was this supposed to leave me? What was I supposed to use? Yet again, the devs understood my intent (they recognized the old flag!) but they refused to actually do what I wanted to do.
+
+Nor did they give me any guidance on how to actually solve my problem. It turned out that there was another actual root cause for my problem, and fixing that was arguably more reasonable than using `--no-merge-sources`. But they provided nothing that would actually help me understand the problem. And the features they provided were literally worse than nothing - they extended me a helping hand, and then snatched it away. Because they hate me.
+
+# In conclusion
+
+In all three of these situations, the devs knew what I wanted to do, but refused to let me do it. This feels TERRIBLE as a user. It feels insulting and condescending. It feels like it’s deliberately withholding useful features, like it doesn’t trust me to use them correctly. It sucks.
+
+And as a dev, it just makes you look lazy. People will understand if you don’t support a feature - maybe it was replaced by something better, or maybe it’s easier for the user to fix their root problem. But if you “support” the feature by telling the user “no”, then why did you even bother “supporting” it?
+
+So don’t do that. Either support the feature, guide the user toward a better solution, or do nothing.
+
+{{ end }}
+{{ end }}

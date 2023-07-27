@@ -70,6 +70,14 @@ type Desmos struct {
 var articles = []Article{
 	{
 		BaseData: BaseData{
+			Title:       `“You can’t do that because I hate you.”`,
+			Description: "An infuriating pattern that devs need to stop.",
+		},
+		Slug: "you-cant",
+		Date: time.Date(2023, 7, 26, 0, 0, 0, 0, time.UTC),
+	},
+	{
+		BaseData: BaseData{
 			Title:       "Coroutines make robot code easy",
 			Description: "Our FIRST Robotics team struggled with autonomous code for years. Coroutines were the missing piece.",
 		},
