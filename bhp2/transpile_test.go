@@ -116,6 +116,70 @@ var vanillaParserTests = []parserTest{
 			[8] = 0xf00
 		}
 	`},
+	{"fancy example with root statements", `
+function Wide(atts, children)
+    if #children ~= 2 then
+        error("requires exactly two children")
+    end
+
+    return __html("div", { class = "wide flex justify-center mv4" }, {
+        __html("div", {
+            class = {
+                "flex flex-column flex-row-l",
+                atts.class or "items-center",
+                "g4"
+            },
+        }, {
+            __html("div", { class = "w-100 flex-fair-l p-dumb" }, {
+                children[1],
+            }),
+            __html("div", { class = "w-100 flex-fair-l p-dumb" }, {
+                children[2],
+            }),
+        }),
+    })
+end
+
+table.insert(__doc, Wide({}, {
+    __fragment({
+        __html("p", {
+            -- "Before we go further, let me introduce you to programming in Dreams.",
+            __source(123, 234), -- avoid allocating and escaping big strings by slicing from source
+        }),
+        Video("wowow"),
+        __html("p", {
+            -- "Dreams code is made up of nodes and wires...",
+            __source(345, 456),
+        }),
+    }),
+}))`},
+	{"path stuff", `
+---mirrors a path, does not make a copy
+function Path:mirror()
+	for _, point in ipairs(self.points) do
+		point.x = 651.25 - point.x
+	end
+
+	self.startAngle = math.pi - self.startAngle
+	self.endAngle = math.pi - self.endAngle
+end
+
+function Path:print()
+	for _, point in ipairs(self.points) do
+		print(point)
+	end
+end
+
+test("Path:new", function(t)
+	local p = Path:new("TestOnlyDoNotEdit", {
+		testEvent = function()
+			print("wow, an event!")
+		end
+	})
+	t:assertEqual(#p.distances, #p.points, "we should have one distance for each point")
+	t:assert(p.events[1].func ~= nil)
+end)
+	`},
 }
 
 func TestTranspile(t *testing.T) {

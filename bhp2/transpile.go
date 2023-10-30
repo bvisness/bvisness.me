@@ -8,7 +8,8 @@ import (
 func Transpile(source string) (string, error) {
 	tr := Transpiler{source: source}
 	tr.skipWhitespace()
-	tr.parseBlock(eof)
+	tr.parseBlock()
+	tr.expect(eof)
 	return "so transpiley wow", nil
 }
 
@@ -277,12 +278,18 @@ func (t *Transpiler) nextToken() string {
 	return tok
 }
 
-func (t *Transpiler) expect(s string) error {
+func (t *Transpiler) expect(s string) {
 	tok := t.nextToken()
 	if tok != s {
 		panic(fmt.Errorf("bad Lua syntax: expected %s but got %s", s, tok))
 	}
-	return nil
+}
+
+func (t *Transpiler) expectName(desc string) {
+	tok := t.nextToken()
+	if !isName(tok) {
+		panic(fmt.Errorf("expected name %s but got %s", desc, tok))
+	}
 }
 
 func (t *Transpiler) maybe(s string) {
@@ -295,14 +302,65 @@ func (t *Transpiler) parseStat() {
 	switch tok := t.peekToken(); tok {
 	case ";":
 		t.nextToken()
-		// TODO: if
+	case "if":
+		t.parseCondAndBlock()
+		for t.peekToken() == "elseif" {
+			t.parseCondAndBlock()
+		}
+		if t.peekToken() == "else" {
+			t.parseBlock()
+		}
+		t.expect("end")
 		// TODO: while
 		// TODO: do
-		// TODO: for
+	case "for":
+		t.nextToken()
+		t.expectName("of loop variable")
+		switch tok := t.peekToken(); tok {
+		case "=":
+			t.expect("=")
+			t.parseSubexp()
+			t.expect(",")
+			t.parseSubexp()
+			if t.peekToken() == "," {
+				t.parseSubexp()
+			}
+		case ",", "in":
+			for t.peekToken() == "," {
+				t.nextToken()
+				t.expectName("of loop variable")
+			}
+			t.expect("in")
+			t.parseExpList()
+		default:
+			panic(fmt.Errorf("unexpected token in loop: %s", tok))
+		}
+		t.expect("do")
+		t.parseBlock()
+		t.expect("end")
 		// TODO: repeat
 	case "function":
-		t.parseFunc(true)
-	// TODO: local
+		t.nextToken()
+		t.parseFuncName()
+		t.parseFuncBody()
+	case "local":
+		t.nextToken()
+		if t.peekToken() == "function" {
+			t.nextToken()
+			t.expectName("of local function")
+			t.parseFuncBody()
+		} else {
+			// LOCAL NAME {`,' NAME} [`=' explist]
+			t.expectName("of local var")
+			for t.peekToken() == "," {
+				t.nextToken()
+				t.expectName("of local var")
+			}
+			if t.peekToken() == "=" {
+				t.nextToken()
+				t.parseExpList()
+			}
+		}
 	// TODO: ::
 	// TODO: return
 	// TODO: break
@@ -310,6 +368,14 @@ func (t *Transpiler) parseStat() {
 	default:
 		t.parseExprStat()
 	}
+}
+
+func (t *Transpiler) parseCondAndBlock() {
+	t.nextToken()   // if | elseif
+	t.parseSubexp() // condition
+	t.expect("then")
+	// TODO: something weird about goto? see test_then_block in lparser.c
+	t.parseBlock()
 }
 
 func (t *Transpiler) parseExprStat() {
@@ -330,35 +396,24 @@ func (t *Transpiler) parseAssignment() {
 	}
 }
 
-func (t *Transpiler) parseFunc(parseName bool) {
-	t.maybe("function")
-
-	if parseName {
-		// Name {'.' Name} [':' Name]
-		name := t.nextToken()
-		if !isName(name) {
-			panic(fmt.Errorf("bad token in function name: %s", name))
+func (t *Transpiler) parseFuncName() {
+	// Name {'.' Name} [':' Name]
+	t.expectName("of function")
+	for {
+		if t.peekToken() != "." {
+			break
 		}
-		for {
-			if t.peekToken() != "." {
-				break
-			}
-			t.nextToken()
-
-			name := t.nextToken()
-			if !isName(name) {
-				panic(fmt.Errorf("bad token in function name: %s", name))
-			}
-		}
-		if t.peekToken() == ":" {
-			t.nextToken()
-			name := t.nextToken()
-			if !isName(name) {
-				panic(fmt.Errorf("bad token in function name: %s", name))
-			}
-		}
+		t.nextToken()
+		t.expectName("in function name")
 	}
+	if t.peekToken() == ":" {
+		t.nextToken()
+		t.expectName("in function name")
+	}
+}
 
+// Includes the parenthesized list of arguments
+func (t *Transpiler) parseFuncBody() {
 	// '(' [parlist] ')'
 	t.expect("(")
 	for {
@@ -380,14 +435,15 @@ func (t *Transpiler) parseFunc(parseName bool) {
 		break
 	}
 
-	t.parseBlock("end")
+	t.parseBlock()
 	t.expect("end")
 }
 
-func (t *Transpiler) parseBlock(ender string) {
+func (t *Transpiler) parseBlock() {
 	for {
-		if t.peekToken() == ender {
-			break
+		switch tok := t.peekToken(); tok {
+		case "else", "elseif", "end", eof, "until":
+			return
 		}
 
 		if t.peekToken() == "return" {
@@ -407,6 +463,7 @@ func (t *Transpiler) parseExpList() {
 		if t.peekToken() != "," {
 			break
 		}
+		t.nextToken()
 		t.parseSubexp()
 	}
 }
@@ -434,18 +491,14 @@ func (t *Transpiler) parseSuffixedExp() {
 		switch tok := t.peekToken(); tok {
 		case ".":
 			t.nextToken()
-			if name := t.nextToken(); !isName(name) {
-				panic(fmt.Errorf("expected name of field, but got: %s", name))
-			}
+			t.expectName("of field")
 		case "[":
 			t.nextToken()
 			t.parseSubexp()
 			t.expect("]")
 		case ":":
 			t.nextToken()
-			if name := t.nextToken(); !isName(name) {
-				panic(fmt.Errorf("expected name of method, but got: %s", name))
-			}
+			t.expectName("of method")
 			t.parseFuncArgs()
 		case "(", "{":
 			t.parseFuncArgs()
@@ -501,7 +554,8 @@ func (t *Transpiler) parseSimpleExp() {
 	case "{":
 		t.parseTable()
 	case "function":
-		t.parseFunc(false)
+		t.nextToken()
+		t.parseFuncBody()
 	default:
 		if isNumber(tok) || isString(tok) {
 			t.nextToken()
@@ -522,10 +576,7 @@ func (t *Transpiler) parseTable() {
 
 		if t.peekToken2() == "=" {
 			// Name '=' exp
-			name := t.nextToken()
-			if !isName(name) {
-				panic(fmt.Errorf("expected name for table field but got %s", name))
-			}
+			t.expectName("for table field")
 			t.nextToken() // '='
 			t.parseSubexp()
 		} else if t.peekToken() == "[" {
