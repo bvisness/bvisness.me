@@ -2,7 +2,7 @@ package bhp2
 
 import (
 	"fmt"
-	"regexp"
+	"strings"
 )
 
 func Transpile(source string) (string, error) {
@@ -10,15 +10,18 @@ func Transpile(source string) (string, error) {
 	tr.skipWhitespace()
 	tr.parseBlock()
 	tr.expect(eof)
-	return "so transpiley wow", nil
+	return tr.b.String(), nil
 }
 
 // See the full Lua grammar:
 // https://www.lua.org/manual/5.2/manual.html#9
 
 type Transpiler struct {
-	source string
-	cur    int
+	source     string
+	cur        int
+	chunkStart int
+
+	b strings.Builder
 }
 
 var operators = []string{
@@ -85,8 +88,6 @@ func isUnop(tok string) bool {
 		return false
 	}
 }
-
-var reWhitespace = regexp.MustCompile(`(\s|--(\[\[]]))*`)
 
 func (t *Transpiler) nextIs(s string) bool {
 	return len(t.source[t.cur:]) >= len(s) && t.source[t.cur:t.cur+len(s)] == s
@@ -285,11 +286,12 @@ func (t *Transpiler) expect(s string) {
 	}
 }
 
-func (t *Transpiler) expectName(desc string) {
+func (t *Transpiler) expectName(desc string) string {
 	tok := t.nextToken()
 	if !isName(tok) {
 		panic(fmt.Errorf("expected name %s but got %s", desc, tok))
 	}
+	return tok
 }
 
 func (t *Transpiler) maybe(s string) {
@@ -559,6 +561,8 @@ func (t *Transpiler) parseSimpleExp() {
 		t.nextToken()
 	case "{":
 		t.parseTable()
+	case "<":
+		t.parseTag()
 	case "function":
 		t.nextToken()
 		t.parseFuncBody()
@@ -605,4 +609,65 @@ func (t *Transpiler) parseTable() {
 		t.expect("}")
 		break
 	}
+}
+
+type TagAttribute struct {
+	Name  string
+	Value string
+}
+
+// finally the actual transpiler part
+func (t *Transpiler) parseTag() {
+	t.b.WriteString(t.source[t.chunkStart:t.cur])
+
+	t.expect("<")
+	if t.peekToken() == ">" {
+		// fragment
+		panic("fragments not implemented")
+	} else {
+		// named tag
+		tagName := t.expectName("of tag")
+		var atts []TagAttribute
+		for isName(t.peekToken()) {
+			// TODO: handle HTML attributes with dashes
+			att := TagAttribute{Name: t.expectName("of attribute")}
+			if t.peekToken() == "=" {
+				t.nextToken()
+				if isString(t.peekToken()) {
+					att.Value = t.nextToken()
+				} else if t.peekToken() == "{" {
+					t.nextToken()
+					expStart := t.cur
+					t.parseSubexp()
+					expEnd := t.cur
+					t.expect("}")
+					att.Value = strings.TrimSpace(t.source[expStart:expEnd])
+				}
+			} else {
+				att.Value = "true"
+			}
+			atts = append(atts, att)
+		}
+		if t.peekToken() == "/" {
+			t.nextToken()
+		}
+		t.expect(">")
+
+		t.b.WriteString("__tag(\"")
+		t.b.WriteString(tagName)
+		t.b.WriteString("\", {")
+		if len(atts) > 0 {
+			t.b.WriteString(" ")
+		}
+		for _, att := range atts {
+			t.b.WriteString(att.Name)
+			t.b.WriteString(" = ")
+			t.b.WriteString(att.Value)
+			t.b.WriteString(", ")
+		}
+		t.b.WriteString("}, {})")
+		// TODO: children
+	}
+
+	t.chunkStart = t.cur
 }

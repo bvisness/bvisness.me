@@ -14,41 +14,41 @@ type tokenizerTest struct {
 
 var tokenizerTests = []tokenizerTest{
 	{"numbers", 10, `
-		3     3.0     3.1416     314.16e-2     0.31416E1
-		0xff  0x0.1E  0xA23p-4   0X1.921FB54442D18P+1
+3     3.0     3.1416     314.16e-2     0.31416E1
+0xff  0x0.1E  0xA23p-4   0X1.921FB54442D18P+1
 	`},
 	{"tables and functions", 76, `
-		function Video(slug)
-			return {
-				__html("div", { class = "relative aspect-ratio--16x9" }, {
-					__html("video", {
-						class = "aspect-ratio--object",
-						src = relurl("vids/" .. slug .. ".mp4"),
-						poster = relurl("vids/" .. slug .. ".jpg"),
-						autoplay = true,
-						muted = true,
-						loop = true,
-						controls = true,
-						preload = "metadata",
-					})
-				})
-			}
-		end
+function Video(slug)
+	return {
+		__html("div", { class = "relative aspect-ratio--16x9" }, {
+			__html("video", {
+				class = "aspect-ratio--object",
+				src = relurl("vids/" .. slug .. ".mp4"),
+				poster = relurl("vids/" .. slug .. ".jpg"),
+				autoplay = true,
+				muted = true,
+				loop = true,
+				controls = true,
+				preload = "metadata",
+			})
+		})
+	}
+end
 	`},
 	{"now with comments", 57, `
-		table.insert(__doc, Wide({}, {
-			__fragment({
-				__html("p", {
-					-- "Before we go further, let me introduce you to programming in Dreams.",
-					__source(123, 234), -- avoid allocating and escaping big strings by slicing from source
-				}),
-				Video("wowow"),
-				__html("p", {
-					-- "Dreams code is made up of nodes and wires...",
-					__source(345, 456),
-				}),
-			}),
-		}))
+table.insert(__doc, Wide({}, {
+	__fragment({
+		__html("p", {
+			-- "Before we go further, let me introduce you to programming in Dreams.",
+			__source(123, 234), -- avoid allocating and escaping big strings by slicing from source
+		}),
+		Video("wowow"),
+		__html("p", {
+			-- "Dreams code is made up of nodes and wires...",
+			__source(345, 456),
+		}),
+	}),
+}))
 	`},
 	{"beeg comment", 5, `
 --[[
@@ -77,21 +77,25 @@ Lyon = {}
 	`},
 }
 
+func tokens(source string) []string {
+	tr := Transpiler{source: source}
+	tr.skipWhitespace()
+	var tokens []string
+	for {
+		tok := tr.nextToken()
+		tokens = append(tokens, tok)
+		if tok == eof {
+			break
+		}
+	}
+	return tokens
+}
+
 func TestTokenizer(t *testing.T) {
 	for _, test := range tokenizerTests {
 		t.Run(test.name, func(t *testing.T) {
-			tr := Transpiler{source: test.source}
-			tr.skipWhitespace()
-			numTokens := 0
-			for {
-				tok := tr.nextToken()
-				t.Log("torken", tok)
-				numTokens++
-				if tok == eof {
-					break
-				}
-			}
-			assert.Equal(t, test.numTokens, numTokens)
+			toks := tokens(test.source)
+			assert.Equal(t, test.numTokens, len(toks))
 		})
 	}
 }
@@ -103,18 +107,18 @@ type parserTest struct {
 
 var vanillaParserTests = []parserTest{
 	{"simple function w/ expression", `
-		function foo.bar:baz(a, b)
-			return a + b + (a - b)
-		end
+function foo.bar:baz(a, b)
+	return a + b + (a - b)
+end
 	`},
 	{"assignment of table", `
-		myTable = {
-			a,
-			1 + 2 - 3,
-			foo = "bar",
-			["baz"] = "I have been a good bing :)",
-			[8] = 0xf00
-		}
+myTable = {
+	a,
+	1 + 2 - 3,
+	foo = "bar",
+	["baz"] = "I have been a good bing :)",
+	[8] = 0xf00
+}
 	`},
 	{"fancy example with root statements", `
 function Wide(atts, children)
@@ -181,7 +185,7 @@ test("Path:new", function(t)
 end)
 	`},
 	{"robot coroutines", `
-	if isTesting() then
+if isTesting() then
 	autoChooser = MockSendableChooser
 end
 
@@ -199,11 +203,44 @@ end
 	`},
 }
 
-func TestTranspile(t *testing.T) {
+func TestVanillaLua(t *testing.T) {
 	for _, test := range vanillaParserTests {
 		t.Run(test.name, func(t *testing.T) {
 			_, err := Transpile(test.source)
 			assert.Nil(t, err)
+		})
+	}
+}
+
+type TagTest struct {
+	name     string
+	source   string
+	expected string
+}
+
+var tagTests = []TagTest{
+	{
+		"simple self-closing",
+		`local tag = <div foo="bar" baz bing />`,
+		`local tag = __tag("div", { foo="bar", baz=true, bing=true, }, {})`,
+	},
+	{
+		"inline Lua expressions",
+		`local tag = <div foo="bar" baz={ 1 + 2 } bing={ foo.bar:greet("hello") } />`,
+		`local tag = __tag("div", { foo="bar", baz=1 + 2, bing=foo.bar:greet("hello"), }, {})`,
+	},
+}
+
+func TestTags(t *testing.T) {
+	for _, test := range tagTests {
+		t.Run(test.name, func(t *testing.T) {
+			transpiled, err := Transpile(test.source)
+			if assert.Nil(t, err) {
+				t.Log(transpiled)
+				actualToks := tokens(transpiled)
+				expectedToks := tokens(test.expected)
+				assert.Equal(t, expectedToks, actualToks)
+			}
 		})
 	}
 }
