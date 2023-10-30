@@ -180,6 +180,23 @@ test("Path:new", function(t)
 	t:assert(p.events[1].func ~= nil)
 end)
 	`},
+	{"robot coroutines", `
+	if isTesting() then
+	autoChooser = MockSendableChooser
+end
+
+local doNothingAuto = FancyCoroutine:new(function()
+end)
+
+local function sleep(timeSeconds)
+	local timer = Timer:new()
+	timer:start()
+
+	while timer:get() < timeSeconds do
+		coroutine.yield()
+	end
+end
+	`},
 }
 
 func TestTranspile(t *testing.T) {

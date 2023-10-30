@@ -311,8 +311,14 @@ func (t *Transpiler) parseStat() {
 			t.parseBlock()
 		}
 		t.expect("end")
-		// TODO: while
-		// TODO: do
+	case "while":
+		t.nextToken()
+		t.parseSubexp()
+		t.expect("do")
+		t.parseBlock()
+		t.expect("end")
+	case "do":
+		panic("unimplemented")
 	case "for":
 		t.nextToken()
 		t.expectName("of loop variable")
@@ -338,7 +344,8 @@ func (t *Transpiler) parseStat() {
 		t.expect("do")
 		t.parseBlock()
 		t.expect("end")
-		// TODO: repeat
+	case "repeat":
+		panic("not implemented")
 	case "function":
 		t.nextToken()
 		t.parseFuncName()
@@ -361,10 +368,8 @@ func (t *Transpiler) parseStat() {
 				t.parseExpList()
 			}
 		}
-	// TODO: ::
-	// TODO: return
-	// TODO: break
-	// TODO: goto
+	case "::", "return", "break", "goto":
+		panic("unimplemented")
 	default:
 		t.parseExprStat()
 	}
@@ -517,6 +522,7 @@ func (t *Transpiler) parseFuncArgs() {
 	case "(":
 		t.nextToken()
 		if t.peekToken() == ")" {
+			t.nextToken()
 			return
 		}
 		t.parseExpList()
