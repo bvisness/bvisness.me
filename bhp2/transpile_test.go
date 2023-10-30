@@ -229,6 +229,19 @@ var tagTests = []TagTest{
 		`local tag = <div foo="bar" baz={ 1 + 2 } bing={ foo.bar:greet("hello") } />`,
 		`local tag = __tag("div", { foo="bar", baz=1 + 2, bing=foo.bar:greet("hello"), }, {})`,
 	},
+	{
+		"before/after",
+		`
+local tag1 = <foo />
+local tag2 = <bar />
+print("good :)")
+`,
+		`
+local tag1 = __tag("foo", {}, {})
+local tag2 = __tag("bar", {}, {})
+print("good :)")
+		`,
+	},
 }
 
 func TestTags(t *testing.T) {

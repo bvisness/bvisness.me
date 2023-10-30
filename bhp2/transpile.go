@@ -10,6 +10,7 @@ func Transpile(source string) (string, error) {
 	tr.skipWhitespace()
 	tr.parseBlock()
 	tr.expect(eof)
+	tr.b.WriteString(tr.source[tr.chunkStart:])
 	return tr.b.String(), nil
 }
 
