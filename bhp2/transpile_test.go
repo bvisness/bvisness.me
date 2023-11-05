@@ -1,8 +1,13 @@
 package bhp2
 
 import (
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
 	"testing"
 
+	"github.com/bvisness/bvisness.me/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -225,22 +230,19 @@ var tagTests = []TagTest{
 		`local tag = __tag("div", { foo="bar", baz=true, bing=true, }, {})`,
 	},
 	{
-		"inline Lua expressions",
+		"simple text contents",
+		`local tag = <div>Hello</div>`,
+		`local tag = __tag("div", {}, { __text(17, 22), })`,
+	},
+	{
+		"Lua expressions in attributes",
 		`local tag = <div foo="bar" baz={ 1 + 2 } bing={ foo.bar:greet("hello") } />`,
 		`local tag = __tag("div", { foo="bar", baz=1 + 2, bing=foo.bar:greet("hello"), }, {})`,
 	},
 	{
-		"before/after",
-		`
-local tag1 = <foo />
-local tag2 = <bar />
-print("good :)")
-`,
-		`
-local tag1 = __tag("foo", {}, {})
-local tag2 = __tag("bar", {}, {})
-print("good :)")
-		`,
+		"Lua expressions in text",
+		`local tag = <div>Hello { firstname } { lastname }!</div>`,
+		`local tag = __tag("div", {}, { __text(17, 23), firstname, __text(36, 37), lastname, __text(49, 50), })`,
 	},
 }
 
@@ -252,6 +254,31 @@ func TestTags(t *testing.T) {
 				t.Log(transpiled)
 				actualToks := tokens(transpiled)
 				expectedToks := tokens(test.expected)
+				assert.Equal(t, expectedToks, actualToks)
+			}
+		})
+	}
+}
+
+func TestTranspile(t *testing.T) {
+	tests := []string{"video"}
+
+	for _, test := range tests {
+		t.Run(test, func(t *testing.T) {
+			luaxName := filepath.Join("test", fmt.Sprintf("%s.luax", test))
+			expectedLuaName := filepath.Join("test", fmt.Sprintf("%s.lua", test))
+			actualLuaName := filepath.Join("test", fmt.Sprintf("%s.actual.lua", test))
+
+			luax := string(utils.Must1(io.ReadAll(utils.Must1(os.Open(luaxName)))))
+			expected := string(utils.Must1(io.ReadAll(utils.Must1(os.Open(expectedLuaName)))))
+
+			transpiled, err := Transpile(luax)
+			if assert.Nil(t, err) {
+				t.Log(transpiled)
+				os.WriteFile(actualLuaName, []byte(transpiled), 0644)
+
+				actualToks := tokens(transpiled)
+				expectedToks := tokens(expected)
 				assert.Equal(t, expectedToks, actualToks)
 			}
 		})

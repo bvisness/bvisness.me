@@ -2,6 +2,7 @@ package bhp2
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -10,7 +11,7 @@ func Transpile(source string) (string, error) {
 	tr.skipWhitespace()
 	tr.parseBlock()
 	tr.expect(eof)
-	tr.b.WriteString(tr.source[tr.chunkStart:])
+	tr.b.WriteString(tr.source[tr.luaChunkStart:])
 	return tr.b.String(), nil
 }
 
@@ -18,11 +19,37 @@ func Transpile(source string) (string, error) {
 // https://www.lua.org/manual/5.2/manual.html#9
 
 type Transpiler struct {
-	source     string
-	cur        int
-	chunkStart int
+	source       string
+	cur, lastCur int
+
+	inHTML        bool
+	luaChunkStart int
+
+	whitespaceStart int
+	indent          string
 
 	b strings.Builder
+}
+
+func (t *Transpiler) switchToHTML() {
+	if !t.inHTML {
+		t.b.WriteString(t.source[t.luaChunkStart:t.cur])
+		t.luaChunkStart = -1
+	}
+	t.inHTML = true
+}
+
+func (t *Transpiler) switchToLua() {
+	if t.inHTML {
+		t.luaChunkStart = t.cur
+	}
+	t.inHTML = false
+}
+
+func (t *Transpiler) fail(msg string, args ...any) error {
+	newArgs := []any{t.lastCur}
+	newArgs = append(newArgs, args...)
+	return fmt.Errorf("bad LuaX syntax at %d: "+msg, newArgs...)
 }
 
 var operators = []string{
@@ -95,6 +122,8 @@ func (t *Transpiler) nextIs(s string) bool {
 }
 
 func (t *Transpiler) skipWhitespace() {
+	t.whitespaceStart = t.cur
+	indentStart := -1
 	for {
 		if t.cur >= len(t.source) {
 			break
@@ -119,10 +148,20 @@ func (t *Transpiler) skipWhitespace() {
 			}
 		} else if isspace(t.source[t.cur]) {
 			t.cur++
+			if t.source[t.cur-1] == '\n' {
+				indentStart = t.cur
+			}
 		} else {
 			break
 		}
 	}
+	if indentStart >= 0 {
+		t.indent = t.source[indentStart:t.cur]
+	}
+}
+
+func (t *Transpiler) unwindWhitespace() {
+	t.cur = t.whitespaceStart
 }
 
 func (t *Transpiler) lexName() string {
@@ -233,6 +272,12 @@ func (t *Transpiler) lexLongString() string {
 }
 
 func (t *Transpiler) peekToken() string {
+	// very bad hack
+	defer func(cur int) {
+		t.cur = cur
+	}(t.cur)
+	t.skipWhitespace()
+
 	if t.cur >= len(t.source) {
 		return eof
 	}
@@ -248,7 +293,7 @@ func (t *Transpiler) peekToken() string {
 		return t.lexString(c)
 	}
 	if t.nextIs("[=") {
-		panic("shut up nerd")
+		panic(t.fail("shut up nerd"))
 	}
 	if t.nextIs("[[") {
 		return t.lexLongString()
@@ -261,7 +306,7 @@ func (t *Transpiler) peekToken() string {
 			return op
 		}
 	}
-	panic("wat is token I do not know")
+	panic(t.fail("wat is token I do not know"))
 }
 
 func (t *Transpiler) peekToken2() string {
@@ -274,7 +319,9 @@ func (t *Transpiler) peekToken2() string {
 }
 
 func (t *Transpiler) nextToken() string {
+	t.skipWhitespace()
 	tok := t.peekToken()
+	t.lastCur = t.cur
 	t.cur += len(tok)
 	t.skipWhitespace()
 	return tok
@@ -283,14 +330,14 @@ func (t *Transpiler) nextToken() string {
 func (t *Transpiler) expect(s string) {
 	tok := t.nextToken()
 	if tok != s {
-		panic(fmt.Errorf("bad Lua syntax: expected %s but got %s", s, tok))
+		panic(t.fail("expected %s but got %s", s, tok))
 	}
 }
 
 func (t *Transpiler) expectName(desc string) string {
 	tok := t.nextToken()
 	if !isName(tok) {
-		panic(fmt.Errorf("expected name %s but got %s", desc, tok))
+		panic(t.fail("expected name %s but got %s", desc, tok))
 	}
 	return tok
 }
@@ -321,7 +368,7 @@ func (t *Transpiler) parseStat() {
 		t.parseBlock()
 		t.expect("end")
 	case "do":
-		panic("unimplemented")
+		panic(t.fail("unimplemented"))
 	case "for":
 		t.nextToken()
 		t.expectName("of loop variable")
@@ -342,13 +389,13 @@ func (t *Transpiler) parseStat() {
 			t.expect("in")
 			t.parseExpList()
 		default:
-			panic(fmt.Errorf("unexpected token in loop: %s", tok))
+			panic(t.fail("unexpected token in loop: %s", tok))
 		}
 		t.expect("do")
 		t.parseBlock()
 		t.expect("end")
 	case "repeat":
-		panic("not implemented")
+		panic(t.fail("not implemented"))
 	case "function":
 		t.nextToken()
 		t.parseFuncName()
@@ -372,7 +419,7 @@ func (t *Transpiler) parseStat() {
 			}
 		}
 	case "::", "return", "break", "goto":
-		panic("unimplemented")
+		panic(t.fail("unimplemented"))
 	default:
 		t.parseExprStat()
 	}
@@ -432,7 +479,7 @@ func (t *Transpiler) parseFuncBody() {
 
 		name := t.nextToken()
 		if !isName(name) && name != "..." {
-			panic(fmt.Errorf("expected argument name for function but got %s", name))
+			panic(t.fail("expected argument name for function but got %s", name))
 		}
 		if t.peekToken() == "," {
 			t.nextToken()
@@ -488,7 +535,7 @@ func (t *Transpiler) parsePrimaryExp() {
 			t.nextToken()
 			return
 		}
-		panic(fmt.Errorf("unexpected token in primary exp: %s", tok))
+		panic(t.fail("unexpected token in primary exp: %s", tok))
 	}
 }
 
@@ -537,7 +584,7 @@ func (t *Transpiler) parseFuncArgs() {
 			t.nextToken()
 			return
 		}
-		panic(fmt.Errorf("unknown token in func args: %s", tok))
+		panic(t.fail("unknown token in func args: %s", tok))
 	}
 }
 
@@ -563,7 +610,7 @@ func (t *Transpiler) parseSimpleExp() {
 	case "{":
 		t.parseTable()
 	case "<":
-		t.parseTag()
+		t.parseTag(t.indent)
 	case "function":
 		t.nextToken()
 		t.parseFuncBody()
@@ -618,13 +665,18 @@ type TagAttribute struct {
 }
 
 // finally the actual transpiler part
-func (t *Transpiler) parseTag() {
-	t.b.WriteString(t.source[t.chunkStart:t.cur])
+func (t *Transpiler) parseTag(indent string) {
+	t.switchToHTML()
+	defer t.switchToLua()
 
 	t.expect("<")
 	if t.peekToken() == ">" {
 		// fragment
-		panic("fragments not implemented")
+		t.expect(">")
+		t.b.WriteString("__fragment(")
+		t.unwindWhitespace()
+		t.parseTagChildren("", indent)
+		t.b.WriteString(")")
 	} else {
 		// named tag
 		tagName := t.expectName("of tag")
@@ -649,26 +701,106 @@ func (t *Transpiler) parseTag() {
 			}
 			atts = append(atts, att)
 		}
-		if t.peekToken() == "/" {
-			t.nextToken()
-		}
-		t.expect(">")
 
 		t.b.WriteString("__tag(\"")
 		t.b.WriteString(tagName)
 		t.b.WriteString("\", {")
 		if len(atts) > 0 {
-			t.b.WriteString(" ")
+			t.b.WriteString("\n")
+			for _, att := range atts {
+				t.b.WriteString(indent)
+				t.b.WriteString("  ")
+				t.b.WriteString(att.Name)
+				t.b.WriteString(" = ")
+				t.b.WriteString(att.Value)
+				t.b.WriteString(",\n")
+			}
+			t.b.WriteString(indent)
 		}
-		for _, att := range atts {
-			t.b.WriteString(att.Name)
-			t.b.WriteString(" = ")
-			t.b.WriteString(att.Value)
-			t.b.WriteString(", ")
+		t.b.WriteString("}, ")
+
+		hasChildren := true
+		if t.peekToken() == "/" {
+			t.nextToken()
+			hasChildren = false
 		}
-		t.b.WriteString("}, {})")
-		// TODO: children
+		t.expect(">")
+		t.unwindWhitespace()
+
+		if hasChildren {
+			t.parseTagChildren(tagName, indent)
+		} else {
+			t.b.WriteString("{}")
+		}
+
+		t.b.WriteString(")")
 	}
 
-	t.chunkStart = t.cur
+	t.luaChunkStart = t.cur
+}
+
+func (t *Transpiler) parseTagChildren(tagName string, indent string) {
+	t.b.WriteString("{\n")
+
+	textStart := t.cur
+	for {
+		if t.source[t.cur] == '<' {
+			t.emitTextNode(textStart, indent+"  ")
+
+			if t.peekToken2() == "/" {
+				// closing tag
+				t.expect("<")
+				t.expect("/")
+				if tagName != "" {
+					name := t.expectName("of closing tag")
+					if name != tagName {
+						panic(t.fail("expected </%s> but got </%s>", tagName, name))
+					}
+				}
+				t.expect(">")
+				t.unwindWhitespace()
+				break
+			} else {
+				// opening tag
+				t.b.WriteString(indent)
+				t.b.WriteString("  ")
+				t.parseTag(indent + "  ")
+				t.b.WriteString(",\n")
+			}
+
+			textStart = t.cur
+		} else if t.source[t.cur] == '{' {
+			t.emitTextNode(textStart, indent+"  ")
+
+			t.b.WriteString(indent + "  ")
+
+			t.expect("{")
+			t.switchToLua()
+			t.parseSubexp()
+			t.switchToHTML()
+			t.expect("}")
+			t.unwindWhitespace()
+
+			t.b.WriteString(",\n")
+
+			textStart = t.cur
+		} else {
+			t.cur++
+		}
+	}
+
+	t.b.WriteString(indent)
+	t.b.WriteString("}")
+}
+
+func (t *Transpiler) emitTextNode(start int, indent string) {
+	if start == t.cur {
+		return
+	}
+	t.b.WriteString(indent)
+	t.b.WriteString("__text(")
+	t.b.WriteString(strconv.Itoa(start))
+	t.b.WriteString(", ")
+	t.b.WriteString(strconv.Itoa(t.cur))
+	t.b.WriteString("),\n")
 }
