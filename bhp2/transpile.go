@@ -673,10 +673,20 @@ func (t *Transpiler) parseTag(indent string) {
 	if t.peekToken() == ">" {
 		// fragment
 		t.expect(">")
-		t.b.WriteString("__fragment(")
 		t.unwindWhitespace()
-		t.parseTagChildren("", indent)
-		t.b.WriteString(")")
+
+		t.b.WriteString("{\n")
+		t.b.WriteString("    ")
+		t.b.WriteString(`type = "fragment",` + "\n")
+		t.b.WriteString(indent)
+		t.b.WriteString("    ")
+		t.b.WriteString("children = ")
+
+		t.parseTagChildren("", indent+"    ")
+
+		t.b.WriteString(",\n")
+		t.b.WriteString(indent)
+		t.b.WriteString("}")
 	} else {
 		// named tag
 		tagName := t.expectName("of tag")
@@ -702,22 +712,43 @@ func (t *Transpiler) parseTag(indent string) {
 			atts = append(atts, att)
 		}
 
-		t.b.WriteString("__tag(\"")
-		t.b.WriteString(tagName)
-		t.b.WriteString("\", {")
+		isCustom := 'A' <= tagName[0] && tagName[0] <= 'Z'
+
+		if isCustom {
+			t.b.WriteString(tagName)
+			t.b.WriteString("(\n")
+			t.b.WriteString(indent)
+			t.b.WriteString("    ")
+		} else {
+			t.b.WriteString("{\n")
+			t.b.WriteString(indent)
+			t.b.WriteString("    ")
+			t.b.WriteString(`type = "html",` + "\n")
+			t.b.WriteString(indent)
+			t.b.WriteString("    ")
+			t.b.WriteString("name = \"" + tagName + "\",\n")
+			t.b.WriteString(indent)
+			t.b.WriteString("    ")
+			t.b.WriteString("atts = ")
+		}
+
 		if len(atts) > 0 {
-			t.b.WriteString("\n")
+			t.b.WriteString("{\n")
 			for _, att := range atts {
 				t.b.WriteString(indent)
-				t.b.WriteString("  ")
+				t.b.WriteString("    ")
+				t.b.WriteString("    ")
 				t.b.WriteString(att.Name)
 				t.b.WriteString(" = ")
 				t.b.WriteString(att.Value)
 				t.b.WriteString(",\n")
 			}
 			t.b.WriteString(indent)
+			t.b.WriteString("    ")
+			t.b.WriteString("},\n")
+		} else {
+			t.b.WriteString("{},\n")
 		}
-		t.b.WriteString("}, ")
 
 		hasChildren := true
 		if t.peekToken() == "/" {
@@ -727,13 +758,25 @@ func (t *Transpiler) parseTag(indent string) {
 		t.expect(">")
 		t.unwindWhitespace()
 
+		t.b.WriteString(indent)
+		t.b.WriteString("    ")
+		if !isCustom {
+			t.b.WriteString("children = ")
+		}
 		if hasChildren {
-			t.parseTagChildren(tagName, indent)
+			t.parseTagChildren(tagName, indent+"    ")
 		} else {
 			t.b.WriteString("{}")
 		}
-
-		t.b.WriteString(")")
+		if isCustom {
+			t.b.WriteString("\n")
+			t.b.WriteString(indent)
+			t.b.WriteString(")")
+		} else {
+			t.b.WriteString(",\n")
+			t.b.WriteString(indent)
+			t.b.WriteString("}")
+		}
 	}
 
 	t.luaChunkStart = t.cur
@@ -745,7 +788,7 @@ func (t *Transpiler) parseTagChildren(tagName string, indent string) {
 	textStart := t.cur
 	for {
 		if t.source[t.cur] == '<' {
-			t.emitTextNode(textStart, indent+"  ")
+			t.emitTextNode(textStart, indent+"    ")
 
 			if t.peekToken2() == "/" {
 				// closing tag
@@ -763,16 +806,17 @@ func (t *Transpiler) parseTagChildren(tagName string, indent string) {
 			} else {
 				// opening tag
 				t.b.WriteString(indent)
-				t.b.WriteString("  ")
-				t.parseTag(indent + "  ")
+				t.b.WriteString("    ")
+				t.parseTag(indent + "    ")
 				t.b.WriteString(",\n")
 			}
 
 			textStart = t.cur
 		} else if t.source[t.cur] == '{' {
-			t.emitTextNode(textStart, indent+"  ")
+			t.emitTextNode(textStart, indent+"    ")
 
-			t.b.WriteString(indent + "  ")
+			t.b.WriteString(indent)
+			t.b.WriteString("    ")
 
 			t.expect("{")
 			t.switchToLua()
@@ -798,9 +842,9 @@ func (t *Transpiler) emitTextNode(start int, indent string) {
 		return
 	}
 	t.b.WriteString(indent)
-	t.b.WriteString("__text(")
+	t.b.WriteString(`{ type = "source", `)
 	t.b.WriteString(strconv.Itoa(start))
 	t.b.WriteString(", ")
 	t.b.WriteString(strconv.Itoa(t.cur))
-	t.b.WriteString("),\n")
+	t.b.WriteString(" },\n")
 }

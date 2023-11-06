@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/bvisness/bvisness.me/bhp"
+	"github.com/bvisness/bvisness.me/bhp2"
 )
 
-func Middleware[T any](b bhp.Instance[T], r bhp.Request[T], w http.ResponseWriter, m bhp.MiddlewareData[T]) bool {
+func Middleware[T any](b bhp2.Instance[T], r bhp2.Request[T], w http.ResponseWriter, m bhp2.MiddlewareData[T]) bool {
 	isImage := false
 	for _, format := range AllFormats {
 		if m.ContentType == format {

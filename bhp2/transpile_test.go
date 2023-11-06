@@ -227,22 +227,27 @@ var tagTests = []TagTest{
 	{
 		"simple self-closing",
 		`local tag = <div foo="bar" baz bing />`,
-		`local tag = __tag("div", { foo="bar", baz=true, bing=true, }, {})`,
+		`local tag = { type = "html", name = "div", atts = { foo="bar", baz=true, bing=true, }, children = {}, }`,
 	},
 	{
 		"simple text contents",
 		`local tag = <div>Hello</div>`,
-		`local tag = __tag("div", {}, { __text(17, 22), })`,
+		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", 17, 22 }, }, }`,
+	},
+	{
+		"custom component",
+		`local tag = <Custom foo="bar" />`,
+		`local tag = Custom({ foo = "bar", }, {})`,
 	},
 	{
 		"Lua expressions in attributes",
 		`local tag = <div foo="bar" baz={ 1 + 2 } bing={ foo.bar:greet("hello") } />`,
-		`local tag = __tag("div", { foo="bar", baz=1 + 2, bing=foo.bar:greet("hello"), }, {})`,
+		`local tag = { type = "html", name = "div", atts = { foo="bar", baz=1 + 2, bing=foo.bar:greet("hello"), }, children = {}, }`,
 	},
 	{
 		"Lua expressions in text",
 		`local tag = <div>Hello { firstname } { lastname }!</div>`,
-		`local tag = __tag("div", {}, { __text(17, 23), firstname, __text(36, 37), lastname, __text(49, 50), })`,
+		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", 17, 23 }, firstname, { type = "source", 36, 37 }, lastname, { type = "source", 49, 50 }, }, }`,
 	},
 }
 

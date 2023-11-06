@@ -31,7 +31,7 @@ function Wide(atts, children)
     </div>
 end
 
-render(<>
+bhp.render(<>
     <Wide>
         <>
             <p>Before we go further, let me introduce you to programming in Dreams.</p>
