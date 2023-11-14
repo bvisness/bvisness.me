@@ -23,34 +23,57 @@ func render(l *lua.State) int {
 	return 0
 }
 
+func checkString(l *lua.State, index int, what string) string {
+	if s, ok := l.ToString(index); ok {
+		return s
+	}
+	lua.ArgumentError(l, index, fmt.Sprintf("%s (string) expected, got %s", what, lua.TypeNameOf(l, index)))
+	panic("unreachable")
+}
+
+func checkType(l *lua.State, index int, t lua.Type, what string) {
+	if l.TypeOf(index) != t {
+		lua.ArgumentError(l, index, fmt.Sprintf("%s (%s) expected, got %s", what, t.String(), lua.TypeNameOf(l, index)))
+		panic("unreachable")
+	}
+}
+
 func renderRec(l *lua.State, b *strings.Builder, source string) {
 	lua.CheckType(l, -1, lua.TypeTable)
-	defer l.Pop(1)
 
 	l.Field(-1, "type")
-	t := lua.CheckString(l, -1)
+	t := checkString(l, -1, "node type")
 	l.Pop(1)
 
 	switch t {
 	case "html":
-		l.Field(1, "name")
-		name := lua.CheckString(l, -1)
-		l.Field(1, "atts")
-		lua.CheckType(l, -1, lua.TypeTable)
-		l.Field(1, "children")
-		lua.CheckType(l, -1, lua.TypeTable)
+		l.Field(-1, "name")
+		name := checkString(l, -1, "tag name")
+		l.Field(-2, "atts")
+		checkType(l, -1, lua.TypeTable, "tag attributes")
+		l.Field(-3, "children")
+		checkType(l, -1, lua.TypeTable, "tag children")
 
 		b.WriteString("<")
 		b.WriteString(name)
 		l.PushNil()
 		for l.Next(-3) { // atts
-			att := lua.CheckString(l, -2)
-			val := lua.CheckString(l, -1)
 			b.WriteString(" ")
-			b.WriteString(att)
-			b.WriteString(`="`)
-			b.WriteString(val) // TODO: escape
-			b.WriteString(`"`)
+
+			att := checkString(l, -2, "attribute name")
+			switch l.TypeOf(-1) {
+			case lua.TypeString:
+				val := checkString(l, -1, "attribute value")
+				b.WriteString(att)
+				b.WriteString(`="`)
+				b.WriteString(val) // TODO: escape
+				b.WriteString(`"`)
+			case lua.TypeBoolean:
+				has := l.ToBoolean(-1)
+				if has {
+					b.WriteString(att)
+				}
+			}
 			l.Pop(1)
 
 			// TODO: special handling of `class`
@@ -59,15 +82,28 @@ func renderRec(l *lua.State, b *strings.Builder, source string) {
 
 		l.PushNil()
 		for l.Next(-2) { // children
-			lua.CheckType(l, -1, lua.TypeTable)
+			checkType(l, -1, lua.TypeTable, "tag child")
 			renderRec(l, b, source)
+			l.Pop(1)
 		}
 
 		b.WriteString("</")
 		b.WriteString(name)
 		b.WriteString(">")
 
-		l.Pop(3)
+		l.Pop(3) // name, atts, children
+	case "fragment":
+		l.Field(1, "children")
+		checkType(l, -1, lua.TypeTable, "fragment children")
+
+		l.PushNil()
+		for l.Next(-2) {
+			checkType(l, -1, lua.TypeTable, "fragment child")
+			renderRec(l, b, source)
+			l.Pop(1)
+		}
+
+		l.Pop(1) // children
 	case "source":
 		l.RawGetInt(-1, 1)
 		start := lua.CheckInteger(l, -1)
