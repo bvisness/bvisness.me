@@ -1,1 +1,1 @@
-bhp.render("Bonk.")
+bhp.render(<h1 class="foo">Wow!</h1>)

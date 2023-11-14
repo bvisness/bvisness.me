@@ -166,26 +166,13 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fileBytes := utils.Must1(io.ReadAll(file))
 		transpiled := utils.Must1(Transpile(string(fileBytes)))
 
-		var rendered string
-		bhpOpen := func(l *lua.State) int {
-			lua.NewLibrary(l, []lua.RegistryFunction{
-				{
-					Name: "render",
-					Function: func(state *lua.State) int {
-						blep := lua.CheckString(l, 1)
-						rendered = blep
-						return 0
-					},
-				},
-			})
-			return 1
-		}
-
 		l := lua.NewState()
-		lua.OpenLibraries(l, lua.RegistryFunction{"bhp", bhpOpen})
+		lua.OpenLibraries(l)
+		lua.Require(l, "bhp", BHP2Open, true)
 
+		setSource(l, string(fileBytes))
 		utils.Must(lua.DoString(l, transpiled))
-		w.Write([]byte(rendered))
+		w.Write([]byte(getRendered(l)))
 
 		// TODO: write something?
 
