@@ -38,12 +38,25 @@ func checkType(l *lua.State, index int, t lua.Type, what string) {
 	}
 }
 
+var depth = 0
+
 func renderRec(l *lua.State, b *strings.Builder, source string) {
+	depth += 1
+	topBefore := l.Top()
+	defer func() {
+		if l.Top() != topBefore {
+			panic(fmt.Errorf("bad stack management at depth %d: top went from %d to %d", depth, topBefore, l.Top()))
+		}
+		depth -= 1
+	}()
+
 	lua.CheckType(l, -1, lua.TypeTable)
 
 	l.Field(-1, "type")
 	t := checkString(l, -1, "node type")
 	l.Pop(1)
+	fmt.Printf("into %s...\n", t)
+	defer fmt.Printf("...out of %s\n", t)
 
 	switch t {
 	case "html":
@@ -73,10 +86,36 @@ func renderRec(l *lua.State, b *strings.Builder, source string) {
 				if has {
 					b.WriteString(att)
 				}
+			case lua.TypeTable:
+				if att != "class" {
+					panic("only `class` can use a table for its value")
+				}
+
+				l.Length(-1)
+				n := lua.CheckInteger(l, -1)
+				l.Pop(1)
+
+				b.WriteString(att)
+				b.WriteString(`="`)
+
+				// numeric fields; unconditionally added first
+				for i := 1; i <= n; i++ {
+					l.PushInteger(i)
+					l.Table(-2)
+					class := checkString(l, -1, "class")
+					l.Pop(1)
+
+					if i > 1 {
+						b.WriteString(" ")
+					}
+					b.WriteString(class)
+				}
+
+				// TODO: string fields, added if value is true
+
+				b.WriteString(`"`)
 			}
 			l.Pop(1)
-
-			// TODO: special handling of `class`
 		}
 		b.WriteString(">")
 
@@ -131,8 +170,32 @@ func setSource(l *lua.State, source string) {
 	l.Pop(1)
 }
 
+func nosource(l *lua.State) int {
+	checkType(l, 1, lua.TypeTable, "children")
+
+	l.NewTable() // 2
+
+	i := 1
+	l.PushNil()
+	for l.Next(1) {
+		l.Field(-1, "type")
+		t := checkString(l, -1, "node type")
+		l.Pop(1)
+
+		if t != "source" {
+			l.RawSetInt(2, i) // pops the value
+			i++
+		} else {
+			l.Pop(1)
+		}
+	}
+
+	return 1
+}
+
 var bhp2Library = []lua.RegistryFunction{
 	{"render", render},
+	{"nosource", nosource},
 }
 
 func BHP2Open(l *lua.State) int {

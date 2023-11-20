@@ -14,8 +14,31 @@ function Video(atts)
     </div>
 end
 
-bhp.render(<>
-    <p>Before we go further, let me introduce you to programming in Dreams.</p>
-    <Video slug="foo" />
-    <p>Dreams code is made up of nodes and wires, superficially similar to some other visual programming systems. However, it is very tightly designed and elegantly integrated into the game world. In this example, a Trigger Zone widget is wired to the Glow property of the lights on this Christmas tree, causing it to light up whenever the player walks into the zone.</p>
-</>)
+function Wide(atts, children)
+    children = bhp.nosource(children)
+
+    if #children ~= 2 then
+        error("requires exactly two children")
+    end
+
+    return <div class="wide flex justify-center mv4">
+        <div class={{
+            "flex flex-column flex-row-l",
+            atts.class or "items-center",
+            "g4"
+        }}>
+            <div class="w-100 flex-fair-l p-dumb">
+                { children[1] }
+            </div>
+            <div class="w-100 flex-fair-l p-dumb">
+                { children[2] }
+            </div>
+        </div>
+    </div>
+end
+
+bhp.render(<p>
+    wow a good
+    <>fraggy</>
+    wowow
+</p>)
