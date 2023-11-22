@@ -4,12 +4,12 @@ go 1.19
 
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
-	github.com/Shopify/go-lua v0.0.0-20221004153744-91867de107cf
 	github.com/alecthomas/chroma/v2 v2.7.0
 	github.com/chai2010/webp v1.1.1
 	github.com/gomarkdown/markdown v0.0.0-20220830015526-01a3c37d6f50
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/stretchr/testify v1.8.0
+	github.com/yuin/gopher-lua v1.1.0
 )
 
 require (

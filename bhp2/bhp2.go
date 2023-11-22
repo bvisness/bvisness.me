@@ -13,8 +13,8 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/Shopify/go-lua"
 	"github.com/bvisness/bvisness.me/utils"
+	lua "github.com/yuin/gopher-lua"
 )
 
 //go:embed builtin/*
@@ -167,11 +167,21 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		transpiled := utils.Must1(Transpile(string(fileBytes)))
 
 		l := lua.NewState()
-		lua.OpenLibraries(l)
-		lua.Require(l, "bhp", BHP2Open, true)
+		defer l.Close()
+		changeSearchers(l)
+
+		// TODO: save bytecode of BHP for faster startup
+		l.PreloadModule("bhp", LoadBHP2)
+		utils.Must(l.DoString("require(\"bhp\")"))
 
 		setSource(l, string(fileBytes))
-		utils.Must(lua.DoString(l, transpiled))
+		mainChunk, err := l.Load(strings.NewReader(transpiled), filename)
+		if err != nil {
+			l.RaiseError("error loading %s: %v", filename, err)
+			return
+		}
+		l.Push(mainChunk)
+		l.Call(0, lua.MultRet)
 		w.Write([]byte(getRendered(l)))
 
 		// TODO: write something?
