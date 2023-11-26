@@ -2,11 +2,15 @@ require("pprint")
 
 bhp = {
     _rendered = "",
-    _source = "",
+    _sources = {},
 }
 
 ---@param b StringBuilder
 local function renderRec(node, b)
+    if node == nil then
+        return
+    end
+
     if type(node) == "string" then
         b:add(node)
         return
@@ -65,10 +69,23 @@ local function renderRec(node, b)
             renderRec(child, b)
         end
     elseif node.type == "source" then
-        b:add(bhp._source:sub(node[1] + 1, node[2]))
+        local raw = bhp._sources[node.file]
+        if not raw then
+            pprint(bhp._sources)
+            error("could not find source file '" .. node.file .. "'")
+        end
+        b:add(raw:sub(node[1] + 1, node[2]))
+    elseif node.type == "doctype" then
+        b:add("<!DOCTYPE html>")
     elseif node.type == nil then
         pprint(node)
-        b:add("[ERROR: nil node type, see console]")
+        if #node > 0 then
+            for i, child in ipairs(node) do
+                renderRec(child, b)
+            end
+        else
+            b:add("[ERROR: nil node type, see console]")
+        end
     else
         error(string.format("unknown luax node type '%s'", node.type))
     end

@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"embed"
 	_ "embed"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
+	"strings"
 
 	"github.com/bvisness/bvisness.me/utils"
 	lua "github.com/yuin/gopher-lua"
@@ -33,6 +35,70 @@ var builtinFSSearcher = FSSearcher{
 	Prefix: "lua/",
 }
 
+func loadPlainLua(l *lua.LState, s FSSearcher) bool {
+	name := l.CheckString(1)
+	filename := s.Prefix + name + ".lua"
+	f, err := s.FS.Open(filename)
+	if errors.Is(err, fs.ErrNotExist) {
+		return false
+	} else if err != nil {
+		l.Push(lua.LString(fmt.Sprintf("error opening file: %v", err)))
+		return true
+	}
+
+	b, err := io.ReadAll(f)
+	if err != nil {
+		l.Push(lua.LString(fmt.Sprintf("error reading file: %v", err)))
+		return true
+	}
+
+	loader, err := l.Load(bytes.NewBuffer(b), name)
+	if err != nil {
+		l.Push(lua.LString(fmt.Sprintf("error in file: %v", err)))
+		return true
+	}
+
+	l.Push(loader)
+	return true
+}
+
+func loadLuax(l *lua.LState, s FSSearcher) bool {
+	name := l.CheckString(1)
+	filename := s.Prefix + name + ".luax"
+	f, err := s.FS.Open(filename)
+	if errors.Is(err, fs.ErrNotExist) {
+		return false
+	} else if err != nil {
+		l.Push(lua.LString(fmt.Sprintf("error opening file: %v", err)))
+		return true
+	}
+
+	b, err := io.ReadAll(f)
+	if err != nil {
+		l.Push(lua.LString(fmt.Sprintf("error reading file: %v", err)))
+		return true
+	}
+
+	// Save file source in bhp._sources
+	bhpSources := l.GetGlobal("bhp").(*lua.LTable).RawGetString("_sources").(*lua.LTable)
+	bhpSources.RawSetString(filename, lua.LString(b))
+
+	transpiled, err := Transpile(string(b), filename)
+	if err != nil {
+		l.Push(lua.LString(fmt.Sprintf("error transpiling file: %v", err)))
+		return true
+	}
+
+	loader, err := l.Load(strings.NewReader(transpiled), name)
+	if err != nil {
+		l.Push(lua.LString(fmt.Sprintf("error in file: %v", err)))
+		return true
+	}
+
+	l.Push(loader)
+	return true
+}
+
 func (b *Instance) initSearchers(l *lua.LState) {
 	p := l.GetGlobal("package")
 	oldLoaders := l.GetField(p, "loaders").(*lua.LTable)
@@ -45,30 +111,11 @@ func (b *Instance) initSearchers(l *lua.LState) {
 	for i := 1; i <= len(fsSearchers); i++ {
 		s := fsSearchers[i-1]
 		l.RawSetInt(newLoaders, i+1, l.NewFunction(func(l *lua.LState) int {
-			name := l.CheckString(1)
-			filename := s.Prefix + name + ".lua"
-			f, err := s.FS.Open(filename)
-			if err == fs.ErrNotExist {
-				l.Push(lua.LNil)
-				return 1
-			} else if err != nil {
-				l.Push(lua.LString(fmt.Sprintf("error opening file: %v", err)))
+			if loadPlainLua(l, s) || loadLuax(l, s) {
 				return 1
 			}
 
-			b, err := io.ReadAll(f)
-			if err != nil {
-				l.Push(lua.LString(fmt.Sprintf("error reading file: %v", err)))
-				return 1
-			}
-
-			loader, err := l.Load(bytes.NewBuffer(b), name)
-			if err != nil {
-				l.Push(lua.LString(fmt.Sprintf("error in file: %v", err)))
-				return 1
-			}
-
-			l.Push(loader)
+			l.Push(lua.LNil)
 			return 1
 		}))
 	}
@@ -82,7 +129,7 @@ func getRendered(l *lua.LState) string {
 	return string(bhp.RawGetString("_rendered").(lua.LString))
 }
 
-func setSource(l *lua.LState, source string) {
-	bhp := l.GetGlobal("bhp").(*lua.LTable)
-	bhp.RawSetString("_source", lua.LString(source))
+func saveSource(l *lua.LState, filename, source string) {
+	sources := l.GetGlobal("bhp").(*lua.LTable).RawGetString("_sources").(*lua.LTable)
+	sources.RawSetString(filename, lua.LString(source))
 }

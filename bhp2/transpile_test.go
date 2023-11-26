@@ -211,7 +211,7 @@ end
 func TestVanillaLua(t *testing.T) {
 	for _, test := range vanillaParserTests {
 		t.Run(test.name, func(t *testing.T) {
-			_, err := Transpile(test.source)
+			_, err := Transpile(test.source, test.name)
 			assert.Nil(t, err)
 		})
 	}
@@ -232,7 +232,7 @@ var tagTests = []TagTest{
 	{
 		"simple text contents",
 		`local tag = <div>Hello</div>`,
-		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", 17, 22 }, }, }`,
+		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", file = "simple text contents", 17, 22 }, }, }`,
 	},
 	{
 		"custom component",
@@ -247,14 +247,29 @@ var tagTests = []TagTest{
 	{
 		"Lua expressions in text",
 		`local tag = <div>Hello { firstname } { lastname }!</div>`,
-		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", 17, 23 }, firstname, { type = "source", 36, 37 }, lastname, { type = "source", 49, 50 }, }, }`,
+		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", file = "Lua expressions in text", 17, 23 }, firstname, { type = "source", file = "Lua expressions in text", 36, 37 }, lastname, { type = "source", file = "Lua expressions in text", 49, 50 }, }, }`,
+	},
+	{
+		"Fragments",
+		`return <><b>yes</b></>`,
+		`return { type = "fragment", children = { { type = "html", name = "b", atts = {}, children = { { type = "source", file = "Fragments", 12, 15 }, }, }, }, }`,
+	},
+	{
+		"HTML comments",
+		`local tag = <div><!-- comment -->Hello</div>`,
+		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", file = "HTML comments", 33, 38 }, }, }`,
+	},
+	{
+		"HTML DOCTYPE",
+		`local tag = <><!DOCTYPE html>Hello</>`,
+		`local tag = { type = "fragment", children = { { type = "doctype" }, { type = "source", file = "HTML DOCTYPE", 29, 34 }, }, }`,
 	},
 }
 
 func TestTags(t *testing.T) {
 	for _, test := range tagTests {
 		t.Run(test.name, func(t *testing.T) {
-			transpiled, err := Transpile(test.source)
+			transpiled, err := Transpile(test.source, test.name)
 			if assert.Nil(t, err) {
 				t.Log(transpiled)
 				actualToks := tokens(transpiled)
@@ -266,7 +281,7 @@ func TestTags(t *testing.T) {
 }
 
 func TestTranspile(t *testing.T) {
-	tests := []string{"video"}
+	tests := []string{"children", "video"}
 
 	for _, test := range tests {
 		t.Run(test, func(t *testing.T) {
@@ -277,7 +292,7 @@ func TestTranspile(t *testing.T) {
 			luax := string(utils.Must1(io.ReadAll(utils.Must1(os.Open(luaxName)))))
 			expected := string(utils.Must1(io.ReadAll(utils.Must1(os.Open(expectedLuaName)))))
 
-			transpiled, err := Transpile(luax)
+			transpiled, err := Transpile(luax, luaxName)
 			if assert.Nil(t, err) {
 				t.Log(transpiled)
 				os.WriteFile(actualLuaName, []byte(transpiled), 0644)

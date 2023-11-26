@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-func Transpile(source string) (string, error) {
-	tr := Transpiler{source: source}
+func Transpile(source, filename string) (string, error) {
+	tr := Transpiler{source: source, filename: filename}
 	tr.skipWhitespace()
 	tr.parseBlock()
 	tr.expect(eof)
@@ -20,8 +20,8 @@ func Transpile(source string) (string, error) {
 
 // TODO: Track newlines, transpile with respect to newlines so that line numbers are preserved
 type Transpiler struct {
-	source       string
-	cur, lastCur int
+	source, filename string
+	cur, lastCur     int
 
 	inHTML        bool
 	luaChunkStart int
@@ -48,13 +48,16 @@ func (t *Transpiler) switchToLua() {
 }
 
 func (t *Transpiler) fail(msg string, args ...any) error {
-	newArgs := []any{t.lastCur}
+	newArgs := []any{t.filename, t.lastCur}
 	newArgs = append(newArgs, args...)
-	return fmt.Errorf("bad LuaX syntax at %d: "+msg, newArgs...)
+	return fmt.Errorf("bad LuaX syntax in %s at %d: "+msg, newArgs...)
 }
 
 var operators = []string{
 	// longest first!
+
+	"!", "--", // for the transpiler only
+
 	"...",
 	"..",
 	".",
@@ -128,7 +131,7 @@ func (t *Transpiler) skipWhitespace() {
 	for {
 		if t.cur >= len(t.source) {
 			break
-		} else if t.nextIs("--") {
+		} else if !t.inHTML && t.nextIs("--") {
 			// comment! possibly multiline
 			t.cur += 2
 			long := t.nextIs("[[")
@@ -307,12 +310,22 @@ func (t *Transpiler) peekToken() string {
 			return op
 		}
 	}
-	panic(t.fail("wat is token I do not know"))
+	panic(t.fail("wat is token I do not know (char: %c)", c))
 }
 
 func (t *Transpiler) peekToken2() string {
 	// godless hack
 	originalCur := t.cur
+	t.nextToken()
+	res := t.peekToken()
+	t.cur = originalCur
+	return res
+}
+
+func (t *Transpiler) peekToken3() string {
+	// godlesser hack
+	originalCur := t.cur
+	t.nextToken()
 	t.nextToken()
 	res := t.peekToken()
 	t.cur = originalCur
@@ -611,7 +624,7 @@ func (t *Transpiler) parseSimpleExp() {
 	case "{":
 		t.parseTable()
 	case "<":
-		t.parseTag(t.indent)
+		t.parseTag(t.indent, true)
 	case "function":
 		t.nextToken()
 		t.parseFuncBody()
@@ -666,9 +679,11 @@ type TagAttribute struct {
 }
 
 // finally the actual transpiler part
-func (t *Transpiler) parseTag(indent string) {
-	t.switchToHTML()
-	defer t.switchToLua()
+func (t *Transpiler) parseTag(indent string, fromLua bool) {
+	if fromLua {
+		t.switchToHTML()
+		defer t.switchToLua()
+	}
 
 	t.expect("<")
 	if t.peekToken() == ">" {
@@ -688,6 +703,20 @@ func (t *Transpiler) parseTag(indent string) {
 		t.b.WriteString(",\n")
 		t.b.WriteString(indent)
 		t.b.WriteString("}")
+	} else if t.peekToken() == "!" {
+		t.expect("!")
+		specialName := t.expectName("of special tag")
+		if specialName != "DOCTYPE" {
+			panic(t.fail("only DOCTYPE is supported for special tags"))
+		}
+
+		doctype := t.expectName("for doctype")
+		if doctype != "html" {
+			panic(t.fail("`html` is the only supported doctype"))
+		}
+		t.expect(">")
+
+		t.b.WriteString(`{ type = "doctype" }`)
 	} else {
 		// named tag
 		tagName := t.expectName("of tag")
@@ -804,11 +833,20 @@ func (t *Transpiler) parseTagChildren(tagName string, indent string) {
 				t.expect(">")
 				t.unwindWhitespace()
 				break
+			} else if t.peekToken2() == "!" && t.peekToken3() == "--" {
+				// comment
+				t.expect("<")
+				t.expect("!")
+				t.expect("--")
+				for t.source[t.cur:t.cur+3] != "-->" {
+					t.cur++
+				}
+				t.cur += 3
 			} else {
 				// opening tag
 				t.b.WriteString(indent)
 				t.b.WriteString("    ")
-				t.parseTag(indent + "    ")
+				t.parseTag(indent+"    ", false)
 				t.b.WriteString(",\n")
 			}
 
@@ -843,7 +881,9 @@ func (t *Transpiler) emitTextNode(start int, indent string) {
 		return
 	}
 	t.b.WriteString(indent)
-	t.b.WriteString(`{ type = "source", `)
+	t.b.WriteString(`{ type = "source", file = "`)
+	t.b.WriteString(t.filename)
+	t.b.WriteString(`", `)
 	t.b.WriteString(strconv.Itoa(start))
 	t.b.WriteString(", ")
 	t.b.WriteString(strconv.Itoa(t.cur))

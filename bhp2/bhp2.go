@@ -132,7 +132,7 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch contentType {
 	case "text/luax":
 		fileBytes := utils.Must1(io.ReadAll(file))
-		transpiled := utils.Must1(Transpile(string(fileBytes)))
+		transpiled := utils.Must1(Transpile(string(fileBytes), filename))
 
 		l := lua.NewState()
 		defer l.Close()
@@ -142,7 +142,7 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		l.PreloadModule("bhp", LoadBHP2)
 		utils.Must(l.DoString("require(\"bhp\")"))
 
-		setSource(l, string(fileBytes))
+		saveSource(l, filename, string(fileBytes))
 		mainChunk, err := l.Load(strings.NewReader(transpiled), filename)
 		if err != nil {
 			l.RaiseError("error loading %s: %v", filename, err)
