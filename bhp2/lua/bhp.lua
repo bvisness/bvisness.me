@@ -1,3 +1,5 @@
+require("pprint")
+
 bhp = {
     _rendered = "",
     _source = "",
@@ -5,6 +7,11 @@ bhp = {
 
 ---@param b StringBuilder
 local function renderRec(node, b)
+    if type(node) == "string" then
+        b:add(node)
+        return
+    end
+
     if node.type == "html" then
         b:add("<")
         b:add(node.name)
@@ -59,6 +66,9 @@ local function renderRec(node, b)
         end
     elseif node.type == "source" then
         b:add(bhp._source:sub(node[1] + 1, node[2]))
+    elseif node.type == nil then
+        pprint(node)
+        b:add("[ERROR: nil node type, see console]")
     else
         error(string.format("unknown luax node type '%s'", node.type))
     end

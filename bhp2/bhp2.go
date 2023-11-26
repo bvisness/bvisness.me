@@ -20,52 +20,25 @@ import (
 //go:embed builtin/*
 var builtinFS embed.FS
 
-type Request[UserData any] struct {
-	R    *http.Request
-	User UserData
-}
-
-type Middleware[UserData any] func(b Instance[UserData], r Request[UserData], w http.ResponseWriter, m MiddlewareData[UserData]) bool
-type MiddlewareData[UserData any] struct {
+type Middleware func(b Instance, r *http.Request, w http.ResponseWriter, m MiddlewareData) bool
+type MiddlewareData struct {
 	FilePath    string
 	ContentType string
 }
 
-type Instance[UserData any] struct {
-	SrcDir, IncludeDir string
-	UserData           UserData
-	StaticPaths        []string
-	Middleware         Middleware[UserData]
-}
-
-type Options[UserData any] struct {
+type Instance struct {
+	SrcDir      string
+	FSSearchers []FSSearcher
 	StaticPaths []string
-	Middleware  Middleware[UserData]
+	Middleware  Middleware
 }
 
-func New[UserData any](
-	srcDir, includeDir string,
-	userData UserData,
-	opts Options[UserData],
-) Instance[UserData] {
-	return Instance[UserData]{
-		SrcDir:      srcDir,
-		IncludeDir:  includeDir,
-		UserData:    userData,
-		StaticPaths: opts.StaticPaths,
-		Middleware:  opts.Middleware,
-	}
+type Options struct {
+	StaticPaths []string
+	Middleware  Middleware
 }
 
-func Run[UserData any](
-	srcDir, includeDir string,
-	userData UserData,
-	opts Options[UserData],
-) {
-	New(srcDir, includeDir, userData, opts).Run()
-}
-
-func (b Instance[UserData]) Run() {
+func (b Instance) Run() {
 	go func() {
 		// Start up private API for pprof
 		addr := ":9494"
@@ -79,7 +52,7 @@ func (b Instance[UserData]) Run() {
 }
 
 // Implements http.Handler. No mux necessary!
-func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Printf("\nERROR: %v\n\n", r)
@@ -94,11 +67,6 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.URL.Host == "" {
 		r.URL.Host = r.Host
-	}
-
-	bhpRequest := Request[UserData]{
-		R:    r,
-		User: b.UserData,
 	}
 
 	// OLD: walk includes
@@ -152,7 +120,7 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	contentType := detectContentType(fileInfo, opening[:])
 
 	if b.Middleware != nil {
-		didHandle := b.Middleware(b, bhpRequest, w, MiddlewareData[UserData]{
+		didHandle := b.Middleware(b, r, w, MiddlewareData{
 			FilePath:    srcFilename,
 			ContentType: contentType,
 		})
@@ -168,7 +136,7 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		l := lua.NewState()
 		defer l.Close()
-		changeSearchers(l)
+		b.initSearchers(l)
 
 		// TODO: save bytecode of BHP for faster startup
 		l.PreloadModule("bhp", LoadBHP2)
@@ -182,6 +150,8 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		l.Push(mainChunk)
 		l.Call(0, lua.MultRet)
+
+		w.Header().Add("Content-Type", "text/html")
 		w.Write([]byte(getRendered(l)))
 
 		// TODO: write something?
@@ -204,7 +174,7 @@ func (b Instance[UserData]) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (b Instance[any]) ResolveFileOrDir(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
+func (b Instance) ResolveFileOrDir(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
 	srcFilename = filepath.Join(b.SrcDir, abspath)
 	fileInfo, err = os.Stat(srcFilename)
 	if err != nil {
@@ -213,7 +183,7 @@ func (b Instance[any]) ResolveFileOrDir(abspath string) (srcFilename string, fil
 	return
 }
 
-func (b Instance[any]) ResolveDirectoryIndex(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
+func (b Instance) ResolveDirectoryIndex(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
 	abspath += "/index.luax"
 	srcFilename, fileInfo, err = b.ResolveFileOrDir(abspath)
 	if err != nil {
@@ -249,7 +219,7 @@ func stripContentType(contentType string) string {
 	return strings.SplitN(contentType, ";", 2)[0]
 }
 
-func (b *Instance[UserData]) pathIsStatic(path string) bool {
+func (b *Instance) pathIsStatic(path string) bool {
 	for _, staticPath := range b.StaticPaths {
 		if strings.HasPrefix(path, staticPath) {
 			return true
@@ -258,8 +228,8 @@ func (b *Instance[UserData]) pathIsStatic(path string) bool {
 	return false
 }
 
-func ChainMiddleware[UserData any](middlewares ...Middleware[UserData]) Middleware[UserData] {
-	return func(b Instance[UserData], r Request[UserData], w http.ResponseWriter, m MiddlewareData[UserData]) bool {
+func ChainMiddleware[UserData any](middlewares ...Middleware) Middleware {
+	return func(b Instance, r *http.Request, w http.ResponseWriter, m MiddlewareData) bool {
 		for _, middleware := range middlewares {
 			didHandle := middleware(b, r, w, m)
 			if didHandle {

@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"os"
 	"runtime/debug"
 	"time"
 
 	"github.com/bvisness/bvisness.me/bhp2"
-	"github.com/bvisness/bvisness.me/pkg/images"
 )
 
 var hash string = fmt.Sprintf("%d", time.Now().Unix())
@@ -29,8 +29,7 @@ func init() {
 type Bvisness struct {
 	BaseData // shut up, errors
 
-	Articles []Article
-	Desmos   DesmosData
+	Desmos DesmosData
 }
 
 type BaseData struct {
@@ -65,184 +64,70 @@ type Desmos struct {
 	JS   template.JS
 }
 
-var articles = []Article{
-	{
-		BaseData: BaseData{
-			Title:       `“You can’t do that because I hate you.”`,
-			Description: "An infuriating pattern that devs need to stop.",
-		},
-		Slug: "you-cant",
-		Date: time.Date(2023, 7, 26, 0, 0, 0, 0, time.UTC),
-	},
-	{
-		BaseData: BaseData{
-			Title:       "Coroutines make robot code easy",
-			Description: "Our FIRST Robotics team struggled with autonomous code for years. Coroutines were the missing piece.",
-		},
-		Slug: "coroutines",
-		Date: time.Date(2023, 6, 19, 0, 0, 0, 0, time.UTC),
-	},
-	{
-		BaseData: BaseData{
-			Title:       "How (not) to write a manifesto",
-			Description: "The Handmade Manifesto is on its third revision now. Let's look back at old versions of the manifesto and see how our messaging has shifted over time.",
-		},
-		Slug: "manifesto",
-		Date: time.Date(2023, 5, 19, 0, 0, 0, 0, time.UTC),
-	},
-	{
-		BaseData: BaseData{
-			Title:       "\"It's always a tradeoff\"",
-			Description: "Programmers love to say things like \"it all depends\" or \"it's always a tradeoff\". This makes them sound very wise, but it's usually a cop-out.",
-		},
-		Slug: "tradeoffs",
-		Date: time.Date(2023, 4, 15, 0, 0, 0, 0, time.UTC),
-	},
-	{
-		BaseData: BaseData{
-			Title:          "I did Advent of Code on a PlayStation",
-			Description:    "How far can I get in Advent of Code if I do all the problems in Dreams?",
-			OpenGraphImage: "advent-of-dreams/vids/crane.jpg",
-		},
-		Slug: "advent-of-dreams",
-		Date: time.Date(2022, 12, 31, 0, 0, 0, 0, time.UTC),
-	},
-	{
-		BaseData: BaseData{
-			Title:       "Essential complexity does not exist",
-			Description: "Trying to define \"essential complexity\" is a waste of time, but maybe not for the reason you think.",
-			Banner:      "essential-complexity/gears.png",
-			BannerScale: 3,
-		},
-		Slug: "essential-complexity",
-		Date: time.Date(2022, 10, 15, 0, 0, 0, 0, time.UTC),
-	},
-	{
-		BaseData: BaseData{
-			Title:          "Untangling a bizarre WASM crash in Chrome",
-			Description:    "How we solved a strange issue involving the guts of Chrome and the Go compiler.",
-			OpenGraphImage: "chrome-wasm-crash/ogimage.png",
-		},
-		Slug: "chrome-wasm-crash",
-		Date: time.Date(2021, 7, 9, 0, 0, 0, 0, time.UTC),
-	},
-	{
-		BaseData: BaseData{
-			Title:          "How to make a 3D renderer in Desmos",
-			Description:    "Learn about the math of 3D rendering, and how to convince a 2D graphing calculator to produce 3D images.",
-			OpenGraphImage: "desmos/opengraph.png",
-			LightOnly:      true,
-		},
-		Slug: "desmos",
-		Date: time.Date(2019, 4, 14, 0, 0, 0, 0, time.UTC),
-	},
-	{
-		BaseData: BaseData{
-			Title:       "UE4: How to Make Awesome Buttons in VR",
-			Description: "Or: why the physics engine is not your friend.",
-			Banner:      "vr-buttons/mediamenu.jpg",
-			BannerScale: 2,
-		},
-		Slug: "vr-buttons",
-		Date: time.Date(2017, 8, 27, 0, 0, 0, 0, time.UTC),
-	},
-	{
-		BaseData: BaseData{
-			Title:       "Blender masking layers: a quick tutorial",
-			Description: "A long response to a short StackExchange question.",
-		},
-		Slug: "blender-masking-layers",
-		Date: time.Date(2017, 4, 25, 0, 0, 0, 0, time.UTC),
-	},
-	{
-		BaseData: BaseData{
-			Title:       "UE4: Controlling Spotify in-game",
-			Description: "And iTunes, Windows Media Player, and everything else, with just a little bit of Windows API magic.",
-			Banner:      "ue4-spotify/mediamenu.jpg",
-			BannerScale: 2,
-		},
-		Slug: "ue4-spotify",
-		Date: time.Date(2017, 2, 12, 0, 0, 0, 0, time.UTC),
-	},
-	{
-		BaseData: BaseData{
-			Title:       "Compiling and using libgit2",
-			Description: "How to build libgit2 from source, install it on your computer, and use it in a project without linker errors.",
-		},
-		Slug: "libgit2",
-		Date: time.Date(2017, 1, 2, 0, 0, 0, 0, time.UTC),
-	},
-	{
-		BaseData: BaseData{
-			Title:       "Project spotlight: VRInteractions",
-			Description: "An engine plugin for Unreal Engine 4 that makes it easy to create interactive objects in VR.",
-		},
-		Slug: "vrinteractions",
-		Date: time.Date(2016, 11, 7, 0, 0, 0, 0, time.UTC),
-	},
+var bvisnessIncludes = bhp2.FSSearcher{
+	FS: os.DirFS("include"),
 }
 
 func main() {
-	bhp2.Run(
-		"site", "include",
-		Bvisness{
-			Articles: articles,
-			Desmos: DesmosData{
-				NextThreegraphID: 1,
-			},
-		},
-		bhp2.Options[Bvisness]{
-			// TODO: Dunno if this is necessary any more.
-			// StaticPaths: []string{"apps/"},
-			// Funcs: func(b bhp.Instance[Bvisness], r bhp.Request[Bvisness]) template.FuncMap {
-			// 	return bhp.MergeFuncMaps(
-			// 		images.TemplateFuncs(b, r),
-			// 		markdown.TemplateFuncs,
-			// 		template.FuncMap{
-			// 			"article": func(slug string) Article {
-			// 				for _, article := range articles {
-			// 					if article.Slug == slug {
-			// 						return article
-			// 					}
-			// 				}
-			// 				panic(fmt.Errorf("No article found with slug %s", slug))
-			// 			},
-			// 			"bust": func(resourceUrl string) string {
-			// 				resUrlParsed, err := url.Parse(resourceUrl)
-			// 				if err != nil {
-			// 					panic(err)
-			// 				}
-			// 				q := resUrlParsed.Query()
-			// 				q.Set("v", hash)
-			// 				resUrlParsed.RawQuery = q.Encode()
-			// 				return resUrlParsed.String()
-			// 			},
-			// 			"permalink": func() string {
-			// 				return bhp.RelURL(r.R, "/")
-			// 			},
+	b := bhp2.Instance{
+		SrcDir:      "site",
+		FSSearchers: []bhp2.FSSearcher{bvisnessIncludes},
+		StaticPaths: []string{"apps/"},
+		// Middleware:  bhp2.ChainMiddleware(images.Middleware[Bvisness]),
+	}
+	b.Run()
 
-			// 			// Desmos article
-			// 			"threegraph": func(js string) template.HTML {
-			// 				result := template.HTML(bhp.Eval(r.T, "desmos/threegraph.html", Threegraph{
-			// 					ID: r.User.Desmos.NextThreegraphID,
-			// 					JS: template.JS(js),
-			// 				}))
-			// 				r.User.Desmos.NextThreegraphID++
-			// 				return result
-			// 			},
-			// 			"desmos": func(opts template.JS, js string) template.HTML {
-			// 				result := template.HTML(bhp.Eval(r.T, "desmos/desmos.html", Desmos{
-			// 					ID:   r.User.Desmos.NextDesmosID,
-			// 					Opts: opts,
-			// 					JS:   template.JS(js),
-			// 				}))
-			// 				r.User.Desmos.NextDesmosID++
-			// 				return result
-			// 			},
-			// 		},
-			// 	)
-			// },
-			Middleware: bhp2.ChainMiddleware(images.Middleware[Bvisness]),
-		},
-	)
+	// bhp2.Options[Bvisness]{
+	// TODO: Dunno if this is necessary any more.
+	// StaticPaths: []string{"apps/"},
+	// Funcs: func(b bhp.Instance[Bvisness], r bhp.Request[Bvisness]) template.FuncMap {
+	// 	return bhp.MergeFuncMaps(
+	// 		images.TemplateFuncs(b, r),
+	// 		markdown.TemplateFuncs,
+	// 		template.FuncMap{
+	// 			"article": func(slug string) Article {
+	// 				for _, article := range articles {
+	// 					if article.Slug == slug {
+	// 						return article
+	// 					}
+	// 				}
+	// 				panic(fmt.Errorf("No article found with slug %s", slug))
+	// 			},
+	// 			"bust": func(resourceUrl string) string {
+	// 				resUrlParsed, err := url.Parse(resourceUrl)
+	// 				if err != nil {
+	// 					panic(err)
+	// 				}
+	// 				q := resUrlParsed.Query()
+	// 				q.Set("v", hash)
+	// 				resUrlParsed.RawQuery = q.Encode()
+	// 				return resUrlParsed.String()
+	// 			},
+	// 			"permalink": func() string {
+	// 				return bhp.RelURL(r.R, "/")
+	// 			},
+
+	// 			// Desmos article
+	// 			"threegraph": func(js string) template.HTML {
+	// 				result := template.HTML(bhp.Eval(r.T, "desmos/threegraph.html", Threegraph{
+	// 					ID: r.User.Desmos.NextThreegraphID,
+	// 					JS: template.JS(js),
+	// 				}))
+	// 				r.User.Desmos.NextThreegraphID++
+	// 				return result
+	// 			},
+	// 			"desmos": func(opts template.JS, js string) template.HTML {
+	// 				result := template.HTML(bhp.Eval(r.T, "desmos/desmos.html", Desmos{
+	// 					ID:   r.User.Desmos.NextDesmosID,
+	// 					Opts: opts,
+	// 					JS:   template.JS(js),
+	// 				}))
+	// 				r.User.Desmos.NextDesmosID++
+	// 				return result
+	// 			},
+	// 		},
+	// 	)
+	// },
+	// 	Middleware: bhp2.ChainMiddleware(images.Middleware[Bvisness]),
+	// },
 }

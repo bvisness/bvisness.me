@@ -18,6 +18,7 @@ func Transpile(source string) (string, error) {
 // See the full Lua grammar:
 // https://www.lua.org/manual/5.2/manual.html#9
 
+// TODO: Track newlines, transpile with respect to newlines so that line numbers are preserved
 type Transpiler struct {
 	source       string
 	cur, lastCur int

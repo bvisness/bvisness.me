@@ -1,3 +1,5 @@
+local article = require("articles")["advent-of-dreams"]
+
 function relurl(url)
     return url
 end
@@ -38,6 +40,7 @@ function Wide(atts, children)
 end
 
 bhp.render(<>
+    <h2>{ article.title }</h2>
     <Wide>
         <>
             <p>Before we go further, let me introduce you to programming in Dreams.</p>
