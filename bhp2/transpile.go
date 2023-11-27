@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+func SafeName(filename string) string {
+	return strings.ReplaceAll(filename, "\\", "/")
+}
+
 func Transpile(source, filename string) (string, error) {
 	tr := Transpiler{source: source, filename: filename}
 	tr.skipWhitespace()
@@ -796,7 +800,7 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 		if hasChildren {
 			t.parseTagChildren(tagName, indent+"    ")
 		} else {
-			t.b.WriteString("{}")
+			t.b.WriteString("{ len = 0 }")
 		}
 		if isCustom {
 			t.b.WriteString("\n")
@@ -816,9 +820,10 @@ func (t *Transpiler) parseTagChildren(tagName string, indent string) {
 	t.b.WriteString("{\n")
 
 	textStart := t.cur
+	n := 0
 	for {
 		if t.source[t.cur] == '<' {
-			t.emitTextNode(textStart, indent+"    ")
+			t.emitTextNode(textStart, indent+"    ", &n)
 
 			if t.peekToken2() == "/" {
 				// closing tag
@@ -848,11 +853,13 @@ func (t *Transpiler) parseTagChildren(tagName string, indent string) {
 				t.b.WriteString("    ")
 				t.parseTag(indent+"    ", false)
 				t.b.WriteString(",\n")
+
+				n += 1
 			}
 
 			textStart = t.cur
 		} else if t.source[t.cur] == '{' {
-			t.emitTextNode(textStart, indent+"    ")
+			t.emitTextNode(textStart, indent+"    ", &n)
 
 			t.b.WriteString(indent)
 			t.b.WriteString("    ")
@@ -867,16 +874,21 @@ func (t *Transpiler) parseTagChildren(tagName string, indent string) {
 			t.b.WriteString(",\n")
 
 			textStart = t.cur
+			n += 1
 		} else {
 			t.cur++
 		}
 	}
 
 	t.b.WriteString(indent)
+	t.b.WriteString("len = ")
+	t.b.WriteString(strconv.Itoa(n))
+
+	t.b.WriteString(indent)
 	t.b.WriteString("}")
 }
 
-func (t *Transpiler) emitTextNode(start int, indent string) {
+func (t *Transpiler) emitTextNode(start int, indent string, numChildren *int) {
 	if start == t.cur {
 		return
 	}
@@ -888,4 +900,5 @@ func (t *Transpiler) emitTextNode(start int, indent string) {
 	t.b.WriteString(", ")
 	t.b.WriteString(strconv.Itoa(t.cur))
 	t.b.WriteString(" },\n")
+	*numChildren += 1
 }

@@ -57,16 +57,16 @@ local function renderRec(node, b)
         end
         b:add(">")
 
-        for i, child in ipairs(node.children) do
-            renderRec(child, b)
+        for i = 1, node.children.len do
+            renderRec(node.children[i], b)
         end
 
         b:add("</")
         b:add(node.name)
         b:add(">")
     elseif node.type == "fragment" then
-        for i, child in ipairs(node.children) do
-            renderRec(child, b)
+        for i = 1, node.children.len do
+            renderRec(node.children[i], b)
         end
     elseif node.type == "source" then
         local raw = bhp._sources[node.file]
@@ -78,14 +78,7 @@ local function renderRec(node, b)
     elseif node.type == "doctype" then
         b:add("<!DOCTYPE html>")
     elseif node.type == nil then
-        pprint(node)
-        if #node > 0 then
-            for i, child in ipairs(node) do
-                renderRec(child, b)
-            end
-        else
-            b:add("[ERROR: nil node type, see console]")
-        end
+        b:add("[ERROR: nil node type, see console]")
     else
         error(string.format("unknown luax node type '%s'", node.type))
     end
@@ -107,6 +100,13 @@ function bhp.nosource(nodes)
         end
     end
     return res
+end
+
+function bhp.expand(nodes)
+    return {
+        type = "fragment",
+        children = nodes,
+    }
 end
 
 ---

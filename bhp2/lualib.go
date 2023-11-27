@@ -81,7 +81,7 @@ func loadLuax(l *lua.LState, s FSSearcher) bool {
 
 	// Save file source in bhp._sources
 	bhpSources := l.GetGlobal("bhp").(*lua.LTable).RawGetString("_sources").(*lua.LTable)
-	bhpSources.RawSetString(filename, lua.LString(b))
+	bhpSources.RawSetString(SafeName(filename), lua.LString(b))
 
 	transpiled, err := Transpile(string(b), filename)
 	if err != nil {

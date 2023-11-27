@@ -142,7 +142,7 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		l.PreloadModule("bhp", LoadBHP2)
 		utils.Must(l.DoString("require(\"bhp\")"))
 
-		saveSource(l, filename, string(fileBytes))
+		saveSource(l, SafeName(filename), string(fileBytes))
 		mainChunk, err := l.Load(strings.NewReader(transpiled), filename)
 		if err != nil {
 			l.RaiseError("error loading %s: %v", filename, err)

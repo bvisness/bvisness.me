@@ -227,43 +227,47 @@ var tagTests = []TagTest{
 	{
 		"simple self-closing",
 		`local tag = <div foo="bar" baz bing />`,
-		`local tag = { type = "html", name = "div", atts = { foo="bar", baz=true, bing=true, }, children = {}, }`,
+		`local tag = { type = "html", name = "div", atts = { foo="bar", baz=true, bing=true, }, children = { len = 0 }, }`,
 	},
 	{
 		"simple text contents",
 		`local tag = <div>Hello</div>`,
-		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", file = "simple text contents", 17, 22 }, }, }`,
+		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", file = "simple text contents", 17, 22 }, len = 1 }, }`,
 	},
 	{
 		"custom component",
 		`local tag = <Custom foo="bar" />`,
-		`local tag = Custom({ foo = "bar", }, {})`,
+		`local tag = Custom({ foo = "bar", }, { len = 0 })`,
 	},
 	{
 		"Lua expressions in attributes",
 		`local tag = <div foo="bar" baz={ 1 + 2 } bing={ foo.bar:greet("hello") } />`,
-		`local tag = { type = "html", name = "div", atts = { foo="bar", baz=1 + 2, bing=foo.bar:greet("hello"), }, children = {}, }`,
+		`local tag = { type = "html", name = "div", atts = { foo="bar", baz=1 + 2, bing=foo.bar:greet("hello"), }, children = { len = 0 }, }`,
 	},
 	{
 		"Lua expressions in text",
 		`local tag = <div>Hello { firstname } { lastname }!</div>`,
-		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", file = "Lua expressions in text", 17, 23 }, firstname, { type = "source", file = "Lua expressions in text", 36, 37 }, lastname, { type = "source", file = "Lua expressions in text", 49, 50 }, }, }`,
+		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", file = "Lua expressions in text", 17, 23 }, firstname, { type = "source", file = "Lua expressions in text", 36, 37 }, lastname, { type = "source", file = "Lua expressions in text", 49, 50 }, len = 5 }, }`,
 	},
 	{
 		"Fragments",
 		`return <><b>yes</b></>`,
-		`return { type = "fragment", children = { { type = "html", name = "b", atts = {}, children = { { type = "source", file = "Fragments", 12, 15 }, }, }, }, }`,
+		`return { type = "fragment", children = { { type = "html", name = "b", atts = {}, children = { { type = "source", file = "Fragments", 12, 15 }, len = 1 }, }, len = 1 }, }`,
 	},
 	{
 		"HTML comments",
 		`local tag = <div><!-- comment -->Hello</div>`,
-		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", file = "HTML comments", 33, 38 }, }, }`,
+		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", file = "HTML comments", 33, 38 }, len = 1 }, }`,
 	},
 	{
 		"HTML DOCTYPE",
 		`local tag = <><!DOCTYPE html>Hello</>`,
-		`local tag = { type = "fragment", children = { { type = "doctype" }, { type = "source", file = "HTML DOCTYPE", 29, 34 }, }, }`,
+		`local tag = { type = "fragment", children = { { type = "doctype" }, { type = "source", file = "HTML DOCTYPE", 29, 34 }, len = 2 }, }`,
 	},
+	{
+		"nils",
+		`local tag = <>foo{ nil }bar</>`,
+		`local tag = { type = "fragment", children = { { type = "source", file = "nils", 14, 17 }, nil, { type = "source", file = "nils", 24, 27 }, len = 3 }, }`},
 }
 
 func TestTags(t *testing.T) {
@@ -292,7 +296,7 @@ func TestTranspile(t *testing.T) {
 			luax := string(utils.Must1(io.ReadAll(utils.Must1(os.Open(luaxName)))))
 			expected := string(utils.Must1(io.ReadAll(utils.Must1(os.Open(expectedLuaName)))))
 
-			transpiled, err := Transpile(luax, luaxName)
+			transpiled, err := Transpile(luax, SafeName(luaxName))
 			if assert.Nil(t, err) {
 				t.Log(transpiled)
 				os.WriteFile(actualLuaName, []byte(transpiled), 0644)

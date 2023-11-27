@@ -6,7 +6,7 @@ function Video(atts)
             class = "relative aspect-ratio--16x9",
         },
         children = {
-            { type = "source", 74,  84 },
+            { type = "source", file = "test/video.luax", 74,  84 },
             {
                 type = "html",
                 name = "video",
@@ -20,9 +20,10 @@ function Video(atts)
                     controls = true,
                     preload = "metadata",
                 },
-                children = {},
+                children = { len = 0 },
             },
-            { type = "source", 350, 356 },
+            { type = "source", file = "test/video.luax", 350, 356 },
+            len = 3
         },
     }
 end
@@ -39,7 +40,7 @@ function Wide(atts, children)
             class = "wide flex justify-center mv4",
         },
         children = {
-            { type = "source", 542, 552 },
+            { type = "source", file = "test/video.luax", 542, 552 },
             {
                 type = "html",
                 name = "div",
@@ -51,32 +52,36 @@ function Wide(atts, children)
                     },
                 },
                 children = {
-                    { type = "source", 683, 697 },
+                    { type = "source", file = "test/video.luax", 683, 697 },
                     {
                         type = "html",
                         name = "div",
                         atts = { class = "w-100 flex-fair-l p-dumb", },
                         children = {
-                            { type = "source", 735, 753 },
+                            { type = "source", file = "test/video.luax", 735, 753 },
                             children[1],
-                            { type = "source", 768, 782 },
+                            { type = "source", file = "test/video.luax", 768, 782 },
+                            len = 3
                         },
                     },
-                    { type = "source", 788, 802 },
+                    { type = "source", file = "test/video.luax", 788, 802 },
                     {
                         type = "html",
                         name = "div",
                         atts = { class = "w-100 flex-fair-l p-dumb", },
                         children = {
-                            { type = "source", 840, 858 },
+                            { type = "source", file = "test/video.luax", 840, 858 },
                             children[2],
-                            { type = "source", 873, 887 },
+                            { type = "source", file = "test/video.luax", 873, 887 },
+                            len = 3
                         },
                     },
-                    { type = "source", 893, 903 },
+                    { type = "source", file = "test/video.luax", 893, 903 },
+                    len = 5
                 },
             },
-            { type = "source", 909, 915 },
+            { type = "source", file = "test/video.luax", 909, 915 },
+            len = 3
         },
     }
 end
@@ -84,41 +89,46 @@ end
 bhp.render({
     type = "fragment",
     children = {
-        { type = "source", 943,  949 },
+        { type = "source", file = "test/video.luax", 943,  949 },
         Wide({}, {
-            { type = "source", 955,  965 },
+            { type = "source", file = "test/video.luax", 955,  965 },
             {
                 type = "fragment",
                 children = {
-                    { type = "source", 967,  981 },
+                    { type = "source", file = "test/video.luax", 967,  981 },
                     {
                         type = "html",
                         name = "p",
                         atts = {},
                         children = {
                             -- "Before we go further, let me introduce you to programming in Dreams.",
-                            { type = "source", 984, 1052 }, -- avoid allocating and escaping big strings by slicing from source
+                            { type = "source", file = "test/video.luax", 984, 1052 }, -- avoid allocating and escaping big strings by slicing from source
+                            len = 1
                         },
                     },
-                    { type = "source", 1056, 1072 },
-                    Video({ slug = "wowow", }, {}),
-                    { type = "source", 1094, 1110 },
+                    { type = "source", file = "test/video.luax", 1056, 1072 },
+                    Video({ slug = "wowow", }, { len = 0 }),
+                    { type = "source", file = "test/video.luax", 1094, 1110 },
                     {
                         type = "html",
                         name = "p",
                         atts = {},
                         children = {
                             -- "Dreams code is made up of nodes and wires...",
-                            { type = "source", 1113, 1473 },
+                            { type = "source", file = "test/video.luax", 1113, 1473 },
+                            len = 1
                         },
                     },
-                    { type = "source", 1477, 1487 },
+                    { type = "source", file = "test/video.luax", 1477, 1487 },
+                    len = 7
                 },
             },
-            { type = "source", 1490, 1500 },
-            Video({ slug = "basics", }, {}),
-            { type = "source", 1523, 1529 },
+            { type = "source", file = "test/video.luax", 1490, 1500 },
+            Video({ slug = "basics", }, { len = 0 }),
+            { type = "source", file = "test/video.luax", 1523, 1529 },
+            len = 5
         }),
-        { type = "source", 1536, 1538 },
+        { type = "source", file = "test/video.luax", 1536, 1538 },
+        len = 3
     },
 })
