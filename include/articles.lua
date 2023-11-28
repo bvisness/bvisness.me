@@ -38,7 +38,7 @@ return slugify({
         date = os.time({ year = 2023, month = 4, day = 15 }),
     },
     {
-        title = "I did Advent of Code on a PlayStation 5 (take that hacker news)",
+        title = "I did Advent of Code on a PlayStation",
         description = "How far can I get in Advent of Code if I do all the problems in Dreams?",
         opengraphImage = "advent-of-dreams/vids/crane.jpg",
         slug = "advent-of-dreams",

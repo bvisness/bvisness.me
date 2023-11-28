@@ -45,3 +45,18 @@ bhp.render(
         Haha.
     </SimpleArticle>
 )
+
+bhp.render(
+    <SimpleArticle article={ article }>
+        <Wide>
+            <>
+                <p>Before we go further, let me introduce you to programming in Dreams.</p>
+
+                <Video slug="wowow" />
+
+                <p>Dreams code is made up of nodes and wires, superficially similar to some other visual programming systems. However, it is very tightly designed and elegantly integrated into the game world. In this example, a Trigger Zone widget is wired to the Glow property of the lights on this Christmas tree, causing it to light up whenever the player walks into the zone.</p>
+            </>
+            <Video slug="basics" />
+        </Wide>
+    </SimpleArticle>
+)

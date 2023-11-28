@@ -78,6 +78,7 @@ local function renderRec(node, b)
     elseif node.type == "doctype" then
         b:add("<!DOCTYPE html>")
     elseif node.type == nil then
+        pprint(node)
         b:add("[ERROR: nil node type, see console]")
     else
         error(string.format("unknown luax node type '%s'", node.type))
