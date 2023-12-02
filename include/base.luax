@@ -1,6 +1,8 @@
 require("util")
 
 function Base(atts, children)
+    local darkEnabled = not atts.lightOnly
+
     return <><!DOCTYPE html>
         <head>
             <meta charset="utf-8" />
@@ -20,7 +22,40 @@ function Base(atts, children)
             <link rel="canonical" href={ permalink() } />
             <link rel="alternate" type="application/rss+xml" href={ absurl("/index.xml") } title="Ben Visness" />
 
-            <!-- TODO: The rest of the head -->
+            <!-- TODO: OpenGraph info -->
+
+            <!-- TODO: Better approach for CSS...this is too sad -->
+            <style>{ [[
+                :root {
+                    --blockquote-bar: #dfe2e5;
+                    --body-background: white;
+                    --code-background: #f5f5f5;
+                    --codeblock-background: #272822;
+                    --footer-text-color: #999;
+                    --hr-color: #ccc;
+                    --text-color: black;
+            ]] .. (
+                    darkEnabled and "color-scheme: light dark"
+            ) .. [[
+                }
+            ]] .. (
+                darkEnabled and [[
+                    @media (prefers-color-scheme: dark) {
+                        :root {
+                            --blockquote-bar: #424242;
+                            --body-background: #222;
+                            --code-background: #0f0f0f;
+                            --codeblock-background: #171717;
+                            --hr-color: #525252;
+                            --text-color: white;
+                        }
+
+                        a {
+                            color: white;
+                        }
+                    }
+                ]]
+            ) }</style>
         </head>
 
         <body>
