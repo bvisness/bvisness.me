@@ -25,7 +25,7 @@ function Common(atts, children)
             </main>
 
             <footer>
-                &copy;{ os.date("!Y") } Ben Visness &#8226; <a href={ absurl("/about/") }>About Me</a> &#8226; <a href={ absurl("/apps/") }>Apps</a> &#8226; <a href="https://github.com/bvisness/">TODO render "svg/github.svg"</a> <a href="https://twitter.com/its_bvisness">TODO render "svg/twitter.svg"</a>
+                &copy;{ os.date("!%Y") } Ben Visness &#8226; <a href={ absurl("/about/") }>About Me</a> &#8226; <a href={ absurl("/apps/") }>Apps</a> &#8226; <a href="https://github.com/bvisness/">TODO render "svg/github.svg"</a> <a href="https://twitter.com/its_bvisness">TODO render "svg/twitter.svg"</a>
             </footer>
         </div>
     </>
