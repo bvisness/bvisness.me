@@ -15,7 +15,7 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
-//go:embed images.lua
+//go:embed images.luax
 var impl string
 
 // Takes the source image, rescales and re-encodes it into several useful
@@ -107,10 +107,9 @@ func LoadLib(l *lua.LState, b *bhp2.Instance, r *http.Request) int {
 	})
 	l.SetGlobal("images", mod)
 
-	implLoader := utils.Must1(l.Load(strings.NewReader(impl), "images.lua"))
-	l.CallByParam(lua.P{
-		Fn: implLoader,
-	})
+	loader := utils.Must1(bhp2.LoadLuaX(l, "images.luax", impl))
+	l.Push(loader)
+	l.Call(0, lua.MultRet)
 
 	return 0
 }

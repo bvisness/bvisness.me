@@ -5,6 +5,25 @@ bhp = {
     _sources = {},
 }
 
+-- Void elements, i.e. those which can have no children and therefore have no
+-- closing tag. To be used as a lookup table.
+local void = {
+    area = true,
+    base = true,
+    br = true,
+    col = true,
+    embed = true,
+    hr = true,
+    img = true,
+    input = true,
+    link = true,
+    meta = true,
+    param = true,
+    source = true,
+    track = true,
+    wbr = true,
+}
+
 ---@param b StringBuilder
 local function renderRec(node, b)
     if node == nil then
@@ -23,9 +42,11 @@ local function renderRec(node, b)
             b:add(" ")
 
             if type(value) == "string" then
+                local escaped = value:gsub('"', "&quot;")
+
                 b:add(att)
                 b:add("=\"")
-                b:add(value)
+                b:add(escaped)
                 b:add("\"")
             elseif type(value) == "boolean" then
                 if att then
@@ -61,9 +82,11 @@ local function renderRec(node, b)
             renderRec(node.children[i], b)
         end
 
-        b:add("</")
-        b:add(node.name)
-        b:add(">")
+        if not void[node.name] then
+            b:add("</")
+            b:add(node.name)
+            b:add(">")
+        end
     elseif node.type == "fragment" then
         for i = 1, node.children.len or #node.children do
             renderRec(node.children[i], b)

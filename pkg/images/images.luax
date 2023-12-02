@@ -1,0 +1,28 @@
+-- the global table `images` is already defined
+
+function Picture(atts, children)
+    atts.scale = atts.scale or 1
+
+    local variants = images.variants(atts.src, atts.scale)
+
+    local optsByType = {}
+    for _, variant in ipairs(variants) do
+        opts = optsByType[variant.contentType] or {}
+        table.insert(opts, string.format("%s %dx", variant.url, variant.scale))
+        optsByType[variant.contentType] = opts
+    end
+
+    local sources = {}
+    for contentType, opts in pairs(optsByType) do
+        local allOpts = 
+        table.insert(sources, <source
+            srcset={ table.concat(opts, ", ") }
+            type={ contentType }
+        />)
+    end
+    
+    return <picture class={ atts.class }>
+        { bhp.expand(sources) }
+        <img src={ absurl(atts.src) } alt={ atts.alt } />
+    </picture>
+end

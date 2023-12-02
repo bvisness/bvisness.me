@@ -133,9 +133,6 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch contentType {
 	case "text/luax":
-		fileBytes := utils.Must1(io.ReadAll(file))
-		transpiled := utils.Must1(Transpile(string(fileBytes), filename))
-
 		l := lua.NewState()
 		defer l.Close()
 		b.initSearchers(l, r)
@@ -147,10 +144,11 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		})
 		utils.Must(l.DoString("require(\"bhp\")"))
 
-		saveSource(l, SafeName(filename), string(fileBytes))
-		mainChunk, err := l.Load(strings.NewReader(transpiled), filename)
+		fileBytes := utils.Must1(io.ReadAll(file))
+		mainChunk, err := LoadLuaX(l, filename, string(fileBytes))
 		if err != nil {
-			l.RaiseError("error loading %s: %v", filename, err)
+			// TODO: Error codes and stuff for everything
+			l.RaiseError("error loading main chunk %s: %v", filename, err)
 			return
 		}
 		l.Push(mainChunk)
@@ -163,8 +161,7 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/html")
 		w.Write([]byte(getRendered(l)))
 
-		// TODO: write something?
-
+		// TODO: Handle redirects somehow
 		// if code, location := getRedirect(t, b.UserData); location != "" {
 		// 	w.Header().Add("Location", location)
 		// 	w.WriteHeader(code)

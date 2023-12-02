@@ -26,6 +26,32 @@ func LoadBHP2Lib(l *lua.LState) int {
 	return 1
 }
 
+func LoadLuaX(l *lua.LState, filename, source string) (*lua.LFunction, error) {
+	transpiled, err := Transpile(source, filename)
+	if err != nil {
+		return nil, fmt.Errorf("error transpiling file: %w", err)
+	}
+
+	loader, err := l.Load(strings.NewReader(transpiled), filename)
+	if err != nil {
+		return nil, fmt.Errorf("error in file: %w", err)
+	}
+
+	sources := l.GetGlobal("bhp").(*lua.LTable).RawGetString("_sources").(*lua.LTable)
+	sources.RawSetString(filename, lua.LString(source))
+
+	return loader, nil
+}
+
+func getRendered(l *lua.LState) string {
+	bhp := l.GetGlobal("bhp").(*lua.LTable)
+	return string(bhp.RawGetString("_rendered").(lua.LString))
+}
+
+//
+// Searchers (package.loaders)
+//
+
 type FSSearcher struct {
 	FS     fs.FS
 	Prefix string // Path prefix to prepend to `require` string before lookup, e.g. `lua/`
@@ -36,7 +62,7 @@ var builtinFSSearcher = FSSearcher{
 	Prefix: "lua/",
 }
 
-func loadPlainLua(l *lua.LState, s FSSearcher) bool {
+func searchPlainLua(l *lua.LState, s FSSearcher) bool {
 	name := l.CheckString(1)
 	filename := s.Prefix + name + ".lua"
 	f, err := s.FS.Open(filename)
@@ -63,7 +89,7 @@ func loadPlainLua(l *lua.LState, s FSSearcher) bool {
 	return true
 }
 
-func loadLuax(l *lua.LState, s FSSearcher) bool {
+func searchLuaX(l *lua.LState, s FSSearcher) bool {
 	name := l.CheckString(1)
 	filename := s.Prefix + name + ".luax"
 	f, err := s.FS.Open(filename)
@@ -74,25 +100,15 @@ func loadLuax(l *lua.LState, s FSSearcher) bool {
 		return true
 	}
 
-	b, err := io.ReadAll(f)
+	source, err := io.ReadAll(f)
 	if err != nil {
 		l.Push(lua.LString(fmt.Sprintf("error reading file: %v", err)))
 		return true
 	}
 
-	// Save file source in bhp._sources
-	bhpSources := l.GetGlobal("bhp").(*lua.LTable).RawGetString("_sources").(*lua.LTable)
-	bhpSources.RawSetString(SafeName(filename), lua.LString(b))
-
-	transpiled, err := Transpile(string(b), filename)
+	loader, err := LoadLuaX(l, filename, string(source))
 	if err != nil {
-		l.Push(lua.LString(fmt.Sprintf("error transpiling file: %v", err)))
-		return true
-	}
-
-	loader, err := l.Load(strings.NewReader(transpiled), name)
-	if err != nil {
-		l.Push(lua.LString(fmt.Sprintf("error in file: %v", err)))
+		l.Push(lua.LString(err.Error()))
 		return true
 	}
 
@@ -134,7 +150,7 @@ func (b *Instance) initSearchers(l *lua.LState, r *http.Request) {
 
 		i++
 		l.RawSetInt(newLoaders, i, l.NewFunction(func(l *lua.LState) int {
-			if loadPlainLua(l, s) || loadLuax(l, s) {
+			if searchPlainLua(l, s) || searchLuaX(l, s) {
 				return 1
 			}
 
@@ -145,14 +161,4 @@ func (b *Instance) initSearchers(l *lua.LState, r *http.Request) {
 
 	l.SetField(p, "loaders", newLoaders)
 	l.SetField(l.Get(lua.RegistryIndex), "_LOADERS", newLoaders)
-}
-
-func getRendered(l *lua.LState) string {
-	bhp := l.GetGlobal("bhp").(*lua.LTable)
-	return string(bhp.RawGetString("_rendered").(lua.LString))
-}
-
-func saveSource(l *lua.LState, filename, source string) {
-	sources := l.GetGlobal("bhp").(*lua.LTable).RawGetString("_sources").(*lua.LTable)
-	sources.RawSetString(filename, lua.LString(source))
 }

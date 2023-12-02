@@ -239,14 +239,14 @@ func (t *Transpiler) lexString(delim byte) string {
 	start, end := t.cur, t.cur+1
 	escaping := false
 	for {
-		if end > len(t.source) {
+		if end >= len(t.source) {
 			break
 		}
 		if escaping {
 			end++
+			escaping = false
 			continue
 		}
-		escaping = false
 
 		if t.source[end] == '\\' {
 			escaping = true

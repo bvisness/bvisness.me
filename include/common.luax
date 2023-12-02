@@ -1,4 +1,5 @@
 require("base")
+require("images")
 require("url")
 
 function Common(atts, children)
@@ -13,9 +14,11 @@ function Common(atts, children)
             <main>
                 {
                     atts.banner and
-                    <picture class="banner">
-                        { picturesource(atts.banner, atts.bannerScale) }
-                    </picture>
+                    <Picture
+                        class="banner"
+                        src={ atts.banner }
+                        scale={ atts.bannerScale }
+                    />
                 }
 
                 { bhp.expand(children) }

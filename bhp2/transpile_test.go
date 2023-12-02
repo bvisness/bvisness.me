@@ -80,6 +80,8 @@ All the core logic of the core Lyon system will be performed in Lyon:periodic.
 
 Lyon = {}
 	`},
+	{"escaping strings", 8, `foo = "bar" .. "\n" .. "\"baz\""`},
+	{"escaping strings in tags", 10, `foo = <img alt="bar\n\"baz\"" />`},
 }
 
 func tokens(source string) []string {
@@ -100,7 +102,9 @@ func TestTokenizer(t *testing.T) {
 	for _, test := range tokenizerTests {
 		t.Run(test.name, func(t *testing.T) {
 			toks := tokens(test.source)
-			assert.Equal(t, test.numTokens, len(toks))
+			if !assert.Equal(t, test.numTokens, len(toks)) {
+				t.Log(toks)
+			}
 		})
 	}
 }
@@ -267,7 +271,13 @@ var tagTests = []TagTest{
 	{
 		"nils",
 		`local tag = <>foo{ nil }bar</>`,
-		`local tag = { type = "fragment", children = { { type = "source", file = "nils", 14, 17 }, nil, { type = "source", file = "nils", 24, 27 }, len = 3 }, }`},
+		`local tag = { type = "fragment", children = { { type = "source", file = "nils", 14, 17 }, nil, { type = "source", file = "nils", 24, 27 }, len = 3 }, }`,
+	},
+	{
+		"escaping",
+		`local tag = <img alt="foo\n\"bar\"" />`,
+		`local tag = { type = "html", name = "img", atts = { alt = "foo\n\"bar\"", }, children = { len = 0 }, }`,
+	},
 }
 
 func TestTags(t *testing.T) {
