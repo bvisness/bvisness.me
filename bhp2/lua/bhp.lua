@@ -57,7 +57,7 @@ local function renderRec(node, b)
         end
         b:add(">")
 
-        for i = 1, node.children.len do
+        for i = 1, node.children.len or #node.children do
             renderRec(node.children[i], b)
         end
 
@@ -65,7 +65,7 @@ local function renderRec(node, b)
         b:add(node.name)
         b:add(">")
     elseif node.type == "fragment" then
-        for i = 1, node.children.len do
+        for i = 1, node.children.len or #node.children do
             renderRec(node.children[i], b)
         end
     elseif node.type == "source" then

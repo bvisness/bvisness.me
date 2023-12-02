@@ -1,0 +1,19 @@
+require("common")
+require("article/title")
+
+function SimpleArticle(atts, children)
+    if not atts.article then
+        return <Error>article attribute is required!</Error>
+    end
+
+    return <Base>
+        <Common>
+            <article>
+                <header>
+                    <ArticleTitle article={ atts.article } />
+                </header>
+                { bhp.expand(children) }
+            </article>
+        </Common>
+    </Base>
+end

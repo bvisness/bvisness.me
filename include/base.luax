@@ -1,0 +1,30 @@
+require("util")
+
+function Base(atts, children)
+    return <><!DOCTYPE html>
+        <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+            <title>{ atts.title and atts.title .. " | " or "" }Ben Visness</title>
+            
+            <meta name="author" content="Ben Visness" />
+            {
+                atts.description and
+                <meta name="description" content={ truncate(atts.description, 160) } />
+            }
+            
+            <!-- CSS -->
+            <link rel="stylesheet" href={ bust("/style.css") } />
+
+            <link rel="canonical" href={ permalink() } />
+            <link rel="alternate" type="application/rss+xml" href={ absurl("/index.xml") } title="Ben Visness" />
+
+            <!-- TODO: The rest of the head -->
+        </head>
+
+        <body>
+            { bhp.expand(children) }
+        </body>
+    </>
+end

@@ -7,7 +7,7 @@ import (
 	"github.com/bvisness/bvisness.me/bhp2"
 )
 
-func Middleware[T any](b bhp2.Instance[T], r bhp2.Request[T], w http.ResponseWriter, m bhp2.MiddlewareData[T]) bool {
+func Middleware(b bhp2.Instance, r *http.Request, w http.ResponseWriter, m bhp2.MiddlewareData) bool {
 	isImage := false
 	for _, format := range AllFormats {
 		if m.ContentType == format {
@@ -19,8 +19,8 @@ func Middleware[T any](b bhp2.Instance[T], r bhp2.Request[T], w http.ResponseWri
 		return false
 	}
 
-	origScaleStr := r.R.URL.Query().Get("orig")
-	scaleStr := r.R.URL.Query().Get("scale")
+	origScaleStr := r.URL.Query().Get("orig")
+	scaleStr := r.URL.Query().Get("scale")
 	if origScaleStr == "" || scaleStr == "" {
 		return false
 	}
@@ -30,7 +30,7 @@ func Middleware[T any](b bhp2.Instance[T], r bhp2.Request[T], w http.ResponseWri
 	if err1 != nil || err2 != nil {
 		return false
 	}
-	format := r.R.URL.Query().Get("fmt")
+	format := r.URL.Query().Get("fmt")
 
 	processed, err := imageCache.GetOrStore(cacheKey(m.FilePath, origScale), func() (ProcessedImage, error) {
 		return ProcessImage(m.FilePath, origScale, ImageOptions{})

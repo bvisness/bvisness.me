@@ -1,0 +1,11 @@
+function Error(atts, children)
+    return <div class="red">[ERROR: { bhp.expand(children) }]</div>
+end
+
+function TODO(atts, children)
+    return <div class="orange">[TODO: { bhp.expand(children) }]</div>
+end
+
+function truncate(str, n)
+    return string.sub(str, 1, n)
+end

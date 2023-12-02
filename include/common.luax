@@ -1,0 +1,29 @@
+require("base")
+require("url")
+
+function Common(atts, children)
+    return <>
+        <div class="container">
+            <header class="site-header">
+                <h1><a href={ absurl("/") }>Ben Visness</a></h1>
+            </header>
+        </div>
+
+        <div class="container">
+            <main>
+                {
+                    atts.banner and
+                    <picture class="banner">
+                        { picturesource(atts.banner, atts.bannerScale) }
+                    </picture>
+                }
+
+                { bhp.expand(children) }
+            </main>
+
+            <footer>
+                &copy;{ os.date("!Y") } Ben Visness &#8226; <a href={ absurl("/about/") }>About Me</a> &#8226; <a href={ absurl("/apps/") }>Apps</a> &#8226; <a href="https://github.com/bvisness/">TODO render "svg/github.svg"</a> <a href="https://twitter.com/its_bvisness">TODO render "svg/twitter.svg"</a>
+            </footer>
+        </div>
+    </>
+end

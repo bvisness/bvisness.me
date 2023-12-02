@@ -1,0 +1,12 @@
+require("util")
+
+function ArticleTitle(atts, children)
+    return <>
+        <h1>
+            <a href={ permalink() }>{ atts.article.title }</a>
+        </h1>
+        <div class="post-details">
+            <!-- <time datetime="{{ date "2006-01-02T15:04:05Z07:00" .Date }}" itemprop="datePublished">{{ date "January 2, 2006" .Date }}</time> -->
+        </div>
+    </>
+end

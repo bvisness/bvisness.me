@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -31,7 +30,10 @@ type Instance struct {
 	FSSearchers []FSSearcher
 	StaticPaths []string
 	Middleware  Middleware
+	Libs        map[string]GoLibLoader
 }
+
+type GoLibLoader func(l *lua.LState, b *Instance, r *http.Request) int
 
 type Options struct {
 	StaticPaths []string
@@ -136,10 +138,13 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		l := lua.NewState()
 		defer l.Close()
-		b.initSearchers(l)
+		b.initSearchers(l, r)
 
 		// TODO: save bytecode of BHP for faster startup
-		l.PreloadModule("bhp", LoadBHP2)
+		l.PreloadModule("bhp", LoadBHP2Lib)
+		l.PreloadModule("url", func(l *lua.LState) int {
+			return LoadURLLib(l, r)
+		})
 		utils.Must(l.DoString("require(\"bhp\")"))
 
 		saveSource(l, SafeName(filename), string(fileBytes))
@@ -149,7 +154,11 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		l.Push(mainChunk)
-		l.Call(0, lua.MultRet)
+		if err := l.PCall(0, lua.MultRet, nil); err != nil {
+			w.Header().Add("Content-Type", "text/plain")
+			w.Write([]byte(err.Error()))
+			panic(err)
+		}
 
 		w.Header().Add("Content-Type", "text/html")
 		w.Write([]byte(getRendered(l)))
@@ -172,27 +181,6 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", contentType)
 		http.ServeContent(w, r, fileInfo.Name(), fileInfo.ModTime(), file)
 	}
-}
-
-func (b Instance) ResolveFileOrDir(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
-	srcFilename = filepath.Join(b.SrcDir, abspath)
-	fileInfo, err = os.Stat(srcFilename)
-	if err != nil {
-		return "", nil, fmt.Errorf("could not resolve file: %w", err)
-	}
-	return
-}
-
-func (b Instance) ResolveDirectoryIndex(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
-	abspath += "/index.luax"
-	srcFilename, fileInfo, err = b.ResolveFileOrDir(abspath)
-	if err != nil {
-		return
-	}
-	if fileInfo.IsDir() {
-		return "", nil, fmt.Errorf("expected valid index file at %s, but got a directory", abspath)
-	}
-	return
 }
 
 func detectContentType(fileInfo os.FileInfo, fileBytes []byte) string {
@@ -226,16 +214,4 @@ func (b *Instance) pathIsStatic(path string) bool {
 		}
 	}
 	return false
-}
-
-func ChainMiddleware[UserData any](middlewares ...Middleware) Middleware {
-	return func(b Instance, r *http.Request, w http.ResponseWriter, m MiddlewareData) bool {
-		for _, middleware := range middlewares {
-			didHandle := middleware(b, r, w, m)
-			if didHandle {
-				return true
-			}
-		}
-		return false
-	}
 }

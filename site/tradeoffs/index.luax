@@ -1,0 +1,47 @@
+local article = require("articles")["tradeoffs"]
+require("simplearticle")
+require("images")
+
+function Picture(atts, children)
+    atts.scale = atts.scale or 1
+
+    local variants = images.variants(atts.src, atts.scale)
+
+    local optsByType = {}
+    for _, variant in ipairs(variants) do
+        opts = optsByType[variant.contentType] or {}
+        table.insert(opts, string.format("%s %dx", variant.url, variant.scale))
+        optsByType[variant.contentType] = opts
+    end
+
+    local sources = {}
+    for contentType, opts in pairs(optsByType) do
+        local allOpts = 
+        table.insert(sources, <source
+            srcset={ table.concat(opts, ", ") }
+            type={ contentType }
+        />)
+    end
+    
+    return <picture class={ atts.class }>
+        { bhp.expand(sources) }
+        <img src={ absurl(atts.src) } alt={ atts.alt } />
+    </picture>
+end
+
+bhp.render(<SimpleArticle article={ article }>
+    <p>
+        Programmers love to say things like "it all depends" or "it's always a tradeoff". This makes them sound very wise, but it's usually a cop-out.
+    </p>
+
+    <h2>Your choices need to be mutually exclusive.</h2>
+
+    <p>
+        Let's look at a fun example from a Content Creator:
+    </p>
+
+    <Picture
+        src={ relpath("triangle.png") }
+        alt="A tradeoff triangle with three corners: Performance, Velocity, and Adaptability"
+    />
+</SimpleArticle>)

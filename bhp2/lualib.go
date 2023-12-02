@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"net/http"
 	"strings"
 
 	"github.com/bvisness/bvisness.me/utils"
@@ -17,7 +18,7 @@ import (
 //go:embed lua/*
 var builtins embed.FS
 
-func LoadBHP2(l *lua.LState) int {
+func LoadBHP2Lib(l *lua.LState) int {
 	bhpSource := utils.Must1(builtins.ReadFile("lua/bhp.lua"))
 	bhp := utils.Must1(l.Load(bytes.NewBuffer(bhpSource), "bhp"))
 	l.Push(bhp)
@@ -99,18 +100,40 @@ func loadLuax(l *lua.LState, s FSSearcher) bool {
 	return true
 }
 
-func (b *Instance) initSearchers(l *lua.LState) {
+func (b *Instance) initSearchers(l *lua.LState, r *http.Request) {
 	p := l.GetGlobal("package")
 	oldLoaders := l.GetField(p, "loaders").(*lua.LTable)
-	preloadSearcher := oldLoaders.RawGetInt(1)
+	preloadSearcher := oldLoaders.RawGetInt(1).(*lua.LFunction)
 
 	newLoaders := l.NewTable()
-	l.RawSetInt(newLoaders, 1, preloadSearcher)
+	i := 0
 
+	// Add the original preload searcher
+	i++
+	l.RawSetInt(newLoaders, i, preloadSearcher)
+
+	// Add Go library searcher
+	i++
+	l.RawSetInt(newLoaders, i, l.NewFunction(func(l *lua.LState) int {
+		name := l.CheckString(1)
+		if lib, ok := b.Libs[name]; ok {
+			l.Push(l.NewFunction(func(l *lua.LState) int {
+				return lib(l, b, r)
+			}))
+			return 1
+		} else {
+			l.Push(lua.LNil)
+			return 1
+		}
+	}))
+
+	// Add searcher functions for FSSearchers
 	fsSearchers := append(b.FSSearchers, builtinFSSearcher)
-	for i := 1; i <= len(fsSearchers); i++ {
-		s := fsSearchers[i-1]
-		l.RawSetInt(newLoaders, i+1, l.NewFunction(func(l *lua.LState) int {
+	for _, s := range fsSearchers {
+		s := s // >:(
+
+		i++
+		l.RawSetInt(newLoaders, i, l.NewFunction(func(l *lua.LState) int {
 			if loadPlainLua(l, s) || loadLuax(l, s) {
 				return 1
 			}

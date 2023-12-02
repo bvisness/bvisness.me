@@ -1,10 +1,6 @@
 local article = require("articles")["advent-of-dreams"]
 require("simplearticle")
 
-function relurl(url)
-    return url
-end
-
 function Video(atts)
     return <div class="relative aspect-ratio--16x9">
         <video
