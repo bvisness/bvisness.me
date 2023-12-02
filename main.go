@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/bvisness/bvisness.me/bhp2"
+	"github.com/bvisness/bvisness.me/pkg/code"
 	"github.com/bvisness/bvisness.me/pkg/images"
 )
 
@@ -77,6 +78,7 @@ func main() {
 		Middleware:  bhp2.ChainMiddleware(images.Middleware),
 		Libs: map[string]bhp2.GoLibLoader{
 			"images": images.LoadLib,
+			"code":   code.LoadLib,
 		},
 	}
 	b.Run()

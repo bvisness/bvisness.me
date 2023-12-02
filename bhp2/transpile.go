@@ -233,6 +233,7 @@ func (t *Transpiler) lexNumber() string {
 func (t *Transpiler) lexString(delim byte) string {
 	if t.cur+1 >= len(t.source) {
 		// weird edge case of source ending in quote
+		// TODO: Error on EOF
 		return ""
 	}
 
@@ -240,6 +241,7 @@ func (t *Transpiler) lexString(delim byte) string {
 	escaping := false
 	for {
 		if end >= len(t.source) {
+			// TODO: Error on EOF
 			break
 		}
 		if escaping {
@@ -264,12 +266,13 @@ func (t *Transpiler) lexString(delim byte) string {
 }
 
 func (t *Transpiler) lexLongString() string {
-	start, end := t.cur, t.cur
+	start, end := t.cur, t.cur+1
 	for {
-		if end > len(t.source) {
+		if end+1 >= len(t.source) {
+			// TODO: Error on EOF
 			break
 		}
-		if t.nextIs("]]") {
+		if t.source[end] == ']' && t.source[end+1] == ']' {
 			end += 2
 			break
 		}

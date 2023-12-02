@@ -82,6 +82,9 @@ Lyon = {}
 	`},
 	{"escaping strings", 8, `foo = "bar" .. "\n" .. "\"baz\""`},
 	{"escaping strings in tags", 10, `foo = <img alt="bar\n\"baz\"" />`},
+	{"long strings", 13, `foo = <Code lang="lua" src=[[
+let foo = bar
+]] />`},
 }
 
 func tokens(source string) []string {

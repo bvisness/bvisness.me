@@ -148,6 +148,7 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		mainChunk, err := LoadLuaX(l, filename, string(fileBytes))
 		if err != nil {
 			// TODO: Error codes and stuff for everything
+			// TODO: Report syntax errors in the browser
 			l.RaiseError("error loading main chunk %s: %v", filename, err)
 			return
 		}
