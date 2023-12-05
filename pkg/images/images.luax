@@ -26,3 +26,7 @@ function Picture(atts, children)
         <img src={ absurl(atts.src) } alt={ atts.alt } />
     </picture>
 end
+
+function Svg(atts, children)
+    return <>{ require(atts.src) }</>;
+end

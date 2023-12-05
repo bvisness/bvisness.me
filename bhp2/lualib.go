@@ -15,6 +15,9 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
+// Files with these extensions can be loaded raw from FSSearchers.
+var staticFileExts = []string{".svg"}
+
 //go:embed lua/*
 var builtins embed.FS
 
@@ -116,6 +119,35 @@ func searchLuaX(l *lua.LState, s FSSearcher) bool {
 	return true
 }
 
+func searchStaticFile(l *lua.LState, s FSSearcher) bool {
+	name := l.CheckString(1)
+	for _, ext := range staticFileExts {
+		if strings.HasSuffix(name, ext) {
+			f, err := s.FS.Open(name)
+			if errors.Is(err, fs.ErrNotExist) {
+				return false
+			} else if err != nil {
+				l.Push(lua.LString(fmt.Sprintf("error reading file: %v", err)))
+				return true
+			}
+
+			var loader lua.LGFunction = func(l *lua.LState) int {
+				contents, err := io.ReadAll(f)
+				if err != nil {
+					RaiseMsg(l, err, "failed to read static file")
+				}
+
+				l.Push(lua.LString(contents))
+				return 1
+			}
+			l.Push(l.NewClosure(loader))
+			return true
+		}
+	}
+
+	return false
+}
+
 func (b *Instance) initSearchers(l *lua.LState, r *http.Request) {
 	p := l.GetGlobal("package")
 	oldLoaders := l.GetField(p, "loaders").(*lua.LTable)
@@ -151,6 +183,10 @@ func (b *Instance) initSearchers(l *lua.LState, r *http.Request) {
 		i++
 		l.RawSetInt(newLoaders, i, l.NewFunction(func(l *lua.LState) int {
 			if searchPlainLua(l, s) || searchLuaX(l, s) {
+				return 1
+			}
+
+			if searchStaticFile(l, s) {
 				return 1
 			}
 
