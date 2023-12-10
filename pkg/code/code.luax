@@ -1,10 +1,9 @@
 function Code(atts, children)
-    if not atts.lang then
-        error("the Code component requires the `lang` attribute")
-    end
     if not atts.src then
         error("the Code component requires the `src` attribute")
     end
 
-    return code.highlight(atts.lang, atts.src)
+    local src = atts.src:gsub("^%s+", "")
+    local src = atts.src:gsub("%s+$", "")
+    return code.highlight(atts.lang or "plain", src)
 end
