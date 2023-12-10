@@ -7,7 +7,7 @@ function SimpleArticle(atts, children)
     end
 
     return <Base>
-        <Common>
+        <Common banner={ atts.article.banner }>
             <article>
                 <header>
                     <ArticleTitle article={ atts.article } />
