@@ -801,7 +801,29 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 			t.b.WriteString("children = ")
 		}
 		if hasChildren {
-			t.parseTagChildren(tagName, indent+"    ")
+			if tagName == "script" {
+				t.b.WriteString("{ ")
+				var n int
+
+				// Blindly parse until </script>
+				start := t.cur
+				for {
+					if len(t.source[t.cur:]) < len("</script>") {
+						panic(t.fail("unclosed <script> tag"))
+					} else if t.source[t.cur:t.cur+len("</script>")] == "</script>" {
+						t.emitTextNode(start, indent, &n)
+						t.cur += len("</script>")
+						break
+					}
+					t.cur += 1
+				}
+
+				t.b.WriteString("len = ")
+				t.b.WriteString(strconv.Itoa(n))
+				t.b.WriteString(" }")
+			} else {
+				t.parseTagChildren(tagName, indent+"    ")
+			}
 		} else {
 			t.b.WriteString("{ len = 0 }")
 		}

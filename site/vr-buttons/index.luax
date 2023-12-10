@@ -1,0 +1,231 @@
+local article = require("articles")["vr-buttons"]
+require("simplearticle")
+
+require("code")
+
+function Head()
+    return <>
+        <!-- MathJax -->
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+                "CommonHTML": { linebreaks: { automatic: true } },
+                "HTML-CSS": { linebreaks: { automatic: true } },
+                "SVG": { linebreaks: { automatic: true } }
+            });
+        </script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+    </>
+end
+
+bhp.render(<SimpleArticle article={ article } head={ Head }>
+    <span style="display: none">{[[
+        $$
+        \DeclareMathOperator{\proj}{proj}
+        \newcommand{\vect}{\mathbf}
+        $$
+    ]]}</span>
+
+    <p>
+        Doing buttons in VR is hard.
+    </p>
+
+    <p>
+        One of the goofy restrictions we placed on ourselves in Beach Ball Valley is that your hands must be pizza paddles at all times. No putting the paddles away, no using a point-and-click mechanic. Your pizza paddle hands are the only way you can interact with the world.
+    </p>
+
+    <p>
+        Designing a UI for pizza paddles is a topic of its own, but the main thing we needed was buttons. Big, squishy, reactive buttons that felt great to press. We figured it would be easy—just put a physics object on an axis and call it a day.
+    </p>
+
+    <p>
+        How wrong we were.
+    </p>
+
+    <h2>Attempt 1: Just Use Physics</h2>
+
+    <p>
+        It's a pretty simple concept. All we need is a box constrained to an axis, some colliders at the top and bottom, and an overlap volume at the bottom to trigger the button's action.
+    </p>
+
+    <img src={ relurl("1.PNG") } title="This should work, right?" alt="Basic drawing of the physics setup" style="max-height: 400px" />
+
+    <p>
+        Unreal will do all the hard work of handling collision and movement for us. Because games are good at handling collision! Right?
+    </p>
+
+    <h3>Problem 1: Constraining to an Axis</h3>
+
+    <p>
+        We ran into problems immediately. First of all, while Unreal allows you to constrain movement to a single axis, that axis is not arbitrary—you can only constrain movement along the world's X, Y, and Z axes.
+    </p>
+
+    <p>
+        That's annoying, but not a deal-breaker, since we can easily move the physics object onto the axis ourselves. The vector math is quite simple. Let {[[ \(\vect{v}\) ]]} be the object's position, {[[ \(\vect{a}\) ]]} be the axis, and {[[ \(\vect{p}\) ]]} be the root location of the button:
+    </p>
+
+    <p>{[[
+        $$
+        \proj_\vect{a} (\vect{v} - \vect{p}) + \vect{p}
+        $$
+    ]]}</p>
+
+    <p>
+        Problem solved!
+    </p>
+
+    <h3>Problem 2: The Constraint Sucks</h3>
+
+    <p>
+        This mostly worked, but unfortunately, Unreal would resolve collisions before rendering the frame, meaning you could push the button slightly off its axis. This looked and felt sloppy, but there wasn't any way to  avoid it because of the order in which Unreal did things each frame.
+    </p>
+
+    <p>
+        Our workaround for this was to make the actual physics box invisible, and to track the visible button to the projected location of the physics box. See the picture below.
+    </p>
+
+    <img src={ relurl("2.PNG") } title="Imagine there is a paddle pushing the blue box to the left." alt="Drawing of the button with the extra invisible physics box" style="max-height: 400px" />
+
+    <h3>Problem 3: The Button Sometimes Leaves</h3>
+
+    <p>
+        This was sort of working, but when we got more aggressive, we found that the physics object would sometimes glitch outside of the colliders that were supposed to contain it. And of course, once it was outside, we 
+        couldn't get it back in.
+    </p>
+
+    <img src={ relurl("3.PNG") } title="Who even knows?" alt="Drawing of the physics box outside its containing colliders" style="max-height: 400px" />
+
+    <p>
+        Our fix for *this* was to just reset the button if the physics object ever strayed too far from its home location.
+    </p>
+
+    <p>
+        Things were starting to get really messy.
+    </p>
+
+    <h3>Problem 4: Spamming Inputs</h3>
+
+    <p>
+        The button's motion finally looked stable, but we found that holding the button down would continuously trigger button presses. This was because the actual physics object was glitching around at the bottom, triggering tons of overlap events.
+    </p>
+
+    <img src={ relurl("4.PNG") } alt="Drawing of the physics box spazzing out" style="max-height: 400px" />
+
+    <p>
+        We tried using the visible, stable button for overlap instead of the physics box, but the physics box was so energetic that even that didn't fix it. We also tried just making the overlap region bigger—this kind of worked, but it didn't fix the problem completely, and it made the button activate too early.
+    </p>
+
+    <p>
+        We also tried debouncing the input signal so that you couldn't trigger successive events too quickly, but at this point it was apparent that these were just Band-Aids over a much larger problem.
+    </p>
+
+    <h3>Problem 5: You Can't Hit the Button Quickly</h3>
+
+    <p>
+        After all that work, we found that the paddle would almost always miss the button when we were swinging it quickly. This was unfortunate, but it made sense why this was happening.
+    </p>
+
+    <p>
+        Basically, the physics engine checks for collisions once per frame (technically, once per physics timestep). It sees if any objects are overlapping, and applies constraint resolution to push objects apart. But since it only does this once per frame, it is possible for fast-moving objects to miss each other. Our paddles are big, and the ends move very fast, so misses were actually <em>more common than successful hits.</em> 
+    </p>
+
+    <p>
+        We didn't even try to fix this.
+    </p>
+
+    <img src={ relurl("5.PNG") } title=":(" alt="Drawing of a paddle swinging straight through a button" style="max-height: 400px" />
+
+    <p>
+        (If you want to learn more about physics engines, go watch <a href="https://www.youtube.com/watch?v=NwPIoVW65pE">this excellent talk</a> by Bennett Foddy, the creator of QWOP.)
+    </p>
+
+    <h3>Problems 6+: Everything Is Bad</h3>
+
+    <p>
+        Besides all the functional issues, there were a host of smaller problems that we couldn't fix (or didn't fix):
+    </p>
+
+    <ul>
+        <li>When the paddle went below the button, the button would pop back up (which felt bad).</li>
+        <li>Stabbing the button from the side instead of pressing it resulted in wild, unpredictable vertical motion.</li>
+        <li>The button blueprint had become incredibly complicated and difficult to deal with.</li>
+        <li>Buttons felt touchy, unpredictable, and generally bad to use.</li>
+    </ul>
+
+    <p>
+        At this point it was clear that we were polishing a turd. We needed a more robust solution, and the more we thought about it, the more we realized that we hadn't understood the limitations of our approach.
+    </p>
+
+    <img src={ relurl("6.PNG") } title="Back to the drawing board..." alt="Drawing of the previous button schematic scribbled out" style="max-height: 400px" />
+
+
+    <h2>Attempt 2: Forget Physics!</h2>
+
+    <p>
+        We had our lightbulb moment when we questioned why we were using physics in the first place.
+    </p>
+
+    <p>
+        I realized that glitchy physics only occur when the physics engine cannot resolve an impossible situation. Freely-moving physics objects are quite stable, but once they get stuck in the ground, or smashed between two objects, they freak out because the physics engine cannot solve the physical impossibility it's presented with.
+    </p>
+
+    <p>
+        But in VR, impossible situations happen *all the time*. In VR, a player can push his hand straight through a tabletop, or pull a doorknob straight up, or throw objects around with alarming force. In our case, the player could stab a pizza paddle straight through a button, causing the physics engine to helplessly try to push the paddle and button apart.
+    </p>
+
+    <p>
+        Our approach was fundamentally bad. We needed a system that was comfortable with the impossible situations VR provided. That's when we cracked it.
+    </p>
+
+    <h3>Box Tracing!</h3>
+
+    <p>
+        Instead of checking for "collisions", why not just do a box trace up from below the button until we hit the paddle?
+    </p>
+
+    <p>
+        This idea is even simpler than the last. We simply start a box trace from way below the button and finish somewhere above the button. If the trace collides with something, we move the button to the height of the collision.
+    </p>
+
+    <img src={ relurl("7.PNG") } alt="Look how simple this is!" style="max-height: 400px" />
+
+    <p>
+        This immediately solved our problems. The glitchy behavior was gone, and we never missed a quick hit. Plus, it felt really good to use!
+    </p>
+
+    <p>
+        From that base, we made a couple small modifications:
+    </p>
+
+    <ol>
+        <li>
+            <p>
+                We wanted to be able to stab the button from the side without the button snapping down to below the paddle. To accomplish this, when the paddle first overlaps the button, we find and save the offset between the collision height and the button's current height. We then use that to offset the button's position in the future. The diagram below explains this more clearly.
+            </p>
+
+            <p>
+                <img src={ relurl("8.PNG") } title="A little more complicated, but not too bad." style="max-height: 400px" />
+            </p>
+        </li>
+        <li>
+            Because of modification number 1, quick hits were not always triggering the button, so we added a special case. If the paddle is moving downward very quickly when it overlaps the button, we immediately trigger a hit without doing any tracing.
+        </li>
+    </ol>
+
+    <p>
+        With these modifications, the buttons did everything we wanted, and felt great to boot. You can see a side-by-side comparison of our old and new buttons in this video:
+    </p>
+
+    <div class="video-container">
+        <iframe src="https://www.youtube-nocookie.com/embed/MYRxsSeLF_8?rel=0" loading="lazy" frameborder="0" allowfullscreen class="video"></iframe>
+    </div>
+
+    <p>
+        And what's more, we programmed them without regard to orientation, enabling us to do wacky stuff like this:
+    </p>
+
+    <div style='position:relative;padding-bottom:54%'><iframe src='https://gfycat.com/ifr/PotableReasonableLeafbird' loading="lazy" frameborder='0' scrolling='no' width='100%' height='100%' style='position:absolute;top:0;left:0' allowfullscreen></iframe></div>
+
+    <p>
+        These buttons are alive and well in <a href="http://store.steampowered.com/app/454830/Beach_Ball_Valley/">Beach Ball Valley</a> right now, so if you have a Vive, go try them out!
+    </p>
+</SimpleArticle>)

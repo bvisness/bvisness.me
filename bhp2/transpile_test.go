@@ -281,6 +281,11 @@ var tagTests = []TagTest{
 		`local tag = <img alt="foo\n\"bar\"" />`,
 		`local tag = { type = "html", name = "img", atts = { alt = "foo\n\"bar\"", }, children = { len = 0 }, }`,
 	},
+	{
+		"javascript 😑",
+		`local tag = <script>const foo = {"bar": "baz"};</script>`,
+		`local tag = { type = "html", name = "script", atts = {}, children = { { type = "source", file = "javascript 😑", 20, 47 }, len = 1 }, }`,
+	},
 }
 
 func TestTags(t *testing.T) {

@@ -56,6 +56,8 @@ function Base(atts, children)
                     }
                 ]]
             ) }</style>
+
+            { atts.head and atts.head() }
         </head>
 
         <body>
