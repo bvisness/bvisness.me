@@ -1,0 +1,5 @@
+- [ ] Resolve all the `<TODO>` components on the site
+- [ ] Make ranges more ergonomic
+    - Extend the syntax with some kind of arrow function? Pipes are not even valid operators today, so `|foo| => bar` syntax would be unambiguous.
+    - Is it good enough to just have a `bhp.map` function that produces a fragment? Probably, if arrow functions are smaller...
+- [ ] Escaping

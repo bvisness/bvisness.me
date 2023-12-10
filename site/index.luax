@@ -1,58 +1,22 @@
-local article = require("articles")["advent-of-dreams"]
-require("simplearticle")
+local articles = require("articles")
+require("common")
+require("url")
+require("util")
 
-function Video(atts)
-    return <div class="relative aspect-ratio--16x9">
-        <video
-            class="aspect-ratio--object"
-            src={ relurl("vids/" .. atts.slug .. ".mp4" ) }
-            poster={ relurl("vids/" .. atts.slug .. ".jpg" ) }
-            autoplay muted loop controls
-            preload="metadata"
-        ></video>
-    </div>
-end
-
-function Wide(atts, children)
-    children = bhp.nosource(children)
-
-    if #children ~= 2 then
-        error("requires exactly two children")
-    end
-
-    return <div class="wide flex justify-center mv4">
-        <div class={{
-            "flex flex-column flex-row-l",
-            atts.class or "items-center",
-            "g4"
-        }}>
-            <div class="w-100 flex-fair-l p-dumb">
-                { children[1] }
-            </div>
-            <div class="w-100 flex-fair-l p-dumb">
-                { children[2] }
-            </div>
+bhp.render(<Base>
+    <Common>
+        <div class="list">
+            { bhp.map(articles, function (a)
+                return <article>
+                    <header>
+                        <h1><a href={ absurl(a.slug) }>{ a.title }</a></h1>
+                        <span class="post-details">
+                            <time datetime={ os.date("%Y-%m-%dT%H:%M:%S%z", a.date) } itemprop="datePublished">{ os.date("%B %-d, %Y", a.date) }</time>
+                        </span>
+                    </header>
+                    { a.description }
+                </article>
+            end) }
         </div>
-    </div>
-end
-
-bhp.render(
-    <SimpleArticle article={ article }>
-        Haha.
-    </SimpleArticle>
-)
-
-bhp.render(
-    <SimpleArticle article={ article }>
-        <Wide>
-            <>
-                <p>Before we go further, let me introduce you to programming in Dreams.</p>
-
-                <Video slug="wowow" />
-
-                <p>Dreams code is made up of nodes and wires, superficially similar to some other visual programming systems. However, it is very tightly designed and elegantly integrated into the game world. In this example, a Trigger Zone widget is wired to the Glow property of the lights on this Christmas tree, causing it to light up whenever the player walks into the zone.</p>
-            </>
-            <Video slug="basics" />
-        </Wide>
-    </SimpleArticle>
-)
+    </Common>
+</Base>)

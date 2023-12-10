@@ -1,4 +1,3 @@
-__debug_bin
-__debug_bin.exe
+__debug_bin*
 .DS_Store
 *.actual.lua

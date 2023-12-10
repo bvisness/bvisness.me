@@ -30,8 +30,8 @@ local function renderRec(node, b)
         return
     end
 
-    if type(node) == "string" then
-        b:add(node)
+    if type(node) ~= "table" then
+        b:add(tostring(node))
         return
     end
 
@@ -131,6 +131,14 @@ function bhp.expand(nodes)
         type = "fragment",
         children = nodes,
     }
+end
+
+function bhp.map(t, f)
+    local res = {}
+    for i, v in ipairs(t) do
+        res[i] = f(v)
+    end
+    return bhp.expand(res)
 end
 
 ---

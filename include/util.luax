@@ -9,3 +9,11 @@ end
 function truncate(str, n)
     return string.sub(str, 1, n)
 end
+
+function map(t, f)
+    local res = {}
+    for i, v in ipairs(t) do
+        res[i] = f(v)
+    end
+    return res
+end

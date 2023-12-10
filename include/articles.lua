@@ -1,12 +1,11 @@
 local function slugify(articles)
-    local res = {}
     for _, article in ipairs(articles) do
         if article.slug == nil then
             error("article missing slug!")
         end
-        res[article.slug] = article
+        articles[article.slug] = article
     end
-    return res
+    return articles
 end
 
 return slugify({
