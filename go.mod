@@ -27,4 +27,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/yuin/gopher-lua v1.1.0 => github.com/bvisness/gopher-lua v0.0.0-20231210202855-94fd27cbfa54
+replace github.com/yuin/gopher-lua v1.1.0 => github.com/bvisness/gopher-lua v0.0.0-20231210210735-90501ab9848b
