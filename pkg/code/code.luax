@@ -3,7 +3,10 @@ function Code(atts, children)
         error("the Code component requires the `src` attribute")
     end
 
-    local src = atts.src:gsub("^%s+", "")
-    local src = atts.src:gsub("%s+$", "")
+    local src = atts.src
+    if not atts.notrim then
+        src = src:gsub("^%s+", "")
+        src = src:gsub("%s+$", "")
+    end
     return code.highlight(atts.lang or "plain", src)
 end
