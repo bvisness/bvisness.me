@@ -1,3 +1,32 @@
+- [ ] Port articles
+    - [ ] VRInteractions (and redirects)
+        - [ ] Article
+        - [ ] Redirects
+    - [ ] libgit2 (and redirects)
+        - [ ] Article
+        - [ ] Redirects
+    - [ ] Spotify in game (and redirects)
+        - [ ] Article
+        - [ ] Redirects
+    - [ ] Blender masking layers (and redirects)
+        - [ ] Article
+        - [ ] Redirects
+    - [ ] VR buttons
+        - [x] Article
+        - [ ] Redirects
+    - [ ] Advent of Dreams
+    - [x] Chrome wasm crash
+    - [x] Coroutines
+    - [ ] Desmos
+    - [x] Essential complexity
+    - [ ] Handmade Manifesto history
+    - [x] Tradeoffs
+    - [x] "You can't"
+- [ ] Port other pages
+    - About
+    - Apps
+    - Papers
+    - XML feed
 - [ ] Resolve all the `<TODO>` components on the site
 - [ ] Make ranges more ergonomic
     - Extend the syntax with some kind of arrow function? Pipes are not even valid operators today, so `|foo| => bar` syntax would be unambiguous.
