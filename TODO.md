@@ -1,15 +1,15 @@
 - [ ] Port articles
     - [ ] VRInteractions (and redirects)
-        - [ ] Article
+        - [x] Article
         - [ ] Redirects
     - [ ] libgit2 (and redirects)
-        - [ ] Article
+        - [x] Article
         - [ ] Redirects
     - [ ] Spotify in game (and redirects)
-        - [ ] Article
+        - [x] Article
         - [ ] Redirects
     - [ ] Blender masking layers (and redirects)
-        - [ ] Article
+        - [x] Article
         - [ ] Redirects
     - [ ] VR buttons
         - [x] Article
@@ -27,6 +27,7 @@
     - Apps
     - Papers
     - XML feed
+- [ ] Page titles (and other base template shenanigans)
 - [ ] Resolve all the `<TODO>` components on the site
 - [ ] Make ranges more ergonomic
     - Extend the syntax with some kind of arrow function? Pipes are not even valid operators today, so `|foo| => bar` syntax would be unambiguous.

@@ -1,0 +1,104 @@
+local article = require("articles")["libgit2"]
+require("simplearticle")
+
+require("code")
+
+bhp.render(<SimpleArticle article={ article }>
+    <h2 id="building-libgit2">Building libgit2</h2>
+    <h3 id="installing-dependencies">Installing dependencies</h3>
+    <h4 id="windows">Windows</h4>
+    <p>You must have CMake installed to compile libgit2. If it is not installed, visit <a href="https://cmake.org/download/">the CMake download page</a> and download the appropriate binary for your version of Windows.</p>
+    <p><em>Important:</em> All terminal commands in this guide must be run from within a Visual Studio command prompt with administrator privileges. To launch this, search the start menu for &quot;Developer Command Prompt&quot; and choose the appropriate option. (The exact wording may vary based on your version of Visual Studio.) </p>
+    <h4 id="mac">Mac</h4>
+    <p>You must have cmake installed to compile libgit2. You must have OpenSSL and libSSH2 installed for libgit2 to build correctly. The easiest way to install all of these is through <a href="http://brew.sh/">Homebrew</a>:</p>
+    <Code lang="bash" src=[[
+brew install cmake
+brew install openssl
+brew install libssh2
+    ]] />
+    <h3 id="compiling">Compiling</h3>
+    <p>When you have downloaded the libgit2 source, unzip it and <code>cd</code> into the folder. In that folder, run one of the following, depending on your operating system:</p>
+    <h4 id="windows-1">Windows</h4>
+    <Code lang="bash" src=[[
+mkdir build
+cd build
+cmake .. -DBUILD_SHARED_LIBS=OFF -DBUILD_CLAR=OFF -DTHREADSAFE=ON
+cmake --build .
+    ]] />
+    <h4 id="mac-1">Mac</h4>
+    <Code lang="bash" src=[[
+mkdir build
+cd build
+cmake .. -DBUILD_SHARED_LIBS=OFF -DBUILD_CLAR=OFF -DTHREADSAFE=ON -DCMAKE_OSX_ARCHITECTURES=&quot;i386;x86_64&quot;
+cmake --build .
+    ]] />
+    <h4 id="options-explained">Options explained</h4>
+    <ul>
+    <li><strong><code>BUILD_SHARED_LIBS=OFF</code></strong> makes libgit2 build as a static library (.lib for Windows, .a for Mac) instead of a dynamic library (.dll for Windows, .dylib for Mac). This is <a href="https://libgit2.github.com/docs/guides/build-and-link/#xcode">recommended</a> by the libgit2 authors, as it simplifies project distribution.</li>
+    <li><strong><code>BUILD_CLAR=OFF</code></strong> prevents cmake from also building the libgit2 unit test suite (which is only useful for libgit2 development.)</li>
+    <li><strong><code>THREADSAFE=ON</code></strong> ensures that libgit2 will be safe for use in a multithreaded application.</li>
+    <li><strong><code>CMAKE_OSX_ARCHITECTURES=&quot;i386;x86_64&quot;</code></strong> is a necessary flag when building for OS X or macOS. (See the libgit2 <a href="https://github.com/libgit2/libgit2#macos-x">readme</a>.)</li>
+    </ul>
+    <h3 id="installing">Installing</h3>
+    <p>Once libgit2 is successfully built, run the following to install the library and C/C++ headers into a directory on your system:</p>
+    <h4 id="windows-2">Windows</h4>
+    <p>To install libgit2 globally:</p>
+    <Code lang="bash" src=[[
+cmake --build . --target install
+    ]] />
+    <p>To install libgit2 into a specific project:</p>
+    <Code src=[[
+cmake .. -DCMAKE_INSTALL_PREFIX=\path\to\your\project
+cmake --build . --target install
+    ]] />
+    <h4 id="mac-2">Mac</h4>
+    <Code src=[[
+cmake .. -DCMAKE_INSTALL_PREFIX=<install directory>
+cmake --build . --target install
+    ]] />
+    <p><code>&lt;install directory&gt;</code> can be replaced with whatever path you like. You might do <code>/usr/local</code> for a system-wide installation, or <code>/path/to/your/project</code> for a project-specific installation.</p>
+    <h2 id="compiling-a-project-that-uses-libgit2">Compiling a project that uses libgit2</h2>
+    <p>This is the hard part. libgit2 has secret dependencies that tend to cause lots of linker errors.</p>
+    <h3 id="windows-3">Windows</h3>
+    <p>libgit2 depends on the following libraries: winhttp, Rpcrt4, Crypt32.</p>
+    <h4 id="visual-studio">Visual Studio</h4>
+    <p>First follow the <a href="https://libgit2.github.com/docs/guides/build-and-link/#visual-studio">official instructions</a> for linking libgit2 into a Visual Studio project.</p>
+    <p>When that is done, add the following as additional dependencies: winhttp.lib, Rpcrt4.lib, and Crypt32.lib. When finished, your Additional Dependencies line should look like the following:</p>
+    <Code src=[[
+git2.lib;winhttp.lib;Rpcrt4.lib;Crypt32.lib;%(AdditionalDependencies)
+    ]] />
+    <h3 id="mac-3">Mac</h3>
+    <p>libgit2 depends on the following:</p>
+    <ul>
+    <li><strong>Frameworks:</strong> Security and CoreFoundation</li>
+    <li><strong>Libraries:</strong> curl, z, iconv, ssh2</li>
+    </ul>
+    <h4 id="g">g++</h4>
+    <Code lang="bash" src=[[
+g++ -I/path/to/git2/include                       \
+    -L/path/to/git2/lib                           \
+    -framework CoreFoundation -framework Security \
+    -lcurl -lz -liconv -lssh2 -lgit2              \
+    my_project.cpp
+    ]] />
+    <p>If you installed libgit2 in a system-standard location, you may omit the <code>-I</code> and <code>-L</code> lines, which tell g++ extra include and library paths.</p>
+    <h4 id="xcode">Xcode</h4>
+    <p><em>Someday...</em></p>
+    <h4 id="resolving-linker-errors">Resolving linker errors</h4>
+    <p>If you still get linker errors even when your compiler is configured correctly, you may not have all the required libraries installed. libssh2 is the most likely culprit, since it is not installed by default on Mac. You can install it with <a href="http://brew.sh/">Homebrew</a> like so:</p>
+    <Code src=[[
+brew install libssh2
+    ]] />
+    <p>curl, z, and iconv should be installed by default on your Mac, but if for some reason they are not, they can be installed through Homebrew as well:</p>
+    <Code src=[[
+brew install curl
+brew install zlib
+brew install libiconv
+    ]] />
+    <p>Homebrew will probably present warnings and extra messages when installing these typically standard libraries. Be careful.</p>
+    <h2 id="resources">Resources</h2>
+    <ul>
+    <li><a href="https://libgit2.github.com/docs/guides/build-and-link">Official libgit2 build and link instructions</a></li>
+    <li><a href="https://github.com/libgit2/libgit2">libgit2 GitHub repo</a> (especially README.MD)</li>
+    </ul>
+</SimpleArticle>)

@@ -1,0 +1,32 @@
+local article = require("articles")["vrinteractions"]
+require("simplearticle")
+
+bhp.render(<SimpleArticle article={ article }>
+    <p>At some point in the development of every VR project, you will want to be able to pick things up. Sadly, this usually means a lot of boilerplate code, and in Unreal, Blueprints make boilerplate a huge chore. And there&#39;s all kinds of questions to worry about:</p>
+    <ul>
+        <li>Can the thing I&#39;m holding read values from the correct controller?</li>
+        <li>When I drop something, does everything get reset correctly?</li>
+        <li>What if I grab something out of my other hand instead of picking it up off the ground?</li>
+        <li>What if I don&#39;t want an object to attach to my hand when I grab it?</li>
+        <li>What if I am already carrying something, then grab something else?</li>
+    </ul>
+    <p>At some point I got fed up with copy-pasting the same crap everywhere, and decided to fix this problem. The result is <a href="https://github.com/bvisness/VRInteractions">VRInteractions</a>, an engine plugin that provides a simple foundation for common VR interactions.</p>
+    <h2 id="the-concept">The Concept</h2>
+    <p>VRInteractions has three classes: <code>Hand</code>, <code>Grabbable</code>, and <code>Interactable</code>. A <code>Hand</code> is an Actor that is attached to a Motion Controller Component and handles the logic of grabbing stuff. <code>Grabbable</code> and <code>Interactable</code> are two classes for the objects themselves, each with a slightly different use case.</p>
+    <p><code>Grabbables</code> are objects that attach to your hand when you grab them. Usually these are physics props that the player can pick up and inspect, but they don&#39;t have to be. Whenever a <code>Grabbable</code> is being held, it receives inputs from the correct motion controller.</p>
+    <p><code>Interactables</code> are objects that you can interact with, but that don&#39;t necessarily attach to your hand. <code>Interactables</code> can get input events and button and axis values from the correct motion controller.</p>
+    <p>Which do you use in different situations? Here&#39;s a bunch of examples:</p>
+    <ul>
+        <li><strong>Gun:</strong> <code>Grabbable</code>, since you want it solidly in the player&#39;s hand. It can fire whenever it receives a Trigger Pressed event from the <code>Hand</code> that is holding it.</li>
+        <li><strong>Block:</strong> <code>Grabbable</code>, since it is simply a physics prop that you want the player to be able to pick up and put down.</li>
+        <li><strong>Doorknob:</strong> <code>Interactable</code>, because it stays where it is and reads the rotation of the motion controller.</li>
+        <li><strong>Kitchen drawer:</strong> <code>Interactable</code>, because it needs to move along a constrained track. It can read the motion controller&#39;s position to update its own position.</li>
+        <li><strong>That awesome arcade joystick on the Xortex machine in The Lab:</strong> <code>Interactable</code>, since it stays in place, but it reads the motion controller&#39;s position and button values.</li>
+    </ul>
+    <h2 id="why-should-i-use-it-tldr">Why should I use it? (TL;DR)</h2>
+    <p><strong>Your objects don&#39;t need to know which hand is holding them.</strong> The <code>Hand</code> class takes care of sending the correct motion controller events along to whatever it&#39;s holding.</p>
+    <p><strong>It handles tricky situations with ease.</strong> Grabbing an object out of your other hand doesn&#39;t leave any dangling references or messed-up variable state. Grabbing a new object when you already have one in your hand is also handled correctly.</p>
+    <p><strong>It&#39;s super easy to implement.</strong> VRInteractions is an engine plugin, which means you can easily drop it into any project. Then all you have to do is make subclasses of <code>Grabbable</code> and <code>Interactable</code> and override the functions you want.</p>
+    <h2 id="download">Download</h2>
+    <p>You can find VRInteractions <a href="https://github.com/bvisness/VRInteractions">on GitHub</a>.</p>
+</SimpleArticle>)

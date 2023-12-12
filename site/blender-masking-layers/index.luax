@@ -1,0 +1,41 @@
+local article = require("articles")["blender-masking-layers"]
+require("simplearticle")
+
+bhp.render(<SimpleArticle article={ article }>
+    <p>This is an archive of a <a href="https://blender.stackexchange.com/questions/10650/manually-make-it-look-like-an-object-is-going-through-the-floor-of-a-real-life/">Blender StackExchange answer</a> that I posted back in 2014.</p>
+    <h2 id="the-question">The Question</h2>
+    <blockquote>
+    <p>I have a picture of a room including the floor and I want it to look like there is, for example, a cube going through the floor. Is there a way to do this, maybe by making it go through a plane that is transparent to the photograph but not to the cube?</p>
+    <p>If anyone knows how to do this, as I&#39;m not very good at doing things from text, would you be able to explain with pictures or something? Is there is a tutorial for this sort of thing?</p>
+    </blockquote>
+    <h2 id="my-answer">My Answer</h2>
+    <p>Blender has a feature called Masking Layers, which nicely accomplish exactly what you&#39;re trying to do. Put your content cube on one layer and your masking plane on another, then set the Masking Layer for the plane&#39;s layer. I got my result to look like this:</p>
+    <p><img src={ relurl("finalcube.jpg") } alt="Final render of a cube set into the floor" /></p>
+    <p>Here&#39;s how to accomplish that effect:</p>
+    <h3 id="1-set-up-your-layers">1. Set up your layers</h3>
+    <p>Start by turning on transparent film. This makes your Cycles render layers use transparency instead of a background color. Go to the Render panel in the Properties window, scroll down to Film, and check Transparent.</p>
+    <p>Put your cube (or other content) on one layer and your masking plane on another. I had my cube on layer <img src={ relurl("1.png") } alt="layer 1" />.</p>
+    <p>Make sure that both your cube and your plane are visible, then go over to the Render Layers tab and set the mask layer to the layer with your plane.</p>
+    <p><img src={ relurl("3.png") } alt="The correct setup for the render layers" /></p>
+    <p>To overlay the render on your image, you can use a compositing setup like this:</p>
+    <p><img src={ relurl("4.png") } alt="Simple composite setup to overlay the render on the image" /></p>
+    <p>Give it a render, and you&#39;ll get something like this:</p>
+    <p><img src={ relurl("5.jpg") } alt="First render, with pretty bad lighting" /></p>
+    <p>This technically answers your question, but it looks really bad, so I&#39;m gonna keep going.</p>
+    <h3 id="2-add-shadows-and-ao">2. Add shadows and AO</h3>
+    <p>You can use your masking plane to capture shadows and AO as well. First add another render layer for just your masking plane. Go down into the &quot;Passes&quot; tab and make sure that Shadows and AO are checked.</p>
+    <p><img src={ relurl("6.png") } alt="Shadows and AO must be checked on the new render layer" /></p>
+    <p>Then, use a composite setup like this to mix the shadows and apply them to the original image:</p>
+    <p><img src={ relurl("7.png") } alt="A complicated composite setup" /></p>
+    <p>This will result in a render like this:</p>
+    <p><img src={ relurl("8.jpg") } alt="A much better render" /></p>
+    <p>Just one more step, if you want the lighting to be more accurate:</p>
+    <h3 id="3-make-the-floor-material-match-the-picture">3. Make the floor material match the picture</h3>
+    <p>You can improve the lighting accuracy if you make the floor material match the picture. This will change the color of the light bounces, even though the plane itself is not actually visible.</p>
+    <p>Create a material with a node setup like this and assign it to the floor:</p>
+    <p><img src={ relurl("9.png") } alt="A good material node setup" /></p>
+    <p>This material will use the coordinates of the window to apply the picture to the floor. This means that there will be no distortion of the texture when it is rendered. This change will result in a subtly improved render:</p>
+    <p><img src={ relurl("10.jpg") } alt="The final render" /></p>
+    <p>This technique works for other objects too. Just replace the cube with whatever object you actually want in your scene.</p>
+    <p><img src={ relurl("finalmonkey.jpg") } alt="Another final render, this time with a monkey" /></p>
+</SimpleArticle>)
