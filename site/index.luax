@@ -14,7 +14,9 @@ bhp.render(<Base>
                             <time datetime={ os.date("%Y-%m-%dT%H:%M:%S%z", a.date) } itemprop="datePublished">{ os.date("%B %-d, %Y", a.date) }</time>
                         </span>
                     </header>
-                    { a.description }
+                    <p>
+                        { a.description }
+                    </p>
                 </article>
             end) }
         </div>
