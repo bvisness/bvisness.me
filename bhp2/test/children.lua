@@ -41,15 +41,15 @@ function SimpleArticle(atts, children)
                             },
                             { type = "source", file = "test/children.luax", 364, 382 },
                             children,
-                            { type = "source", file = "test/children.luax", 394, 408 },
+                            { type = "source", file = "test/children.luax", 396, 410 },
                             len = 5
                         },
                     },
-                    { type = "source", file = "test/children.luax", 418, 428 },
+                    { type = "source", file = "test/children.luax", 420, 430 },
                     len = 3
                 }
             ),
-            { type = "source", file = "test/children.luax", 437, 443 },
+            { type = "source", file = "test/children.luax", 439, 445 },
             len = 3
         }
     )

@@ -3,10 +3,10 @@ require("util")
 function ArticleTitle(atts, children)
     return <>
         <h1>
-            <a href={ permalink() }>{ atts.article.title }</a>
+            <a href={ permalink() }>{{ atts.article.title }}</a>
         </h1>
         <div class="post-details">
-            <time datetime={ os.date("%Y-%m-%dT%H:%M:%S%z", atts.article.date) } itemprop="datePublished">{ os.date("%B %-d, %Y", atts.article.date) }</time>
+            <time datetime={ os.date("%Y-%m-%dT%H:%M:%S%z", atts.article.date) } itemprop="datePublished">{{ os.date("%B %-d, %Y", atts.article.date) }}</time>
         </div>
     </>
 end

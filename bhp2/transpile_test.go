@@ -253,8 +253,8 @@ var tagTests = []TagTest{
 	},
 	{
 		"Lua expressions in text",
-		`local tag = <div>Hello { firstname } { lastname }!</div>`,
-		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", file = "Lua expressions in text", 17, 23 }, firstname, { type = "source", file = "Lua expressions in text", 36, 37 }, lastname, { type = "source", file = "Lua expressions in text", 49, 50 }, len = 5 }, }`,
+		`local tag = <div>Hello {{ firstname }} {{ lastname }}!</div>`,
+		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", file = "Lua expressions in text", 17, 23 }, firstname, { type = "source", file = "Lua expressions in text", 38, 39 }, lastname, { type = "source", file = "Lua expressions in text", 53, 54 }, len = 5 }, }`,
 	},
 	{
 		"Fragments",
@@ -273,8 +273,13 @@ var tagTests = []TagTest{
 	},
 	{
 		"nils",
-		`local tag = <>foo{ nil }bar</>`,
-		`local tag = { type = "fragment", children = { { type = "source", file = "nils", 14, 17 }, nil, { type = "source", file = "nils", 24, 27 }, len = 3 }, }`,
+		`local tag = <>foo{{ nil }}bar</>`,
+		`local tag = { type = "fragment", children = { { type = "source", file = "nils", 14, 17 }, nil, { type = "source", file = "nils", 26, 29 }, len = 3 }, }`,
+	},
+	{
+		"tags in lua in tags",
+		`local tag = <div>{{ <b>Wow!</b> }}</div>`,
+		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "html", name = "b", atts = {}, children = { { type = "source", file = "tags in lua in tags", 23, 27 }, len = 1 }, }, len = 1 }, }`,
 	},
 	{
 		"escaping",
@@ -283,8 +288,13 @@ var tagTests = []TagTest{
 	},
 	{
 		"javascript 😑",
-		`local tag = <script>const foo = {"bar": "baz"};</script>`,
-		`local tag = { type = "html", name = "script", atts = {}, children = { { type = "source", file = "javascript 😑", 20, 47 }, len = 1 }, }`,
+		`local tag = <script>const foo = { "bar": "baz" };</script>`,
+		`local tag = { type = "html", name = "script", atts = {}, children = { { type = "source", file = "javascript 😑", 20, 49 }, len = 1 }, }`,
+	},
+	{
+		"javascript 😑 but with template values",
+		`local tag = <script>const foo = { "bar": {{ pizza }} };</script>`,
+		`local tag = { type = "html", name = "script", atts = {}, children = { { type = "source", file = "javascript 😑 but with template values", 20, 41 }, pizza, { type = "source", file = "javascript 😑 but with template values", 52, 55 }, len = 3 }, }`,
 	},
 }
 

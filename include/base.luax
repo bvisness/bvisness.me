@@ -8,13 +8,13 @@ function Base(atts, children)
             <meta charset="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-            <title>{ atts.title and atts.title .. " | " or "" }Ben Visness</title>
+            <title>{{ atts.title and atts.title .. " | " or "" }}Ben Visness</title>
             
             <meta name="author" content="Ben Visness" />
-            {
+            {{
                 atts.description and
                 <meta name="description" content={ truncate(atts.description, 160) } />
-            }
+            }}
             
             <!-- CSS -->
             <link rel="stylesheet" href={ bust("/style.css") } />
@@ -24,8 +24,7 @@ function Base(atts, children)
 
             <!-- TODO: OpenGraph info -->
 
-            <!-- TODO: Better approach for CSS...this is too sad -->
-            <style>{ [[
+            <style>
                 :root {
                     --blockquote-bar: #dfe2e5;
                     --body-background: white;
@@ -34,34 +33,36 @@ function Base(atts, children)
                     --footer-text-color: #999;
                     --hr-color: #ccc;
                     --text-color: black;
-            ]] .. (
-                    darkEnabled and "color-scheme: light dark"
-            ) .. [[
+
+                    {{ darkEnabled and "color-scheme: light dark" }}
                 }
-            ]] .. (
-                darkEnabled and [[
-                    @media (prefers-color-scheme: dark) {
-                        :root {
-                            --blockquote-bar: #424242;
-                            --body-background: #222;
-                            --code-background: #0f0f0f;
-                            --codeblock-background: #171717;
-                            --hr-color: #525252;
-                            --text-color: white;
-                        }
 
-                        a {
-                            color: white;
-                        }
-                    }
-                ]]
-            ) }</style>
+                <!-- TODO: some kind of "raw fragment", or just propagate whether tags are allowed? -->
+                {{
+                    darkEnabled and [[
+                        @media (prefers-color-scheme: dark) {
+                            :root {
+                                --blockquote-bar: #424242;
+                                --body-background: #222;
+                                --code-background: #0f0f0f;
+                                --codeblock-background: #171717;
+                                --hr-color: #525252;
+                                --text-color: white;
+                            }
 
-            { atts.head and atts.head() }
+                            a {
+                                color: white;
+                            }
+                        }
+                    ]]
+                }}
+            </style>
+
+            {{ atts.head and atts.head() }}
         </head>
 
         <body>
-            { bhp.expand(children) }
+            {{ bhp.expand(children) }}
         </body>
     </>
 end

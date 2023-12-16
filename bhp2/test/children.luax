@@ -12,7 +12,7 @@ function SimpleArticle(atts, children)
                 <header>
                     <ArticleTitle article={ atts.article } />
                 </header>
-                { children }
+                {{ children }}
             </article>
         </Common>
     </Base>

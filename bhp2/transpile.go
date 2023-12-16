@@ -60,7 +60,7 @@ func (t *Transpiler) fail(msg string, args ...any) error {
 var operators = []string{
 	// longest first!
 
-	"!", "--", // for the transpiler only
+	"!", "--", // for the transpiler specifically
 
 	"...",
 	"..",
@@ -329,11 +329,12 @@ func (t *Transpiler) peekToken2() string {
 	return res
 }
 
-func (t *Transpiler) peekToken3() string {
-	// godlesser hack
+func (t *Transpiler) peekTokenN(n int) string {
+	// hack enshrined as feature
 	originalCur := t.cur
-	t.nextToken()
-	t.nextToken()
+	for i := 0; i < n-1; i++ {
+		t.nextToken()
+	}
 	res := t.peekToken()
 	t.cur = originalCur
 	return res
@@ -705,7 +706,7 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 		t.b.WriteString("    ")
 		t.b.WriteString("children = ")
 
-		t.parseTagChildren("", indent+"    ")
+		t.parseTagChildren("", true, indent+"    ")
 
 		t.b.WriteString(",\n")
 		t.b.WriteString(indent)
@@ -801,29 +802,8 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 			t.b.WriteString("children = ")
 		}
 		if hasChildren {
-			if tagName == "script" {
-				t.b.WriteString("{ ")
-				var n int
-
-				// Blindly parse until </script>
-				start := t.cur
-				for {
-					if len(t.source[t.cur:]) < len("</script>") {
-						panic(t.fail("unclosed <script> tag"))
-					} else if t.source[t.cur:t.cur+len("</script>")] == "</script>" {
-						t.emitTextNode(start, indent, &n)
-						t.cur += len("</script>")
-						break
-					}
-					t.cur += 1
-				}
-
-				t.b.WriteString("len = ")
-				t.b.WriteString(strconv.Itoa(n))
-				t.b.WriteString(" }")
-			} else {
-				t.parseTagChildren(tagName, indent+"    ")
-			}
+			allowTags := !(tagName == "script" || tagName == "style")
+			t.parseTagChildren(tagName, allowTags, indent+"    ")
 		} else {
 			t.b.WriteString("{ len = 0 }")
 		}
@@ -841,58 +821,27 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 	t.luaChunkStart = t.cur
 }
 
-func (t *Transpiler) parseTagChildren(tagName string, indent string) {
+func (t *Transpiler) parseTagChildren(tagName string, allowTags bool, indent string) {
 	t.b.WriteString("{\n")
 
 	textStart := t.cur
 	n := 0
 	for {
-		if t.source[t.cur] == '<' {
-			t.emitTextNode(textStart, indent+"    ", &n)
-
-			if t.peekToken2() == "/" {
-				// closing tag
-				t.expect("<")
-				t.expect("/")
-				if tagName != "" {
-					name := t.expectName("of closing tag")
-					if name != tagName {
-						panic(t.fail("expected </%s> but got </%s>", tagName, name))
-					}
-				}
-				t.expect(">")
-				t.unwindWhitespace()
-				break
-			} else if t.peekToken2() == "!" && t.peekToken3() == "--" {
-				// comment
-				t.expect("<")
-				t.expect("!")
-				t.expect("--")
-				for t.source[t.cur:t.cur+3] != "-->" {
-					t.cur++
-				}
-				t.cur += 3
-			} else {
-				// opening tag
-				t.b.WriteString(indent)
-				t.b.WriteString("    ")
-				t.parseTag(indent+"    ", false)
-				t.b.WriteString(",\n")
-
-				n += 1
-			}
-
-			textStart = t.cur
-		} else if t.source[t.cur] == '{' {
+		if t.nextIs("{{") {
 			t.emitTextNode(textStart, indent+"    ", &n)
 
 			t.b.WriteString(indent)
 			t.b.WriteString("    ")
 
 			t.expect("{")
+			t.expect("{")
 			t.switchToLua()
 			t.parseSubexp()
 			t.switchToHTML()
+			t.expect("}")
+			if !t.nextIs("}") { // dumb hack to avoid making }} a token
+				t.expect("}}")
+			}
 			t.expect("}")
 			t.unwindWhitespace()
 
@@ -900,6 +849,61 @@ func (t *Transpiler) parseTagChildren(tagName string, indent string) {
 
 			textStart = t.cur
 			n += 1
+			continue
+		}
+
+		// Closing-tag behavior differs when we allow tags vs. not.
+		// When tags are allowed, a `<` always means something taggy.
+		// When they're not, we require more exact closing behavior.
+		var isOpening, isClosing bool
+		if allowTags {
+			isOpening = t.nextIs("<")
+			isClosing = t.nextIs("<") && t.peekToken2() == "/"
+		} else {
+			isClosing = t.nextIs("<") && t.peekToken2() == "/" && isName(t.peekTokenN(3)) && t.peekTokenN(3) == tagName && t.peekTokenN(4) == ">"
+		}
+		isComment := t.nextIs("<") && t.peekToken2() == "!" && t.peekTokenN(3) == "--"
+
+		if isClosing {
+			// closing tag
+			t.emitTextNode(textStart, indent+"    ", &n)
+
+			t.expect("<")
+			t.expect("/")
+			if tagName != "" {
+				name := t.expectName("of closing tag")
+				if name != tagName {
+					panic(t.fail("expected </%s> but got </%s>", tagName, name))
+				}
+			}
+			t.expect(">")
+			t.unwindWhitespace()
+			break
+		} else if isComment {
+			// comment
+			t.emitTextNode(textStart, indent+"    ", &n)
+
+			t.expect("<")
+			t.expect("!")
+			t.expect("--")
+			for t.source[t.cur:t.cur+3] != "-->" {
+				t.cur++
+			}
+			t.cur += 3
+
+			textStart = t.cur
+		} else if isOpening {
+			// opening tag
+			t.emitTextNode(textStart, indent+"    ", &n)
+
+			t.b.WriteString(indent)
+			t.b.WriteString("    ")
+			t.parseTag(indent+"    ", false)
+			t.b.WriteString(",\n")
+
+			n += 1
+
+			textStart = t.cur
 		} else {
 			t.cur++
 		}

@@ -14,7 +14,7 @@ function Picture(atts, children)
 
     local sources = {}
     for contentType, opts in pairs(optsByType) do
-        local allOpts = 
+        local allOpts =
         table.insert(sources, <source
             srcset={ table.concat(opts, ", ") }
             type={ contentType }
@@ -22,11 +22,11 @@ function Picture(atts, children)
     end
     
     return <picture class={ atts.class }>
-        { bhp.expand(sources) }
+        {{ bhp.expand(sources) }}
         <img src={ absurl(atts.src) } alt={ atts.alt } />
     </picture>
 end
 
 function Svg(atts, children)
-    return <>{ require(atts.src) }</>;
+    return <>{{ require(atts.src) }}</>;
 end

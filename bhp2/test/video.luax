@@ -22,10 +22,10 @@ function Wide(atts, children)
             "g4"
         }}>
             <div class="w-100 flex-fair-l p-dumb">
-                { children[1] }
+                {{ children[1] }}
             </div>
             <div class="w-100 flex-fair-l p-dumb">
-                { children[2] }
+                {{ children[2] }}
             </div>
         </div>
     </div>
