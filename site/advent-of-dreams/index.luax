@@ -56,10 +56,147 @@ local days = {
       </p>
     </>,
   },
+  {
+    num = 4,
+    name = "Camp Cleanup",
+    tdreams = "35:00",
+    tjs = "4:57",
+    tweeturl = "https://twitter.com/its_bvisness/status/1599551861757186049",
+    dreamsid = "dEhxyCpJJnK",
+    vods = {"83Qy8xZlXmA"},
+    highlightid = "83Qy8xZlXmA",
+    highlightts = "2167",
+    desc = <>
+      <p>
+        I opened this stream saying that “my goal is to solve this problem in less than five hours”. Luckily, this one took me literally just a half hour. In fact, it went so fast that I decided to do part 2 as well - which only took another half hour. The iterator worked fine, which was a huge blessing.
+      </p>
+      <p>
+        This is a fun one to watch if you want to see a speedrun of the process. No other day would be so easy.
+      </p>
+    </>,
+  },
+  {
+    num = 5,
+    name = "Supply Stacks",
+    tdreams = "2:08:40",
+    tjs = "~15:00",
+    tweeturl = "https://twitter.com/its_bvisness/status/1600010187494006785",
+    dreamsid = "dUXkDcqEwAc",
+    vods = {"-Q7v_M2aOS4"},
+    highlightid = "-Q7v_M2aOS4",
+    highlightts = "12314",
+    desc = <>
+      <p>
+        I love this problem. It exemplifies everything that is great about Dreams, as well as all the issues I had throughout the challenge. The result is a literal simulation of the problem; the program is also so fragile that it breaks if you breathe on it. All the highs and lows are in one place.
+      </p>
+      <p>
+        If I could revisit this one, I would probably save a full hour due to better handling of iteration and of large cycles in the graph. I talk about cycle issues later on.
+      </p>
+      <p>
+        (Skip back a bit in the video if you want to see some shenanigans.)
+      </p>
+    </>,
+  },
+  {
+    num = 6,
+    name = "Tuning Trouble",
+    tdreams = "0:56:15",
+    tjs = "~15:00",
+    tweeturl = "https://twitter.com/its_bvisness/status/1600741462500675584",
+    dreamsid = "dCbGJbJguec",
+    vods = {"afdC-HxvCTs"},
+    highlightid = "afdC-HxvCTs",
+    highlightts = "3967",
+    desc = <>
+      <p>
+        I don't even remember this one tbh. It went really fast. I guess it all worked fine right away?
+      </p>
+    </>,
+  },
+  {
+    num = 7,
+    name = "No Space Left On Device",
+    tdreams = "3:46:00",
+    tjs = "13:02",
+    tweeturl = "https://twitter.com/its_bvisness/status/1600741462500675584",
+    dreamsid = "diAJLRKJTCS",
+    vods = {"afdC-HxvCTs"},
+    highlightid = "afdC-HxvCTs",
+    highlightts = "18060",
+    desc = <>
+      <p>
+        This was the first problem that required me to "allocate memory", that is, spawn objects in the world to store data and run logic of their own. This thankfully went pretty well, in part thanks to my experience two years ago with the LISP thing.
+      </p>
+      <p>
+        I took what I think are some justified shortcuts in this program - it seems that the input always follows a depth-first traversal of the file data, so I hardcoded a depth-first traversal in my implementation.
+      </p>
+    </>,
+  },
+  {
+    num = 8,
+    name = "Treetop Tree House",
+    tdreams = "3:00:00",
+    tjs = "8:17",
+    tweeturl = "https://twitter.com/its_bvisness/status/1601066115865915392",
+    dreamsid = "dCNquYmNbjY",
+    vods = {"ZGpTPE-RD60"},
+    highlightid = "ZGpTPE-RD60",
+    highlightts = "10438",
+    desc = <>
+      <p>
+        This is one of my favorite simulation problems from this year. When the problem described trees occluding other trees, I couldn't help but think "RAYCASTS!!" (or, Laser Scopes, as Dreams calls them). Iteration was working pretty reliably at this point; although this problem took three hours to solve, most of that time was spent learning how to properly use Laser Scopes.
+      </p>
+      <p>
+        It is just absolutely delightful to me that I can push a little guy around using a Follower and he actually does a run animation. That would never work in any other engine but it saves me so much effort here.
+      </p>
+    </>,
+  },
+  {
+    num = 9,
+    name = "Rope Bridge",
+    tdreams = "3:10:00",
+    tjs = "12:51",
+    tweeturl = "https://twitter.com/its_bvisness/status/1601449174490308611",
+    dreamsid = "dqGcyfZTvtr",
+    vods = {"2V9ujq92fOU"},
+    highlightid = "2V9ujq92fOU",
+    highlightts = "10638",
+    desc = <>
+      <p>
+        This one turned out great as well. If you imagine a rope between the two elves, you can imagine the back elf being tugged around only when the front elf is at least two tiles away.
+      </p>
+      <p>
+        Amusing fact: I originally had the elves face in the direction they were walking, but disabled it because the code was attached to the elves, and when they turned around, the code would turn around. How many other programmers have ever had their code run away from them?
+      </p>
+    </>,
+  },
+  {
+    num = 10,
+    name = "Cathode-Ray Tube",
+    tdreams = "3:00:00",
+    tjs = "~5:00",
+    tweeturl = "https://twitter.com/its_bvisness/status/1601813672166363137",
+    dreamsid = "dqvCGbAzPHS",
+    vods = {"mJE1MYBw4eY"},
+    highlightid = "mJE1MYBw4eY",
+    highlightts = "10412",
+    desc = <>
+      <p>
+        I spent SO LONG entering the example data for this one. It is just cruel to give a Dreams programmer sample input that is 146 lines long.
+      </p>
+      <p>
+        Worse yet, I realized later than the <em>actual</em> input was only 140 lines. So, I spent another half hour entering the <em>actual</em> input, and managed to produce my <a href="https://twitter.com/its_bvisness/status/1601822981587697664">first and only</a> legitimate Advent of Code answer from Dreams.
+      </p>
+      <p>
+        At least this one was pretty!
+      </p>
+    </>,
+  },
 }
 
 local weeks = {
   {false, false, false, false, days[1], days[2], days[3]},
+  {days[4], days[5], days[6], days[7], days[8], days[9], days[10]},
 }
 
 function Head(atts, children)
@@ -326,7 +463,7 @@ function Preview(atts, children)
   end
   table.insert(infos, <a href={ "https://indreams.me/scene/"..atts.day.dreamsid }><span class="icon icon--uiimp"></span> Dreams</a>)
   for i, vod in ipairs(atts.day.vods) do
-    table.insert(infos, <a href={ "https://www.youtube.com/watch?v="..vod }><span class="icon icon--uiplay"></span> VOD {{ i }}</a>)
+    table.insert(infos, <a href={ "https://www.youtube.com/watch?v="..vod }><span class="icon icon--uiplay"></span> VOD {{ #atts.day.vods > 1 and i or nil }}</a>)
   end
 
   return <div
