@@ -213,6 +213,89 @@ local function sleep(timeSeconds)
 	end
 end
 	`},
+	{"early returns", `
+function Foo(atts)
+	if atts.bar then
+		return {}
+	else
+		return {}
+	end
+end
+	`},
+	{"various utils", `
+	function truncate(str, n)
+    return string.sub(str, 1, n)
+end
+
+function map(t, f)
+    local res = {}
+    for i, v in ipairs(t) do
+        res[i] = f(v)
+    end
+    return res
+end
+
+function collect(it)
+    local res = {}
+    for i in it do
+        table.insert(res, i)
+    end
+    return res
+end
+
+function explode(s, limit)
+    limit = limit or -1
+
+    if limit == 0 then
+        return {}
+    end
+
+    local res = {}
+    local n = 0
+    for i = 1, #s do
+        if n == limit - 1 then
+            table.insert(res, string.sub(s, i))
+            break
+        end
+        table.insert(res, string.sub(s, i, i))
+        n = n + 1
+    end
+    return res
+end
+
+function split(s, sep, limit, plain)
+    sep = sep or ""
+    limit = limit or -1
+
+    if sep == "" then
+        return explode(s, limit)
+    end
+    if limit == 0 then
+        return {}
+    end
+
+    local res = {}
+    local i, n = 1, 0
+    while i <= #s do
+        if n == limit - 1 then
+            table.insert(res, string.sub(s, i))
+            break
+        end
+
+        local mstart, mend = string.find(s, sep, i, plain)
+        if not mstart then
+            table.insert(res, string.sub(s, i))
+            break
+        end
+
+        table.insert(res, string.sub(s, i, mstart-1))
+        i = mend + 1
+        n = n + 1
+    end
+
+    return res
+end
+	`},
 }
 
 func TestVanillaLua(t *testing.T) {
@@ -255,6 +338,11 @@ var tagTests = []TagTest{
 		"Lua expressions in text",
 		`local tag = <div>Hello {{ firstname }} {{ lastname }}!</div>`,
 		`local tag = { type = "html", name = "div", atts = {}, children = { { type = "source", file = "Lua expressions in text", 17, 23 }, firstname, { type = "source", file = "Lua expressions in text", 38, 39 }, lastname, { type = "source", file = "Lua expressions in text", 53, 54 }, len = 5 }, }`,
+	},
+	{
+		"Dashed attributes",
+		`local tag = <div foo="foo" data-bar="bar" />`,
+		`local tag = { type = "html", name = "div", atts = { foo = "foo", ["data-bar"] = "bar", }, children = { len = 0 }, }`,
 	},
 	{
 		"Fragments",

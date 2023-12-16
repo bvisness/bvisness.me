@@ -172,4 +172,114 @@ end
 bhp.render(<SimpleArticle article={ article } head={ Head }>
   <YouTube id="MiCbA3JuaWk" />
   <YouTube id="5s55Ks7wdcc" start="6862" deferred />
+
+  <script>
+    function footnote(name) {
+      const fn = document.querySelector(`[data-footnote="${name}"]`);
+      fn.classList.toggle('dn');
+    }
+    
+    function initYoutube() {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+    initYoutube();
+    
+    let resolveYoutubeReady;
+    const youtubeReady = new Promise(resolve => {
+      resolveYoutubeReady = resolve;
+    });
+    
+    let ytid = 0;
+    const youtubes = [];
+    function onYouTubeIframeAPIReady() {
+      for (const iframe of document.querySelectorAll('iframe')) {
+        if (iframe.src.indexOf('youtube-nocookie.com') < 0) {
+          continue;
+        }
+        
+        ytid += 1;
+        iframe.id = 'embeddedvideoiframe' + ytid;
+        youtubes.push(new YT.Player(iframe.id));
+      }
+      
+      resolveYoutubeReady();
+    }
+    
+    async function activateYoutube(ytd) {
+      await youtubeReady;
+      
+      ytid += 1;
+      ytd.id = 'ytd-' + ytid;
+      
+      console.log(ytd);
+      
+      const videoId = ytd.getAttribute('data-id');
+      const start = ytd.getAttribute('data-start');
+      const player = new YT.Player(ytd.id, {
+        videoId: videoId,
+        host: 'https://www.youtube-nocookie.com',
+        playerVars: {
+          'start': start,
+        },
+        events: {
+          'onReady': e => {
+            youtubes.push(e.target);
+          },
+        },
+      });
+    }
+    
+    function pauseAllYoutubes() {
+      for (const youtube of youtubes) {
+        if (youtube.pauseVideo) {
+          youtube.pauseVideo();
+        }
+      }
+    }
+    
+    let currentDay;
+    function previewDay(num) {
+      const preview = document.querySelector(`.preview[data-day="${ num }"]`);
+      const previews = preview.closest('.previews');
+      
+      const justCollapse = num === currentDay;
+      
+      for (const otherPreview of previews.querySelectorAll('.preview')) {
+        otherPreview.classList.toggle('flex', false);
+        otherPreview.classList.toggle('dn', true);
+      }
+      for (const otherPreviews of document.querySelectorAll('.previews')) {
+        otherPreviews.classList.toggle('open', false);
+      }
+      
+      preview.classList.toggle('flex', true);
+      preview.classList.toggle('dn', false);
+      if (justCollapse) {
+        currentDay = undefined;
+        return;
+      } else {
+        currentDay = num;
+        previews.classList.toggle('open', true);
+        
+        const ytd = preview.querySelector('.youtube-deferred');
+        if (ytd) {
+          activateYoutube(ytd);
+        }
+      }
+      
+      pauseAllYoutubes();
+    }
+    
+    const days = document.querySelectorAll('.calendar .day');
+    for (const day of days) {
+      day.addEventListener('click', e => {
+        const day = e.target.closest('.day');
+        const num = day.getAttribute('data-day');
+        previewDay(num);
+      });
+    }
+  </script>
 </SimpleArticle>)

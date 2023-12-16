@@ -364,13 +364,22 @@ func (t *Transpiler) expectName(desc string) string {
 	return tok
 }
 
+func (t *Transpiler) expectAttName() string {
+	name := t.expectName("of attribute")
+	for t.peekToken() == "-" {
+		name += t.nextToken()
+		name += t.expectName("of attribute")
+	}
+	return name
+}
+
 func (t *Transpiler) maybe(s string) {
 	if t.peekToken() == s {
 		t.nextToken()
 	}
 }
 
-func (t *Transpiler) parseStat() {
+func (t *Transpiler) parseStat() (isLast bool) {
 	switch tok := t.peekToken(); tok {
 	case ";":
 		t.nextToken()
@@ -380,17 +389,20 @@ func (t *Transpiler) parseStat() {
 			t.parseCondAndBlock()
 		}
 		if t.peekToken() == "else" {
+			t.nextToken()
 			t.parseBlock()
 		}
 		t.expect("end")
+		return false
 	case "while":
 		t.nextToken()
 		t.parseSubexp()
 		t.expect("do")
 		t.parseBlock()
 		t.expect("end")
+		return false
 	case "do":
-		panic(t.fail("unimplemented"))
+		panic(t.fail("do statements are not implemented"))
 	case "for":
 		t.nextToken()
 		t.expectName("of loop variable")
@@ -416,12 +428,14 @@ func (t *Transpiler) parseStat() {
 		t.expect("do")
 		t.parseBlock()
 		t.expect("end")
+		return false
 	case "repeat":
 		panic(t.fail("not implemented"))
 	case "function":
 		t.nextToken()
 		t.parseFuncName()
 		t.parseFuncBody()
+		return false
 	case "local":
 		t.nextToken()
 		if t.peekToken() == "function" {
@@ -440,11 +454,18 @@ func (t *Transpiler) parseStat() {
 				t.parseExpList()
 			}
 		}
-	case "::", "return", "break", "goto":
-		panic(t.fail("unimplemented"))
+		return false
+	case "break":
+		t.nextToken() // skip BREAK
+		return true
+	case "::", "return", "goto":
+		panic(t.fail(tok + " is not implemented"))
 	default:
 		t.parseExprStat()
+		return false
 	}
+
+	panic("unreachable")
 }
 
 func (t *Transpiler) parseCondAndBlock() {
@@ -529,7 +550,11 @@ func (t *Transpiler) parseBlock() {
 			t.maybe(";")
 			break
 		} else {
-			t.parseStat()
+			isLast := t.parseStat()
+			t.maybe(";")
+			if isLast {
+				break
+			}
 		}
 	}
 }
@@ -730,8 +755,7 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 		tagName := t.expectName("of tag")
 		var atts []TagAttribute
 		for isName(t.peekToken()) {
-			// TODO: handle HTML attributes with dashes
-			att := TagAttribute{Name: t.expectName("of attribute")}
+			att := TagAttribute{Name: t.expectAttName()}
 			if t.peekToken() == "=" {
 				t.nextToken()
 				if isString(t.peekToken()) {
@@ -776,7 +800,13 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 				t.b.WriteString(indent)
 				t.b.WriteString("    ")
 				t.b.WriteString("    ")
-				t.b.WriteString(att.Name)
+				if strings.Contains(att.Name, "-") {
+					t.b.WriteString(`["`)
+					t.b.WriteString(att.Name)
+					t.b.WriteString(`"]`)
+				} else {
+					t.b.WriteString(att.Name)
+				}
 				t.b.WriteString(" = ")
 				t.b.WriteString(att.Value)
 				t.b.WriteString(",\n")
