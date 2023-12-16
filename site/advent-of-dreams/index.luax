@@ -1,0 +1,175 @@
+local article = require("articles")["advent-of-dreams"]
+require("simplearticle")
+
+function Head(atts, children)
+  return <>
+    <link rel="stylesheet" href={ relurl("tachyons.min.css") } />
+    <link rel="stylesheet" href={ relurl("dreams-icons.css") } />
+    <style>
+      @font-face {
+        font-family: "Fela";
+        src: url("Fela-Regular.otf") format("opentype"), url("Fela-Regular.ttf") format("truetype"), url("Fela-Regular.woff2") format("woff2");
+        font-weight: normal;
+      }
+      @font-face {
+        font-family: "Fela";
+        src: url("Fela-Bold.otf") format("opentype"), url("Fela-Bold.ttf") format("truetype"), url("Fela-Bold.woff2") format("woff2");
+        font-weight: bold;
+      }
+
+      :root {
+        --spacing-0: 0;
+        --spacing-1: .25rem;
+        --spacing-2: .5rem;
+        --spacing-3: 1rem;
+        --spacing-4: 2rem;
+        --spacing-5: 4rem;
+        --spacing-6: 8rem;
+        --spacing-7: 16rem;
+        
+        --footnote-color: #666;
+        --footnote-background: #fff;
+        
+        --fela: Fela, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --footnote-color: #ccc;
+          --footnote-background: #1c1c1c
+        }
+      }
+
+      body {
+        overflow-x: hidden; /* lol */
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        font-family: var(--fela);
+      }
+
+      article > h1 {
+        text-align: center;
+        margin-top: var(--spacing-4);
+      }
+
+      .flex-fair {
+        flex-basis: 1px;
+        flex-grow: 1;
+        flex-shrink: 1;
+      }
+
+      .g1 { gap: var(--spacing-1); }
+      .g2 { gap: var(--spacing-2); }
+      .g3 { gap: var(--spacing-3); }
+      .g4 { gap: var(--spacing-4); }
+
+      .youtube {
+        width: 100%;
+        background-color: black;
+      }
+
+      .youtube, picture, video, img {
+        border-radius: 8px;
+      }
+
+      .twitter-tweet.twitter-tweet-rendered {
+        margin: 0 !important;
+      }
+
+      .wide > * {
+        width: 100%;
+      }
+
+      .p-dumb > :first-child {
+        margin-top: 0;
+      }
+
+      .p-dumb > :last-child {
+        margin-bottom: 0;
+      }
+
+      .footnote-container {
+        position: relative;
+      }
+
+      .footnote {
+        --shadow-color: rgba(0, 0, 0, 0.5);
+        position: relative;
+        width: 100vw;
+        left: calc(50% - 50vw);
+        box-shadow: inset 0 20px 16px -20px var(--shadow-color), inset 0 -20px 16px -20px var(--shadow-color);
+        color: var(--footnote-color);
+        background-color: var(--footnote-background);
+      }
+
+      .glow, img:not(.no-glow), video:not(.no-glow), .youtube:not(.no-glow) {
+        --glow-color: #2d60bf;
+        box-shadow: 0 0 6px 2px var(--glow-color);
+      }
+
+      picture.no-glow img {
+        box-shadow: none;
+      }
+
+      /* large */
+      @media screen and (min-width: 60em) {
+        .flex-fair-l {
+          flex-basis: 1px;
+          flex-grow: 1;
+          flex-shrink: 1;
+        }
+        
+        .g1-l { gap: var(--spacing-1); }
+        .g2-l { gap: var(--spacing-2); }
+        .g3-l { gap: var(--spacing-3); }
+        .g4-l { gap: var(--spacing-4); }
+        
+        .wide {
+          --wideness: 10rem;
+          margin-left: calc(var(--wideness) * -1);
+          margin-right: calc(var(--wideness) * -1);
+          display: flex;
+          justify-content: center;
+        }
+        
+        .wide > * {
+          max-width: calc(100vw - calc(calc(2 * var(--spacing-3)) + var(--spacing-4)));
+        }
+      }
+    </style>
+  </>
+end
+
+function YouTube(atts, children)
+  if atts.deferred then
+    return <div class="relative aspect-ratio--16x9">
+      <div
+        class="youtube-deferred youtube aspect-ratio--object"
+        data-id={ atts.id }
+        data-start={ atts.start }
+      />
+    </div>
+  else
+    local sep = "?"
+    if atts.id:find("?") then
+      sep = "&"
+    end
+
+    return <div class="relative aspect-ratio--16x9">
+      <iframe
+        class="youtube aspect-ratio--object"
+        src={ string.format("https://www.youtube-nocookie.com/embed/%s%senablejsapi=1", atts.id, sep) }
+        title="YouTube video player"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      />
+    </div>
+  end
+end
+
+bhp.render(<SimpleArticle article={ article } head={ Head }>
+  <YouTube id="MiCbA3JuaWk" />
+  <YouTube id="5s55Ks7wdcc" start="6862" deferred />
+</SimpleArticle>)
