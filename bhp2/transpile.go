@@ -776,23 +776,23 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 
 		isCustom := 'A' <= tagName[0] && tagName[0] <= 'Z'
 
+		t.b.WriteString("{\n")
+		t.b.WriteString(indent)
+		t.b.WriteString("    ")
 		if isCustom {
-			t.b.WriteString(tagName)
-			t.b.WriteString("(\n")
+			t.b.WriteString(`type = "custom",` + "\n")
 			t.b.WriteString(indent)
 			t.b.WriteString("    ")
+			t.b.WriteString("func = " + tagName + ",\n")
 		} else {
-			t.b.WriteString("{\n")
-			t.b.WriteString(indent)
-			t.b.WriteString("    ")
 			t.b.WriteString(`type = "html",` + "\n")
 			t.b.WriteString(indent)
 			t.b.WriteString("    ")
 			t.b.WriteString("name = \"" + tagName + "\",\n")
-			t.b.WriteString(indent)
-			t.b.WriteString("    ")
-			t.b.WriteString("atts = ")
 		}
+		t.b.WriteString(indent)
+		t.b.WriteString("    ")
+		t.b.WriteString("atts = ")
 
 		if len(atts) > 0 {
 			t.b.WriteString("{\n")
@@ -828,24 +828,16 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 
 		t.b.WriteString(indent)
 		t.b.WriteString("    ")
-		if !isCustom {
-			t.b.WriteString("children = ")
-		}
+		t.b.WriteString("children = ")
 		if hasChildren {
 			allowTags := !(tagName == "script" || tagName == "style")
 			t.parseTagChildren(tagName, allowTags, indent+"    ")
 		} else {
 			t.b.WriteString("{ len = 0 }")
 		}
-		if isCustom {
-			t.b.WriteString("\n")
-			t.b.WriteString(indent)
-			t.b.WriteString(")")
-		} else {
-			t.b.WriteString(",\n")
-			t.b.WriteString(indent)
-			t.b.WriteString("}")
-		}
+		t.b.WriteString(",\n")
+		t.b.WriteString(indent)
+		t.b.WriteString("}")
 	}
 
 	t.luaChunkStart = t.cur

@@ -90,44 +90,59 @@ bhp.render({
     type = "fragment",
     children = {
         { type = "source", file = "test/video.luax", 947,  953 },
-        Wide({}, {
-            { type = "source", file = "test/video.luax", 959,  969 },
-            {
-                type = "fragment",
-                children = {
-                    { type = "source", file = "test/video.luax", 971,  985 },
-                    {
-                        type = "html",
-                        name = "p",
-                        atts = {},
-                        children = {
-                            -- "Before we go further, let me introduce you to programming in Dreams.",
-                            { type = "source", file = "test/video.luax", 988, 1056 }, -- avoid allocating and escaping big strings by slicing from source
-                            len = 1
+        {
+            type = "custom",
+            func = Wide,
+            atts = {},
+            children = {
+                { type = "source", file = "test/video.luax", 959,  969 },
+                {
+                    type = "fragment",
+                    children = {
+                        { type = "source", file = "test/video.luax", 971,  985 },
+                        {
+                            type = "html",
+                            name = "p",
+                            atts = {},
+                            children = {
+                                -- "Before we go further, let me introduce you to programming in Dreams.",
+                                { type = "source", file = "test/video.luax", 988, 1056 }, -- avoid allocating and escaping big strings by slicing from source
+                                len = 1
+                            },
                         },
-                    },
-                    { type = "source", file = "test/video.luax", 1060, 1076 },
-                    Video({ slug = "wowow", }, { len = 0 }),
-                    { type = "source", file = "test/video.luax", 1098, 1114 },
-                    {
-                        type = "html",
-                        name = "p",
-                        atts = {},
-                        children = {
-                            -- "Dreams code is made up of nodes and wires...",
-                            { type = "source", file = "test/video.luax", 1117, 1477 },
-                            len = 1
+                        { type = "source", file = "test/video.luax", 1060, 1076 },
+                        {
+                            type = "custom",
+                            func = Video,
+                            atts = { slug = "wowow", },
+                            children = { len = 0 },
                         },
+                        { type = "source", file = "test/video.luax", 1098, 1114 },
+                        {
+                            type = "html",
+                            name = "p",
+                            atts = {},
+                            children = {
+                                -- "Dreams code is made up of nodes and wires...",
+                                { type = "source", file = "test/video.luax", 1117, 1477 },
+                                len = 1
+                            },
+                        },
+                        { type = "source", file = "test/video.luax", 1481, 1491 },
+                        len = 7
                     },
-                    { type = "source", file = "test/video.luax", 1481, 1491 },
-                    len = 7
                 },
+                { type = "source", file = "test/video.luax", 1494, 1504 },
+                {
+                    type = "custom",
+                    func = Video,
+                    atts = { slug = "basics", },
+                    children = { len = 0 },
+                },
+                { type = "source", file = "test/video.luax", 1527, 1533 },
+                len = 5
             },
-            { type = "source", file = "test/video.luax", 1494, 1504 },
-            Video({ slug = "basics", }, { len = 0 }),
-            { type = "source", file = "test/video.luax", 1527, 1533 },
-            len = 5
-        }),
+        },
         { type = "source", file = "test/video.luax", 1540, 1542 },
         len = 3
     },

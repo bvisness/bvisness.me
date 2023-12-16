@@ -327,7 +327,7 @@ var tagTests = []TagTest{
 	{
 		"custom component",
 		`local tag = <Custom foo="bar" />`,
-		`local tag = Custom({ foo = "bar", }, { len = 0 })`,
+		`local tag = { type = "custom", func = Custom, atts = { foo = "bar", }, children = { len = 0 }, }`,
 	},
 	{
 		"Lua expressions in attributes",

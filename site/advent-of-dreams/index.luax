@@ -1,6 +1,67 @@
 local article = require("articles")["advent-of-dreams"]
 require("simplearticle")
 
+local days = {
+  {
+    num = 1,
+    name = "Calorie Counting",
+    tdreams = "1:45:00",
+    tjs = "~15:00",
+    dreamsid = "dAFfSQkZJKq",
+    vods = {"5s55Ks7wdcc"},
+    highlightid = "5s55Ks7wdcc",
+    highlightts = "6862",
+    desc = <>
+      <p>
+        As expected, I spent a lot of time on Day 1 getting my bearings. Rather than figure out double iteration on my first day, I manually walked from elf to elf to compute the final answer.
+      </p>
+      <p>
+        I hadn't yet learned about some newer features in Dreams, like scope (which was added sometime in the last couple years.) Those features would make subsequent days considerably easier.
+      </p>
+    </>,
+  },
+  {
+    num = 2,
+    name = "Rock Paper Scissors",
+    tdreams = "1:30:00",
+    tjs = "~15:00",
+    dreamsid = "dSUxZKAedNS",
+    vods = {"07GstsK8Aos"},
+    highlightid = "07GstsK8Aos",
+    highlightts = "6890",
+    desc = <>
+      <p>
+        I put in a tiny amount of visual polish, and I think it paid off. This one is still quite simple, and some changes I made to iteration were an improvement, but I still ran into a lot of issues. (More on that later.)
+      </p>
+    </>,
+  },
+  {
+    num = 3,
+    name = "Rucksack Reorganization",
+    tdreams = "4:44:32",
+    tjs = "~15:00",
+    dreamsid = "dqFhNYeMwNx",
+    vods = {"KyioOX7_5oU"},
+    highlightid = "KyioOX7_5oU",
+    highlightts = "16795",
+    desc = <>
+      <p>
+        This stream went for a grueling five full hours. I spent about half the time just fixing bugs in my iterator and weird suppressed-behavior / bad-cycle bugs in the larger program. I also spent at least an hour just inputting the example data, which was unusually large. It took me a staggering 4 hours and 45 minutes to get the right answer on this one.
+      </p>
+      <p>
+        I ended up abandoning the internal timer on the iterator on this day. This was the right decision.
+      </p>
+      <p>
+        I didn't have the energy to make this one pretty. Not sure how I would have anyway.
+      </p>
+    </>,
+  },
+}
+
+local weeks = {
+  {false, false, false, false, days[1], days[2], days[3]},
+}
+
 function Head(atts, children)
   return <>
     <link rel="stylesheet" href={ relurl("tachyons.min.css") } />
@@ -169,9 +230,417 @@ function YouTube(atts, children)
   end
 end
 
+function Wide(atts, children)
+  if #children ~= 2 then
+    error("requires exactly two children")
+  end
+
+  return <div class="wide flex justify-center mv4">
+    <div class={{
+      "flex flex-column flex-row-l",
+      atts.class or "items-center",
+      "g4"
+    }}>
+      <div class="w-100 flex-fair-l p-dumb">
+        {{ children[1] }}
+      </div>
+      <div class="w-100 flex-fair-l p-dumb">
+        {{ children[2] }}
+      </div>
+    </div>
+  </div>
+end
+
+function Footnote(atts, children)
+  return <div class="footnote-container dn" data-footnote={ atts.id }>
+    <div class="footnote">
+      <div class="container ph2 pv3 p-dumb">
+        <!-- TODO: This sucks. Why should I have to expand this? I need to rethink how lists work here, or what gets passed into `children`. -->
+        {{ bhp.expand(children) }}
+      </div>
+    </div>
+  </div>
+end
+
+function Video(atts)
+  return <div class="relative aspect-ratio--16x9">
+    <video
+      class="aspect-ratio--object"
+      src={ relurl("vids/" .. atts.slug .. ".mp4" ) }
+      poster={ relurl("vids/" .. atts.slug .. ".jpg" ) }
+      autoplay muted loop controls
+      preload="metadata"
+    />
+  </div>
+end
+
+function Day(atts, children)
+  return <div class="day" data-day={ atts.day.num }>
+    <div class="thumbnail relative aspect-ratio--1x1">
+      <div class="aspect-ratio--object">
+        <Picture src={ relpath("days/day"..atts.day.num..".jpg") } scale={ 3 } />
+      </div>
+      {{
+        atts.star and
+        <div class="favorite"><img class="no-glow" src={ relurl("days/star"..atts.day.num..".png") } /></div>
+      }}
+    </div>
+    <h2>{{ atts.day.name }}</h2>
+  </div>
+end
+
+function Week(atts, children)
+  return <>
+    <div class="week dn flex-l">
+      {{
+        bhp.map(atts.week, function (day)
+          if day then
+            return <Day day={ day } />
+          else
+            return <div class="day"></div>
+          end
+        end)
+      }}
+    </div>
+    <div class="previews">
+      <div class="preview-container">
+        {{
+          bhp.map(atts.week, function (day)
+            if day then
+              return <Preview day={ day } />
+            end
+          end)
+        }}
+      </div>
+    </div>
+  </>
+end
+
+function Preview(atts, children)
+  local infos = {}
+  table.insert(infos, <>
+    <span class="solve dreams">{{ atts.day.tdreams }}</span> vs. <span class="solve js">{{ atts.day.tjs }}</span>
+  </>)
+  if atts.day.tweeturl then
+    table.insert(infos, <a href={ atts.day.tweeturl }><Svg src="svg/twitter.svg" /> Tweet</a>)
+  end
+  table.insert(infos, <a href={ "https://indreams.me/scene/"..atts.day.dreamsid }><span class="icon icon--uiimp"></span> Dreams</a>)
+  for i, vod in ipairs(atts.day.vods) do
+    table.insert(infos, <a href={ "https://www.youtube.com/watch?v="..vod }><span class="icon icon--uiplay"></span> VOD {{ i }}</a>)
+  end
+
+  return <div
+    class="preview flex-column flex-row-l items-center g4 ph3 pv4 dn"
+    data-day={ atts.day.num }
+  >
+    <div class="flex-fair-l w-100">
+      <h2>Day {{ atts.day.num }}: {{ atts.day.name }}</h2>
+      <div class="info">
+        {{
+          bhp.join(
+            bhp.map(infos, function (info)
+              return <div>{{ info }}</div>
+            end),
+            " / "
+          )
+        }}
+      </div>
+      <div class="desc mt3 p-dumb">
+        {{ atts.day.desc }}
+      </div>
+    </div>
+    <div class="flex-fair-l w-100">
+      <YouTube id={ atts.day.highlightid } start={ atts.day.highlightts } deferred />
+    </div>
+  </div>
+end
+
 bhp.render(<SimpleArticle article={ article } head={ Head }>
-  <YouTube id="MiCbA3JuaWk" />
-  <YouTube id="5s55Ks7wdcc" start="6862" deferred />
+  <p>
+    I did a very stupid challenge this December - I did Advent of Code in Dreams.
+  </p>
+
+  <div class="wide mv4">
+    <div>
+        <Video slug="crane" />
+    </div>
+  </div>
+
+  <p>
+    <a href="https://indreams.me/">Dreams</a> is a PlayStation game creation platform by Media Molecule, the studio most famous for the LittleBigPlanet games. Users can create and share everything from games to animations to interactive art. It’s truly amazing what these tools can do - I mean, just look at <a href="https://youtu.be/2HBBh8O1xpk">this</a> <a href="https://twitter.com/LeorProject/status/1604128725414600711">stuff</a>.
+  </p>
+
+  <p>
+    Unfortunately I am no artist. But I am a programmer, and Dreams has a robust “logic” system designed for game scripting. When I bought Dreams a couple years ago, I discovered that this logic system is a capable visual scripting engine with a very thoughtful design, and I was quickly able to produce some fun results, culminating in my magnum opus: a toy LISP interpreter.
+  </p>
+
+  <div class="mv4">
+    <YouTube id="MiCbA3JuaWk" />
+  </div>
+
+  <p>
+    This proved to me that Dreams was capable of just about anything. And as the leader of the <a href="https://handmade.network/">Handmade Network</a>, I’ve heard a lot of discussion over the years about “visual programming”.<a href="javascript:footnote('vp')"><sup>[1]</sup></a> So this year, I decided to give visual programming a serious try. And what better way to experiment with a new programming system than <a href="https://adventofcode.com/">Advent of Code</a>?
+  </p>
+
+  <Footnote id="vp">
+    <p>
+      By “discussion”, I primarily mean “I am a Real Programmer and would never dare touch a mouse”, or “I have only seen visual programming systems for children, therefore all visual programming systems are toys”, or “but Fred Brooks said that programs cannot be visualized”. Have some imagination!
+    </p>
+  </Footnote>
+  
+  <h1>The results</h1>
+
+  <p>
+    I completed 15 of the 25 days of Advent of Code. By “completed” I mean “got the example working”, because I didn’t have any way to copy-paste my actual puzzle input into Dreams. Also, Dreams doesn’t have lists.
+  </p>
+
+  <p>
+    In the end, Day 16 was too much - an optimization problem that requires recursion, Dijkstra’s algorithm, and N! runs to determine the optimal path. I spent three days trying to solve it and eventually had to admit defeat.
+  </p>
+
+  <p>
+    You can see videos of each solution on the calendar below. I’ve highlighted my favorite results! (Each video is timestamped to a good part.)
+  </p>
+
+  <style>
+    .calendar {
+      --border-color: #333;
+      /* border: 1px solid var(--border-color); */
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .day {
+      /* border: 1px solid var(--border-color); */
+      padding: var(--spacing-3);
+      
+      position: relative;
+      cursor: pointer;
+      
+      width: 10rem;
+      flex-shrink: 0;
+    }
+    
+    .day::before {
+      content: attr(data-day);
+      position: absolute;
+      left: 0.4rem;
+      top: 0.4rem;
+      color: #aaa;
+      font-family: var(--fela);
+      font-size: 1.4rem;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .day::before {
+        color: #555;
+      }
+    }
+    
+    .day .thumbnail {
+      transition: all 200ms ease-in-out;
+    }
+    
+    .day .thumbnail picture img {
+      border-radius: 50%;
+    }
+    
+    .day h2 {
+      font-size: 1rem;
+      text-align: center;
+      margin-top: 1rem;
+      margin-bottom: 0;
+    }
+    
+    .day:hover .thumbnail {
+      transform: scale(1.05);
+    }
+    
+    .day .favorite {
+      position: absolute;
+      right: -0.3rem;
+      top: -0.5rem;
+      font-size: 2rem;
+      z-index: 101;
+      width: 3rem;
+    }
+    
+    .week .heading {
+      font-family: var(--fela);
+      font-size: 1.8rem;
+      text-align: center;
+      
+      /* flex-fair */
+      flex-basis: 1px;
+      flex-grow: 1;
+      flex-shrink: 1;
+    }
+    
+    .previews {
+      position: relative;
+      display: none;
+    }
+    
+    .preview-container {
+      --shadow-color: rgba(0, 0, 0, 0.5);
+      position: relative;
+      width: 100vw;
+      left: calc(50% - 50vw);
+      box-shadow: inset 0 20px 16px -20px var(--shadow-color), inset 0 -20px 16px -20px var(--shadow-color);
+      background-color: var(--footnote-background);
+      transition: all 200ms ease-in-out;
+      margin: 0;
+      overflow: hidden;
+      
+      display: flex;
+      justify-content: center;
+    }
+    
+    .previews.open {
+      display: block;
+    }
+    
+    .previews.open .preview-container {
+      margin-bottom: var(--spacing-3);
+    }
+    
+    .calendar .preview {
+      flex-grow: 1;
+      max-width: 60rem;
+    }
+    
+    .preview h2 {
+      margin-top: 0;
+      margin-bottom: var(--spacing-2);
+    }
+    
+    .preview .info {
+      font-family: var(--fela);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      color: #999;
+    }
+    
+    .preview .info span {
+      color: var(--text-color);
+    }
+    
+    .preview .info a {
+      color: var(--text-color);
+      text-decoration: none;
+    }
+    
+    .preview .info svg {
+      height: 0.9em;
+      transform: translateY(1px);
+    }
+    
+    .icon {
+      font-family: DreamsIcons;
+    }
+    
+    .icon--uiimp::before {
+      content: "";
+    }
+    
+    .icon--uiplay::before {
+      content: "";
+    }
+    
+    .solve {
+      position: relative;
+    }
+    
+    .solve::after {
+      display: none;
+      position: absolute;
+      bottom: -2.5rem;
+      left: 0;
+      width: var(--width);
+      padding: var(--spacing-2);
+      text-align: center;
+      color: white;
+      background-color: black;
+      border-radius: 4px;
+    }
+    
+    .solve:hover::after {
+      display: block;
+    }
+    
+    .solve.dreams::after {
+      content: "Dreams solve time";
+      --width: 8.4rem;
+    }
+    
+    .solve.js::after {
+      content: "JavaScript solve time";
+      --width: 10rem;
+    }
+    
+    .mobile-days-container {
+      position: relative;
+    }
+    
+    .mobile-days {
+      --shadow-color: rgba(0, 0, 0, 0.5);
+      position: relative;
+      width: 100vw;
+      left: calc(50% - 50vw);
+    }
+    
+    @media screen and (min-width: 60em) {
+      .day {
+        /* flex-fair */
+        flex-basis: 1px;
+        flex-grow: 1;
+        flex-shrink: 1;
+      }
+      
+      .previews {
+        display: block;
+      }
+      
+      .preview-container {
+        height: 0;
+      }
+      
+      .previews.open .preview-container {
+        height: 25rem;
+      }
+    }
+  </style>
+
+  <div class="wide mv4 mv5-l">
+    <div class="calendar">
+      <!-- Mobile stuff -->
+      <div class="mobile-days overflow-hidden">
+        <div class="week flex dn-l overflow-x-scroll ph3">
+          {{
+            bhp.map(days, function (day)
+              return <Day day={ day } />
+            end)
+          }}
+        </div>
+      </div>
+
+      <div class="week mb3 dn flex-l">
+        <div class="heading">Sunday</div>
+        <div class="heading">Monday</div>
+        <div class="heading">Tuesday</div>
+        <div class="heading">Wednesday</div>
+        <div class="heading">Thursday</div>
+        <div class="heading">Friday</div>
+        <div class="heading">Saturday</div>
+      </div>
+      {{
+        bhp.map(weeks, function (week)
+          return <Week week={ week } />
+        end)
+      }}
+    </div>
+  </div>
 
   <script>
     function footnote(name) {

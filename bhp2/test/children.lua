@@ -3,19 +3,28 @@ require("article/title")
 
 function SimpleArticle(atts, children)
     if not atts.article then
-        return Error({}, {
-            { type = "source", file = "test/children.luax", 139, 169 },
-            len = 1
-        })
+        return {
+            type = "custom",
+            func = Error,
+            atts = {},
+            children = {
+                { type = "source", file = "test/children.luax", 139, 169 },
+                len = 1
+            },
+        }
     end
 
-    return Base(
-        {},
-        {
+    return {
+        type = "custom",
+        func = Base,
+        atts = {},
+        children = {
             { type = "source", file = "test/children.luax", 207, 217 },
-            Common(
-                {},
-                {
+            {
+                type = "custom",
+                func = Common,
+                atts = {},
+                children = {
                     { type = "source", file = "test/children.luax", 225, 239 },
                     {
                         type = "html",
@@ -29,12 +38,14 @@ function SimpleArticle(atts, children)
                                 atts = {},
                                 children = {
                                     { type = "source", file = "test/children.luax", 274, 296 },
-                                    ArticleTitle(
-                                        {
+                                    {
+                                        type = "custom",
+                                        func = ArticleTitle,
+                                        atts = {
                                             article = atts.article,
                                         },
-                                        { len = 0 }
-                                    ),
+                                        children = { len = 0 },
+                                    },
                                     { type = "source", file = "test/children.luax", 337, 355 },
                                     len = 3
                                 },
@@ -47,10 +58,10 @@ function SimpleArticle(atts, children)
                     },
                     { type = "source", file = "test/children.luax", 420, 430 },
                     len = 3
-                }
-            ),
+                },
+            },
             { type = "source", file = "test/children.luax", 439, 445 },
             len = 3
-        }
-    )
+        },
+    }
 end

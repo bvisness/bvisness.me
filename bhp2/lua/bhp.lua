@@ -35,7 +35,9 @@ local function renderRec(node, b)
         return
     end
 
-    if node.type == "html" then
+    if node.type == "custom" then
+        renderRec(node.func(node.atts, node.children), b)
+    elseif node.type == "html" then
         b:add("<")
         b:add(node.name)
         for att, value in pairs(node.atts) do
@@ -52,6 +54,11 @@ local function renderRec(node, b)
                 if att then
                     b:add(att)
                 end
+            elseif type(value) == "number" then
+                b:add(att)
+                b:add("=\"")
+                b:add(tostring(value))
+                b:add("\"")
             elseif type(value) == "table" then
                 if att ~= "class" then
                     error("only `class` can use a table for its value")
@@ -72,8 +79,7 @@ local function renderRec(node, b)
 
                 b:add("\"")
             else
-                -- TODO: more specific error message
-                error("unknown type for tag attribute")
+                error(string.format("unknown type %s for tag attribute %s", type(value), att))
             end
         end
         b:add(">")
@@ -137,6 +143,23 @@ function bhp.map(t, f)
     local res = {}
     for i, v in ipairs(t) do
         res[i] = f(v)
+    end
+    return bhp.expand(res)
+end
+
+function bhp.join(t, sep)
+    if t.type == "fragment" then
+        t = t.children
+    end
+
+    local res = {}
+    local len = t.len or #t
+    for i = 1, len - 1 do
+        table.insert(res, t[i])
+        table.insert(res, sep)
+    end
+    if len > 0 then
+        table.insert(res, t[len])
     end
     return bhp.expand(res)
 end
