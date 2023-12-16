@@ -6,19 +6,24 @@ require("util")
 bhp.render(<Base>
     <Common>
         <div class="list">
-            { bhp.map(articles, function (a)
+            {{ bhp.map(articles, function (a)
                 return <article>
                     <header>
-                        <h1><a href={ absurl(a.slug) }>{ a.title }</a></h1>
+                        <h1><a href={ absurl(a.slug) }>{{ a.title }}</a></h1>
                         <span class="post-details">
-                            <time datetime={ os.date("%Y-%m-%dT%H:%M:%S%z", a.date) } itemprop="datePublished">{ os.date("%B %-d, %Y", a.date) }</time>
+                            <time
+                                datetime={ os.date("%Y-%m-%dT%H:%M:%S%z", a.date) }
+                                itemprop="datePublished"
+                            >
+                                {{ os.date("%B %-d, %Y", a.date) }}
+                            </time>
                         </span>
                     </header>
                     <p>
-                        { a.description }
+                        {{ a.description }}
                     </p>
                 </article>
-            end) }
+            end) }}
         </div>
     </Common>
 </Base>)

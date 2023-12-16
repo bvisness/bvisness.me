@@ -166,7 +166,16 @@ end
 
 ---@return string
 function StringBuilder:toString()
-    return table.concat(self.strs, "")
+    local size = #self.strs
+    local chunkSize = 1000 -- Adjust the chunk size based on your scenario
+    local result = {}
+
+    for i = 1, size, chunkSize do
+        local chunkEnd = math.min(i + chunkSize - 1, size)
+        table.insert(result, table.concat(self.strs, "", i, chunkEnd))
+    end
+
+    return table.concat(result)
 end
 
 return bhp

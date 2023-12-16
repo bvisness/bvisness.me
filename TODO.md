@@ -17,7 +17,7 @@
     - [ ] Advent of Dreams
     - [x] Chrome wasm crash
     - [x] Coroutines
-    - [ ] Desmos
+    - [x] Desmos
     - [x] Essential complexity
     - [ ] Handmade Manifesto history
     - [x] Tradeoffs

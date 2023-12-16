@@ -6,7 +6,7 @@ function SimpleArticle(atts, children)
         return <Error>article attribute is required!</Error>
     end
 
-    return <Base head={ atts.head }>
+    return <Base head={ atts.head } lightOnly={ atts.article.lightOnly }>
         <Common banner={ atts.article.banner }>
             <article>
                 <header>

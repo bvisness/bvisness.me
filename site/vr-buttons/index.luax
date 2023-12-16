@@ -18,12 +18,12 @@ function Head()
 end
 
 bhp.render(<SimpleArticle article={ article } head={ Head }>
-    <span style="display: none">{[[
+    <span style="display: none">
         $$
         \DeclareMathOperator{\proj}{proj}
         \newcommand{\vect}{\mathbf}
         $$
-    ]]}</span>
+    </span>
 
     <p>
         Doing buttons in VR is hard.
@@ -60,14 +60,14 @@ bhp.render(<SimpleArticle article={ article } head={ Head }>
     </p>
 
     <p>
-        That's annoying, but not a deal-breaker, since we can easily move the physics object onto the axis ourselves. The vector math is quite simple. Let {[[ \(\vect{v}\) ]]} be the object's position, {[[ \(\vect{a}\) ]]} be the axis, and {[[ \(\vect{p}\) ]]} be the root location of the button:
+        That's annoying, but not a deal-breaker, since we can easily move the physics object onto the axis ourselves. The vector math is quite simple. Let \(\vect{v}\) be the object's position, \(\vect{a}\) be the axis, and \(\vect{p}\) be the root location of the button:
     </p>
 
-    <p>{[[
+    <p>
         $$
         \proj_\vect{a} (\vect{v} - \vect{p}) + \vect{p}
         $$
-    ]]}</p>
+    </p>
 
     <p>
         Problem solved!
@@ -76,7 +76,7 @@ bhp.render(<SimpleArticle article={ article } head={ Head }>
     <h3>Problem 2: The Constraint Sucks</h3>
 
     <p>
-        This mostly worked, but unfortunately, Unreal would resolve collisions before rendering the frame, meaning you could push the button slightly off its axis. This looked and felt sloppy, but there wasn't any way to  avoid it because of the order in which Unreal did things each frame.
+        This mostly worked, but unfortunately, Unreal would resolve collisions before rendering the frame, meaning you could push the button slightly off its axis. This looked and felt sloppy, but there wasn't any way to avoid it because of the order in which Unreal did things each frame.
     </p>
 
     <p>
