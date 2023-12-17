@@ -19,7 +19,7 @@
     - [x] Coroutines
     - [x] Desmos
     - [x] Essential complexity
-    - [ ] Handmade Manifesto history
+    - [x] Handmade Manifesto history
     - [x] Tradeoffs
     - [x] "You can't"
 - [ ] Port other pages
