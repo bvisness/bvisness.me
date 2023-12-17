@@ -59,6 +59,7 @@ local days = {
   {
     num = 4,
     name = "Camp Cleanup",
+    star = true,
     tdreams = "35:00",
     tjs = "4:57",
     tweeturl = "https://twitter.com/its_bvisness/status/1599551861757186049",
@@ -78,6 +79,7 @@ local days = {
   {
     num = 5,
     name = "Supply Stacks",
+    star = true,
     tdreams = "2:08:40",
     tjs = "~15:00",
     tweeturl = "https://twitter.com/its_bvisness/status/1600010187494006785",
@@ -135,6 +137,7 @@ local days = {
   {
     num = 8,
     name = "Treetop Tree House",
+    star = true,
     tdreams = "3:00:00",
     tjs = "8:17",
     tweeturl = "https://twitter.com/its_bvisness/status/1601066115865915392",
@@ -154,6 +157,7 @@ local days = {
   {
     num = 9,
     name = "Rope Bridge",
+    star = true,
     tdreams = "3:10:00",
     tjs = "12:51",
     tweeturl = "https://twitter.com/its_bvisness/status/1601449174490308611",
@@ -192,11 +196,102 @@ local days = {
       </p>
     </>,
   },
+  {
+    num = 11,
+    name = "Monkey in the Middle",
+    tdreams = "3:00:00",
+    tjs = "~10:00",
+    tweeturl = "https://twitter.com/its_bvisness/status/1602061466806456322",
+    dreamsid = "dZSiafCcEhv",
+    vods = {"5Ku8A6q5TNU"},
+    highlightid = "5Ku8A6q5TNU",
+    highlightts = "17232",
+    desc = <>
+      <p>
+        This problem was really incredibly difficult. I spent at least an hour just figuring out how to make monkeys toss objects to each other, and at least an hour debugging sync issues again. Some days are just like that.
+      </p>
+      <p>
+        I ran out of time at the end of the stream, so I wasn't quite able to make it as pretty as I would like. Despite that, and despite all the grueling bugs, I think this is one of the most technically impressive simulation problems I completed.
+      </p>
+    </>,
+  },
+  {
+    num = 12,
+    name = "Hill Climbing Algorithm",
+    star = true,
+    tdreams = "6:00:00",
+    tweeturl = "https://twitter.com/its_bvisness/status/1603251146340159490",
+    dreamsid = "dgCpxpGGYqE",
+    vods = {"PPBMRLtO7fY", "Rv3_Sn5ljnA"},
+    highlightid = "Rv3_Sn5ljnA",
+    highlightts = "8523",
+    desc = <>
+      <p>
+        This is, without a doubt, the most technically challenging problem I completed. It took two days and six hours total, and required both recursion and wireless communication between adjacent tiles. It recursively flood-fills the scene by spawning elves to go to each unvisited tile - whoever gets there fastest took the shortest path.
+      </p>
+      <p>
+        (The elves ascend to heaven because otherwise Dreams yells about having too many entities.)
+      </p>
+    </>,
+  },
+  {
+    num = 13,
+    name = "Distress Signal",
+    tdreams = "3:00:00",
+    tweeturl = "https://twitter.com/its_bvisness/status/1603644554376318978",
+    dreamsid = "dSgFuiorUsM",
+    vods = {"9kDqbqzsVQw"},
+    highlightid = "9kDqbqzsVQw",
+    highlightts = "11005",
+    desc = <>
+      <p>
+        This problem was a welcome reprieve. I'm proud of the solution here; I came up with a way to transform the obvious recursive solution into an iterative one, dramatically reducing the complexity of my Dreams logic. More info in <a href="https://twitter.com/its_bvisness/status/1603851835047088153?s=20">this follow-up tweet</a>.
+      </p>
+    </>,
+  },
+  {
+    num = 14,
+    name = "Regolith Reservoir",
+    star = true,
+    tdreams = "3:00:00",
+    tweeturl = "https://twitter.com/its_bvisness/status/1603987010322038785",
+    dreamsid = "dsdPQDWndRs",
+    vods = {"CLzvTgFa0Ic"},
+    highlightid = "CLzvTgFa0Ic",
+    highlightts = "11927",
+    desc = <>
+      <p>
+        I am so happy with this one. It directly simulates the problem, has great visuals I found on the Dreamiverse, and I even verified that it works with other inputs too (skip to 3:23:39 for an example). Cellular automata turn out to be really fun in Dreams!
+      </p>
+      <p>
+        There were a couple weird issues, like trigger zones not detecting anything on the first frame they're active. Iteration was still difficult. But the end result is just wonderful.
+      </p>
+    </>,
+  },
+  {
+    num = 15,
+    name = "Beacon Exclusion Zone",
+    tdreams = "2:30:00",
+    tweeturl = "https://twitter.com/its_bvisness/status/1604342436502933504",
+    dreamsid = "dQzdiPRHVDk",
+    vods = {"2oVMMIhE-0k"},
+    highlightid = "2oVMMIhE-0k",
+    highlightts = "8696",
+    desc = <>
+      <p>
+        This one looked cool at the end but was quite a grind. Taxicab / Manhattan distance stuff was fun to work with, though. I didn't really bother to actually produce a legit answer for real, but I did get the simulation stuff working.
+      </p>
+      <p>
+        This would be the final problem I completed; Day 16 was ludicrously difficult, and I had to admit defeat.
+      </p>
+    </>,
+  },
 }
 
 local weeks = {
   {false, false, false, false, days[1], days[2], days[3]},
   {days[4], days[5], days[6], days[7], days[8], days[9], days[10]},
+  {days[11], days[12], days[13], days[14], days[15], false, false},
 }
 
 function Head(atts, children)
@@ -418,7 +513,7 @@ function Day(atts, children)
         <Picture src={ relpath("days/day"..atts.day.num..".jpg") } scale={ 3 } />
       </div>
       {{
-        atts.star and
+        atts.day.star and
         <div class="favorite"><img class="no-glow" src={ relurl("days/star"..atts.day.num..".png") } /></div>
       }}
     </div>
@@ -456,7 +551,12 @@ end
 function Preview(atts, children)
   local infos = {}
   table.insert(infos, <>
-    <span class="solve dreams">{{ atts.day.tdreams }}</span> vs. <span class="solve js">{{ atts.day.tjs }}</span>
+    <span class="solve dreams">{{ atts.day.tdreams }}</span>
+    {{
+      atts.day.tjs and <>
+        vs. <span class="solve js">{{ atts.day.tjs }}</span>
+      </>
+    }}
   </>)
   if atts.day.tweeturl then
     table.insert(infos, <a href={ atts.day.tweeturl }><Svg src="svg/twitter.svg" /> Tweet</a>)
