@@ -14,7 +14,7 @@
     - [ ] VR buttons
         - [x] Article
         - [ ] Redirects
-    - [ ] Advent of Dreams
+    - [x] Advent of Dreams
     - [x] Chrome wasm crash
     - [x] Coroutines
     - [x] Desmos
