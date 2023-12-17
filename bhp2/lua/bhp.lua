@@ -1,7 +1,6 @@
 require("pprint")
 
 bhp = {
-    _rendered = "",
     _sources = {},
 }
 
@@ -118,7 +117,15 @@ function bhp.render(node)
     local b = StringBuilder:new()
     renderRec(node, b)
 
-    bhp._rendered = b:toString()
+    return b:toString()
+end
+
+function bhp.redirect(url, code)
+    return {
+        action = "redirect",
+        url = url,
+        code = code or 301,
+    }
 end
 
 ---@param nodes table[]

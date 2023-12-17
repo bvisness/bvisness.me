@@ -46,11 +46,6 @@ func LoadLuaX(l *lua.LState, filename, source string) (*lua.LFunction, error) {
 	return loader, nil
 }
 
-func getRendered(l *lua.LState) string {
-	bhp := l.GetGlobal("bhp").(*lua.LTable)
-	return string(bhp.RawGetString("_rendered").(lua.LString))
-}
-
 //
 // Searchers (package.loaders)
 //

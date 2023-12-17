@@ -4,7 +4,7 @@ require("simplearticle")
 require("code")
 require("images")
 
-bhp.render(<SimpleArticle article={ article }>
+return <SimpleArticle article={ article }>
     <p>
         Programmers love to say things like "it all depends" or "it's always a tradeoff". This makes them sound very wise, but it's usually a cop-out.
     </p>
@@ -128,5 +128,4 @@ const userShifts = getShiftsForUser(start)(end)(123);
     <p>
         Some things are just better than other things. Try to recognize them.
     </p>
-
-</SimpleArticle>)
+</SimpleArticle>

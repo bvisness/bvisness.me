@@ -17,7 +17,7 @@ function Head()
     </>
 end
 
-bhp.render(<SimpleArticle article={ article } head={ Head }>
+return <SimpleArticle article={ article } head={ Head }>
     <span style="display: none">
         $$
         \DeclareMathOperator{\proj}{proj}
@@ -228,4 +228,4 @@ bhp.render(<SimpleArticle article={ article } head={ Head }>
     <p>
         These buttons are alive and well in <a href="http://store.steampowered.com/app/454830/Beach_Ball_Valley/">Beach Ball Valley</a> right now, so if you have a Vive, go try them out!
     </p>
-</SimpleArticle>)
+</SimpleArticle>

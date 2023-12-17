@@ -1,12 +1,14 @@
 package bhp2
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	lua "github.com/yuin/gopher-lua"
 )
@@ -45,34 +47,65 @@ func Bust(resourceUrl string) string {
 	return resUrlParsed.String()
 }
 
-func (b Instance) ResolveFileOrDir(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
+// Resolves the file to serve from a URL path. For a path like /foo/bar, this
+// will look for the following:
+//
+//   - /foo/bar (the file itself)
+//   - /foo/bar.luax (a .luax file with the same name)
+//   - /foo/bar/index.luax (a directory index)
+//
+// Some paths should not be directly resolved by the browser without a
+// redirect. On the other hand, when resolving a path internally (e.g. in
+// middleware) you may not care. If a redirect should occur, the redirectPath
+// parameter will contain the absolute URL path to redirect to.
+func (b Instance) ResolveFile(abspath string) (srcFilename string, fileInfo fs.FileInfo, redirectPath string, err error) {
+	var filename string
+	if abspath == "" || abspath == "/" {
+		filename = ""
+	} else {
+		filename = strings.TrimLeft(abspath, "/")
+	}
+
+	srcFilename, fileInfo, err = b.ResolveRawFileOrDir(filename)
+	if errors.Is(err, fs.ErrNotExist) {
+		srcFilename, fileInfo, err = b.ResolveRawFileOrDir(filename + ".luax")
+	}
+	if err != nil {
+		return
+	}
+
+	if fileInfo.IsDir() {
+		// Redirect http://example.org/foo/bar to http://example.org/foo/bar/.
+		// Only folders are subject to this behavior, and must be valid
+		// folders.
+		//
+		// Note that this does not abort this function.
+		pathEndsInSlash := len(abspath) > 0 && abspath[len(abspath)-1] == '/'
+		if !pathEndsInSlash {
+			redirectPath = abspath + "/"
+		}
+
+		// Resolve directory index.
+		srcFilename, fileInfo, err = b.ResolveRawFileOrDir(abspath + "/index.luax")
+		if err != nil {
+			return
+		}
+		if fileInfo.IsDir() {
+			err = fmt.Errorf("expected valid index file at %s, but got a directory", abspath)
+			return
+		}
+	}
+	return
+}
+
+// Get a file or directory for the given website path without resolving
+// indexes, redirects, or other shenanigans. The name helps emphasize that you
+// may in fact get back a directory instead of a file you can actually return.
+func (b Instance) ResolveRawFileOrDir(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
 	srcFilename = filepath.Join(b.SrcDir, abspath)
 	fileInfo, err = os.Stat(srcFilename)
 	if err != nil {
-		return "", nil, fmt.Errorf("could not resolve file: %w", err)
-	}
-	return
-}
-
-func (b Instance) ResolveDirectoryIndex(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
-	abspath += "/index.luax" // who knows, maybe someday we could support other kinds of indexes
-	srcFilename, fileInfo, err = b.ResolveFileOrDir(abspath)
-	if err != nil {
-		return
-	}
-	if fileInfo.IsDir() {
-		return "", nil, fmt.Errorf("expected valid index file at %s, but got a directory", abspath)
-	}
-	return
-}
-
-func (b Instance) ResolveFile(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
-	srcFilename, fileInfo, err = b.ResolveFileOrDir(abspath)
-	if err != nil {
-		return
-	}
-	if fileInfo.IsDir() {
-		return b.ResolveDirectoryIndex(abspath)
+		return "", nil, fmt.Errorf("could not resolve file for path %s: %w", abspath, err)
 	}
 	return
 }

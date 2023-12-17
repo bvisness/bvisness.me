@@ -3,7 +3,7 @@ require("simplearticle")
 
 require("code")
 
-bhp.render(<SimpleArticle article={ article }>
+return <SimpleArticle article={ article }>
     <p>
         I love the <a href="https://www.firstinspires.org/robotics/frc"><i>FIRST</i> Robotics Competition</a>. It's absolutely the best way for high school kids to learn engineering and programming. When I was on a team in high school, I was the Software Kid and did all the robot programming, and I loved it so much that I stuck around to coach the team after graduation. In total I've spent over a decade writing and teaching <i>FIRST</i> code.
     </p>
@@ -366,4 +366,4 @@ end
     <p>
         So please pay close attention to how your students feel. If they go beyond mere confusion into disappointment and disillusionment, you can probably find a way to simplify.
     </p>
-</SimpleArticle>)
+</SimpleArticle>

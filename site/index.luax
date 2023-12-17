@@ -1,9 +1,8 @@
 local articles = require("articles")
 require("common")
-require("url")
 require("util")
 
-bhp.render(<Base>
+return <Base>
     <Common>
         <div class="list">
             {{ bhp.map(articles, function (a)
@@ -26,4 +25,4 @@ bhp.render(<Base>
             end) }}
         </div>
     </Common>
-</Base>)
+</Base>

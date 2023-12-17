@@ -3,7 +3,7 @@ require("simplearticle")
 
 require("code")
 
-bhp.render(<SimpleArticle article={ article }>
+return <SimpleArticle article={ article }>
     <p>
         This is the truest tweet ever written:
     </p>
@@ -193,4 +193,4 @@ https://github.com/rust-lang/cargo/issues/new
     <p>
         So don’t do that. Either support the feature, guide the user toward a better solution, or do nothing.
     </p>
-</SimpleArticle>)
+</SimpleArticle>

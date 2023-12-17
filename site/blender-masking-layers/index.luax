@@ -1,7 +1,7 @@
 local article = require("articles")["blender-masking-layers"]
 require("simplearticle")
 
-bhp.render(<SimpleArticle article={ article }>
+return <SimpleArticle article={ article }>
     <p>This is an archive of a <a href="https://blender.stackexchange.com/questions/10650/manually-make-it-look-like-an-object-is-going-through-the-floor-of-a-real-life/">Blender StackExchange answer</a> that I posted back in 2014.</p>
     <h2 id="the-question">The Question</h2>
     <blockquote>
@@ -38,4 +38,4 @@ bhp.render(<SimpleArticle article={ article }>
     <p><img src={ relurl("10.jpg") } alt="The final render" /></p>
     <p>This technique works for other objects too. Just replace the cube with whatever object you actually want in your scene.</p>
     <p><img src={ relurl("finalmonkey.jpg") } alt="Another final render, this time with a monkey" /></p>
-</SimpleArticle>)
+</SimpleArticle>

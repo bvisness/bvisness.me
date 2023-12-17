@@ -3,7 +3,7 @@ require("simplearticle")
 
 require("code")
 
-bhp.render(<SimpleArticle article={ article }>
+return <SimpleArticle article={ article }>
     <h2 id="building-libgit2">Building libgit2</h2>
     <h3 id="installing-dependencies">Installing dependencies</h3>
     <h4 id="windows">Windows</h4>
@@ -101,4 +101,4 @@ brew install libiconv
     <li><a href="https://libgit2.github.com/docs/guides/build-and-link">Official libgit2 build and link instructions</a></li>
     <li><a href="https://github.com/libgit2/libgit2">libgit2 GitHub repo</a> (especially README.MD)</li>
     </ul>
-</SimpleArticle>)
+</SimpleArticle>

@@ -1,7 +1,7 @@
 local article = require("articles")["vrinteractions"]
 require("simplearticle")
 
-bhp.render(<SimpleArticle article={ article }>
+return <SimpleArticle article={ article }>
     <p>At some point in the development of every VR project, you will want to be able to pick things up. Sadly, this usually means a lot of boilerplate code, and in Unreal, Blueprints make boilerplate a huge chore. And there&#39;s all kinds of questions to worry about:</p>
     <ul>
         <li>Can the thing I&#39;m holding read values from the correct controller?</li>
@@ -29,4 +29,4 @@ bhp.render(<SimpleArticle article={ article }>
     <p><strong>It&#39;s super easy to implement.</strong> VRInteractions is an engine plugin, which means you can easily drop it into any project. Then all you have to do is make subclasses of <code>Grabbable</code> and <code>Interactable</code> and override the functions you want.</p>
     <h2 id="download">Download</h2>
     <p>You can find VRInteractions <a href="https://github.com/bvisness/VRInteractions">on GitHub</a>.</p>
-</SimpleArticle>)
+</SimpleArticle>

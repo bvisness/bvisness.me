@@ -68,7 +68,7 @@ func LoadLib(l *lua.LState, b *bhp2.Instance, r *http.Request) int {
 				scale = 1
 			}
 
-			filepath, _, err := b.ResolveFile(abspath)
+			filepath, _, _, err := b.ResolveFile(abspath)
 			if err != nil {
 				return bhp2.Raise(l, err)
 			}

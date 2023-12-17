@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -71,48 +72,19 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r.URL.Host = r.Host
 	}
 
-	// OLD: walk includes
-	// TODO: maybe add some directory to the require path or something?
-
-	var filename string
-	if r.URL.Path == "" || r.URL.Path == "/" {
-		filename = ""
-	} else {
-		filename = utils.Must1(filepath.Rel("/", r.URL.Path))
+	srcFilename, fileInfo, redirectPath, err := b.ResolveFile(r.URL.Path)
+	if errors.Is(err, fs.ErrNotExist) {
+		w.WriteHeader(http.StatusNotFound)
+		// TODO: 404
+		return
+	} else if err != nil {
+		panic(err)
 	}
 
-	srcFilename, fileInfo, err := b.ResolveFileOrDir(filename)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			w.WriteHeader(http.StatusNotFound)
-			// TODO: 404
-			return
-		} else {
-			panic(err)
-		}
-	}
-
-	// Resolve folders (either redirecting or finding an index)
-	if fileInfo.IsDir() {
-		// Redirect e.g. http://example.org/foo/bar to http://example.org/foo/bar/
-		// Only folders are subject to this behavior, and must be valid folders.
-		pathEndsInSlash := len(r.URL.Path) > 0 && r.URL.Path[len(r.URL.Path)-1] == '/'
-		if !pathEndsInSlash {
-			r.URL.Path += "/"
-			http.Redirect(w, r, r.URL.String(), http.StatusSeeOther)
-			return
-		}
-
-		srcFilename, fileInfo, err = b.ResolveDirectoryIndex(filename)
-		if err != nil {
-			if errors.Is(err, os.ErrNotExist) {
-				w.WriteHeader(http.StatusNotFound)
-				// TODO: 404
-				return
-			} else {
-				panic(err)
-			}
-		}
+	if redirectPath != "" {
+		r.URL.Path = redirectPath
+		http.Redirect(w, r, r.URL.String(), http.StatusSeeOther)
+		return
 	}
 
 	file := utils.Must1(os.Open(srcFilename))
@@ -143,33 +115,55 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return LoadURLLib(l, r)
 		})
 		utils.Must(l.DoString("require(\"bhp\")"))
+		utils.Must(l.DoString("require(\"url\")"))
 
 		fileBytes := utils.Must1(io.ReadAll(file))
-		mainChunk, err := LoadLuaX(l, filename, string(fileBytes))
+		mainChunk, err := LoadLuaX(l, srcFilename, string(fileBytes))
 		if err != nil {
 			// TODO: Error codes and stuff for everything
 			// TODO: Report syntax errors in the browser
-			l.RaiseError("error loading main chunk %s: %v", filename, err)
+			l.RaiseError("error loading main chunk %s: %v", srcFilename, err)
 			return
 		}
 		l.Push(mainChunk)
 		if err := l.PCall(0, lua.MultRet, nil); err != nil {
+			// TODO: Error handling
 			w.Header().Add("Content-Type", "text/plain")
 			w.Write([]byte(err.Error()))
 			panic(err)
 		}
+		toRender := l.CheckAny(-1)
+
+		if t, ok := toRender.(*lua.LTable); ok {
+			if action, ok := t.RawGetString("action").(lua.LString); ok && action == "redirect" {
+				code := int(t.RawGetString("code").(lua.LNumber))
+				location := string(t.RawGetString("url").(lua.LString))
+
+				w.Header().Add("Location", location)
+				w.WriteHeader(code)
+				return
+			}
+		}
+
+		if toRender == lua.LNil {
+			fmt.Printf("WARNING: Page returned nil; no content will be rendered.\n")
+		}
+
+		err = l.CallByParam(lua.P{
+			Fn:      l.GetGlobal("bhp").(*lua.LTable).RawGetString("render").(*lua.LFunction),
+			NRet:    1,
+			Protect: true,
+		}, toRender)
+		if err != nil {
+			// TODO: Error handling
+			w.Header().Add("Content-Type", "text/plain")
+			w.Write([]byte(err.Error()))
+			panic(err)
+		}
+		rendered := l.CheckString(-1)
 
 		w.Header().Add("Content-Type", "text/html")
-		w.Write([]byte(getRendered(l)))
-
-		// TODO: Handle redirects somehow
-		// if code, location := getRedirect(t, b.UserData); location != "" {
-		// 	w.Header().Add("Location", location)
-		// 	w.WriteHeader(code)
-		// 	return
-		// }
-
-		// must(t.Execute(w, b.UserData))
+		w.Write([]byte(rendered))
 	case "text/xml":
 		// Stupid hacks 😑
 		w.Write([]byte("<?xml version=\"1.0\" standalone=\"yes\" ?>\n"))

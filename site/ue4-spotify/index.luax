@@ -3,7 +3,7 @@ require("simplearticle")
 
 require("code")
 
-bhp.render(<SimpleArticle article={ article }>
+return <SimpleArticle article={ article }>
     <p>One thing our users have told us about <a href="http://store.steampowered.com/app/454830">Beach Ball Valley</a> is that it&#39;s really fun to play with music. We tried it, and it is a lot of fun – the problem is, when you&#39;re actually in-game, you have no control over your music. To make the music experience any good, we had to let you control your music without taking the headset off, and ideally without switching to SteamVR&#39;s desktop view.</p>
     <p>We considered coming up with our own media-player code, and scanning the user&#39;s My Music directory for songs to play (<a href="http://store.steampowered.com/app/412740/">AudioShield</a>-style), but that sounded like a mess, and frankly, it&#39;s hard to have fine-grained control over file selection when you have giant pizza paddles for hands.</p>
     <p>So we came up with a better solution: <strong>controlling the user&#39;s favorite media player from in-game.</strong></p>
@@ -116,4 +116,4 @@ void UMediaFunctionLibrary::SimulateMediaKeyPress(EMediaKey key)
 #endif
 }
     ]] />
-</SimpleArticle>)
+</SimpleArticle>

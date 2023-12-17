@@ -191,7 +191,7 @@ function Desmos(atts, children)
 end
 
 
-bhp.render(<SimpleArticle article={ article } head={ Head }>
+return <SimpleArticle article={ article } head={ Head }>
   <span style="display: none">
     $$
     \DeclareMathOperator{\length}{length}
@@ -2259,4 +2259,4 @@ bhp.render(<SimpleArticle article={ article } head={ Head }>
       </p>
     </li>
   </ul>
-</SimpleArticle>)
+</SimpleArticle>

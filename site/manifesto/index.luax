@@ -128,7 +128,7 @@ function Head()
   </>
 end
 
-bhp.render(<SimpleArticle article={ article } head={ Head }>
+return <SimpleArticle article={ article } head={ Head }>
   <p>
     I recently updated the <a href="https://handmade.network/manifesto">Handmade Manifesto</a> again.
   </p>
@@ -391,5 +391,4 @@ bhp.render(<SimpleArticle article={ article } head={ Head }>
       });
     }
   </script>
-
-</SimpleArticle>)
+</SimpleArticle>

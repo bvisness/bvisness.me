@@ -3,7 +3,7 @@ require("simplearticle")
 
 require("code")
 
-bhp.render(<SimpleArticle article={ article }>
+return <SimpleArticle article={ article }>
     <p>
         It is not possible to define the “essence” of a problem.
     </p>
@@ -67,4 +67,4 @@ bhp.render(<SimpleArticle article={ article }>
     <p>
         We don't need to know the exact “essence” of a problem in order to cut accidental complexity from our solutions. The more essential, the better, but I don’t need an exact number. I’m happy just moving in the right direction.
     </p>
-</SimpleArticle>)
+</SimpleArticle>

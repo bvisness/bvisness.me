@@ -594,7 +594,7 @@ function Preview(atts, children)
   </div>
 end
 
-bhp.render(<SimpleArticle article={ article } head={ Head }>
+return <SimpleArticle article={ article } head={ Head }>
   <p>
     I did a very stupid challenge this December - I did Advent of Code in Dreams.
   </p>
@@ -1302,4 +1302,4 @@ bhp.render(<SimpleArticle article={ article } head={ Head }>
       });
     }
   </script>
-</SimpleArticle>)
+</SimpleArticle>

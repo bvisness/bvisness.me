@@ -3,7 +3,7 @@ require("simplearticle")
 
 require("code")
 
-bhp.render(<SimpleArticle article={ article }>
+return <SimpleArticle article={ article }>
     <p>
         We're currently rewriting the <a href="https://handmade.network/">Handmade Network</a> website in Go. As part of this, we're taking the opportunity to revamp the old, dated forum post editor, which still doesn't have Markdown support, and only supports BBCode.
     </p>
@@ -246,4 +246,4 @@ var html5entitieslist = [...]HTML5Entity{
     <p>
         Of course, both of these ideas could be wrong. But I hope that the issue can somehow be mitigated so that it doesn't bite other people in the future!
     </p>
-</SimpleArticle>)
+</SimpleArticle>

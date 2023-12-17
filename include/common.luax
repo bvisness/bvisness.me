@@ -1,6 +1,5 @@
 require("base")
 require("images")
-require("url")
 
 function Common(atts, children)
     return <>
