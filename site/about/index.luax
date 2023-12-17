@@ -1,0 +1,43 @@
+require("common")
+
+return <Common title="About">
+  <article>
+    <p>
+      I am the following things, in no particular order:
+    </p>
+
+    <ul>
+      <li>
+        Lead of the <a href="https://handmade.network/">Handmade Network</a>
+      </li>
+      <li>
+        WebAssembly engineer on SpiderMonkey at Mozilla
+      </li>
+      <li>
+        Lead mentor for <a href="https://www.msarobotics.org/">FIRST Robotics Competition team 2175, The Fighting Calculators</a>
+      </li>
+      <li>
+        Co-author of a couple <a href={ absurl("papers") }>papers</a> for the COMAP Mathematical Contest in Modeling in college
+      </li>
+    </ul>
+
+    <p>
+      I am on the internet:
+    </p>
+
+    <ul>
+      <li>
+        Email: <a href="mailto:ben@bvisness.me">ben@bvisness.me</a>
+      </li>
+      <li>
+        GitHub: <a href="https://github.com/bvisness/">bvisness</a>
+      </li>
+      <li>
+        Twitter: <a href="https://twitter.com/its_bvisness">its_bvisness</a>
+      </li>
+      <li>
+        Mastodon: <a href="https://mastodon.gamedev.place/@bvisness">@bvisness@mastodon.gamedev.place</a>
+      </li>
+    </ul>
+  </article>
+</Common>

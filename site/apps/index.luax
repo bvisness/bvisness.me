@@ -1,0 +1,37 @@
+require("common")
+
+return <Common title="Apps">
+  <article>
+    <p>Apps and projects that I have made.</p>
+
+    <ul class="app-gallery">
+      <li>
+        <a href="https://handmade.network/" target="_blank">Handmade Network website</a>: Made together with <a href="https://github.com/AsafGartner/">Asaf Gartner</a>, the website for the Handmade Network acts as a hub for the community. The website is completely custom and supports forums, blogs, feeds of project activity, a podcast, a robust custom Discord integration, and more. Now <a href="https://git.handmade.network/hmn/hmn">open source</a> and developed with the community.
+      </li>
+      <li>
+        <a href="https://github.com/bvisness/SQLJam" target="_blank">Database Explorer</a>: Explore a relational database fluidly and naturally, using a system inspired by node graphs from film and game software. Created with Ejekaflex for the 2021 Wheel Reinvention Jam. <a href="https://handmade.network/forums/jam/t/8127-jam_submission__database_explorer">Details and video here.</a>
+      </li>
+      <li>
+        <a href="https://regular.express/" target="_blank">Regular Express</a>: A visual regular expression editor, allowing you to create and edit complex regular expressions without touching the syntax. Created for the web in C and WebAssembly. Currently in alpha.
+      </li>
+      <li>
+        <a href="https://namemy.church/" target="_blank">Name My Church</a>: A tongue-in-cheek church name generator.
+      </li>
+      <li>
+        <a href="https://store.steampowered.com/app/454830/Beach_Ball_Valley/" target="_blank">Beach Ball Valley</a>: A whimsical VR experience with too many beach balls. Created with <a href="https://bricklightstudios.com/">Paul Eckhardt</a>.
+      </li>
+      <li>
+        <a href="https://bvisness.itch.io/adrift" target="_blank">Adrift</a>: A bullet hell where you can't move. Made in Godot for the 2018 GMTK Jam.
+      </li>
+      <li>
+        <a href="https://bvisness.itch.io/territoris" target="_blank">Territoris</a>: A puzzle game where your kingdom behaves like a slide puzzle. Made in Unity with Joseph Merboth for Ludum Dare 35.
+      </li>
+      <li>
+        <a href="https://bvisness.me/apps/boggler" target="_blank">Boggler</a>: A speedy Boggle solver.
+      </li>
+      <li>
+        <a href="https://bvisness.me/apps/sandbox" target="_blank">Sandbox</a>: A modern replacement for Eric Gossett's Sandbox applet. Used by <a href="https://www.bethel.edu/">Bethel University</a> in their Discrete Math courses - at least when I was a student!
+      </li>
+    </ul>
+  </article>
+</Common>

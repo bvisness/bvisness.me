@@ -2,18 +2,20 @@ require("common")
 require("article/title")
 
 function SimpleArticle(atts, children)
-    if not atts.article then
-        return <Error>article attribute is required!</Error>
-    end
+  if not atts.article then
+    return <Error>article attribute is required!</Error>
+  end
 
-    return <Base head={ atts.head } lightOnly={ atts.article.lightOnly }>
-        <Common banner={ atts.article.banner }>
-            <article>
-                <header>
-                    <ArticleTitle article={ atts.article } />
-                </header>
-                {{ bhp.expand(children) }}
-            </article>
-        </Common>
-    </Base>
+  return <Common
+    head={ atts.head }
+    lightOnly={ atts.article.lightOnly }
+    banner={ atts.article.banner }
+  >
+    <article>
+      <header>
+        <ArticleTitle article={ atts.article } />
+      </header>
+      {{ bhp.expand(children) }}
+    </article>
+  </Common>
 end

@@ -1,0 +1,25 @@
+require("common")
+
+return <Common title="Papers">
+  <article>
+    <p>
+      I participated in the COMAP Mathematical Contest in Modeling in 2015 and 2016, along with Phil Gibbens and Tyler Miller.
+    </p>
+
+    <h2>2015</h2>
+
+    <p>
+      This year had us develop a mathematical model to help find planes that were lost at sea. This paper won us the Outstanding Winner designation (the highest possible level of achievement). It also won us the Frank Giordano award (for excellence in the modeling process), and the MAA Award.
+    </p>
+
+    <a href="/papers/COMAP2015.pdf">Download the paper here.</a>
+
+    <h2>2016</h2>
+
+    <p>
+      This year had us developing a mathematical model that would help a private company get into the business of space debris removal. This paper won us an Honorable Mention designation.
+    </p>
+
+    <a href="/papers/COMAP2016.pdf">Download the paper here.</a>
+  </article>
+</Common>

@@ -2,30 +2,30 @@ require("base")
 require("images")
 
 function Common(atts, children)
-    return <>
-        <div class="container">
-            <header class="site-header">
-                <h1><a href={ absurl("/") }>Ben Visness</a></h1>
-            </header>
-        </div>
+  return <Base head={ atts.head } lightOnly={ atts.lightOnly }>
+    <div class="container">
+      <header class="site-header">
+        <h1><a href={ absurl("/") }>Ben Visness</a></h1>
+      </header>
+    </div>
 
-        <div class="container">
-            <main>
-                {{
-                    atts.banner and
-                    <Picture
-                        class="banner"
-                        src={ atts.banner }
-                        scale={ atts.bannerScale }
-                    />
-                }}
+    <div class="container">
+      <main>
+        {{
+          atts.banner and
+          <Picture
+            class="banner"
+            src={ atts.banner }
+            scale={ atts.bannerScale }
+          />
+        }}
 
-                {{ bhp.expand(children) }}
-            </main>
+        {{ bhp.expand(children) }}
+      </main>
 
-            <footer>
-                &copy;{{ os.date("!%Y") }} Ben Visness &#8226; <a href={ absurl("/about/") }>About Me</a> &#8226; <a href={ absurl("/apps/") }>Apps</a> &#8226; <a href="https://github.com/bvisness/"><Svg src="svg/github.svg" /></a> <a href="https://twitter.com/its_bvisness"><Svg src="svg/twitter.svg" /></a>
-            </footer>
-        </div>
-    </>
+      <footer>
+        &copy;{{ os.date("!%Y") }} Ben Visness &#8226; <a href={ absurl("/about/") }>About Me</a> &#8226; <a href={ absurl("/apps/") }>Apps</a> &#8226; <a href="https://github.com/bvisness/"><Svg src="svg/github.svg" /></a> <a href="https://twitter.com/its_bvisness"><Svg src="svg/twitter.svg" /></a>
+      </footer>
+    </div>
+  </Base>
 end

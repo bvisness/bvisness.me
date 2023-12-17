@@ -23,10 +23,10 @@
     - [x] Tradeoffs
     - [x] "You can't"
 - [ ] Port other pages
-    - About
-    - Apps
-    - Papers
-    - XML feed
+    - [x] About
+    - [x] Apps
+    - [x] Papers
+    - [ ] XML feed
 - [ ] Page titles (and other base template shenanigans)
 - [ ] 404 page
 - [ ] Error handling
