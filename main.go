@@ -72,15 +72,17 @@ var bvisnessIncludes = bhp.FSSearcher{
 
 func main() {
 	b := bhp.Instance{
-		SrcDir:      "site",
-		FourOhFour:  "404.luax",
-		FSSearchers: []bhp.FSSearcher{bvisnessIncludes},
+		SrcDir:     "site",
+		FourOhFour: "404.luax",
+		Searchers: []bhp.Searcher{
+			bhp.GoSearcher{
+				"images": images.LoadLib,
+				"code":   code.LoadLib,
+			},
+			bvisnessIncludes,
+		},
 		StaticPaths: []string{"apps/"},
 		Middleware:  bhp.ChainMiddleware(images.Middleware),
-		Libs: map[string]bhp.GoLibLoader{
-			"images": images.LoadLib,
-			"code":   code.LoadLib,
-		},
 	}
 	b.Run()
 }

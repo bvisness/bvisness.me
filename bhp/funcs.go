@@ -122,20 +122,34 @@ func ChainMiddleware(middlewares ...Middleware) Middleware {
 	}
 }
 
-func LoadURLLib(l *lua.LState, r *http.Request) int {
-	l.SetGlobal("relpath", l.NewClosure(WrapS_S(func(path string) string {
+func wrapUrlFunc(l *lua.LState, f func(*http.Request, string) string) *lua.LFunction {
+	return l.NewFunction(func(l *lua.LState) int {
+		res := f(GetRequest(l), l.CheckString(1))
+		l.Push(lua.LString(res))
+		return 1
+	})
+}
+
+func LoadURLLib(l *lua.LState) int {
+	l.SetGlobal("relpath", wrapUrlFunc(l, func(r *http.Request, path string) string {
 		return RelPath(r, path)
-	})))
-	l.SetGlobal("absurl", l.NewClosure(WrapS_S(func(path string) string {
+	}))
+	l.SetGlobal("absurl", wrapUrlFunc(l, func(r *http.Request, path string) string {
 		return AbsURL(r, path)
-	})))
-	l.SetGlobal("relurl", l.NewClosure(WrapS_S(func(path string) string {
+	}))
+	l.SetGlobal("relurl", wrapUrlFunc(l, func(r *http.Request, path string) string {
 		return RelURL(r, path)
-	})))
-	l.SetGlobal("bust", l.NewClosure(WrapS_S(Bust)))
-	l.SetGlobal("permalink", l.NewClosure(WrapS_S(func(s string) string {
-		return RelURL(r, "/")
-	})))
+	}))
+	l.SetGlobal("bust", l.NewFunction(func(l *lua.LState) int {
+		res := Bust(l.CheckString(1))
+		l.Push(lua.LString(res))
+		return 1
+	}))
+	l.SetGlobal("permalink", l.NewFunction(func(l *lua.LState) int {
+		res := RelURL(GetRequest(l), "/")
+		l.Push(lua.LString(res))
+		return 1
+	}))
 
 	return 0
 }

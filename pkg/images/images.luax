@@ -1,5 +1,7 @@
 -- the global table `images` is already defined
 
+require("vec")
+
 function Picture(atts, children)
     atts.scale = atts.scale or 1
 

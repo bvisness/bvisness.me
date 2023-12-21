@@ -2,6 +2,8 @@ require("pprint")
 
 bhp = {
     _sources = {},
+    _instance = nil, -- userdata, *bhp.Instance
+    _request = nil,  -- userdata, *http.Request
 }
 
 -- Void elements, i.e. those which can have no children and therefore have no

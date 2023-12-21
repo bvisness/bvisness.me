@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"fmt"
 	"image"
-	"net/http"
 	"net/url"
 	"strconv"
 
@@ -27,8 +26,7 @@ func vec2p(l *lua.LState, p image.Point) lua.LValue {
 	return v
 }
 
-func LoadLib(l *lua.LState, b *bhp.Instance, r *http.Request) int {
-	utils.Must(l.DoString("require(\"vec\")"))
+func LoadLib(l *lua.LState) int {
 	mod := l.SetFuncs(l.NewTable(), map[string]lua.LGFunction{
 		"variants": func(l *lua.LState) int {
 			abspath := l.ToString(1)
@@ -37,6 +35,9 @@ func LoadLib(l *lua.LState, b *bhp.Instance, r *http.Request) int {
 			if scale < 1 {
 				scale = 1
 			}
+
+			b := bhp.GetInstance(l)
+			r := bhp.GetRequest(l)
 
 			filepath, _, _, err := b.ResolveFile(abspath)
 			if err != nil {

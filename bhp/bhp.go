@@ -30,10 +30,9 @@ type MiddlewareData struct {
 type Instance struct {
 	SrcDir      string
 	FourOhFour  string
-	FSSearchers []FSSearcher
+	Searchers   []Searcher
 	StaticPaths []string
 	Middleware  Middleware
-	Libs        map[string]GoLibLoader
 }
 
 type GoLibLoader func(l *lua.LState, b *Instance, r *http.Request) int
@@ -115,18 +114,21 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (b Instance) preloadLuaX() {
+
+}
+
 func (b Instance) serveLuaX(file fs.File, srcFilename string, r *http.Request, w http.ResponseWriter) {
 	l := lua.NewState()
 	defer l.Close()
-	b.initSearchers(l, r)
+	b.initSearchers(l)
 
-	// TODO: save bytecode of BHP for faster startup
-	l.PreloadModule("bhp", LoadbhpLib)
-	l.PreloadModule("url", func(l *lua.LState) int {
-		return LoadURLLib(l, r)
-	})
+	// TODO: Require without parsing
 	utils.Must(l.DoString("require(\"bhp\")"))
 	utils.Must(l.DoString("require(\"url\")"))
+
+	setInstance(l, &b)
+	setRequest(l, r)
 
 	fileBytes := utils.Must1(io.ReadAll(file))
 	mainChunk, err := LoadLuaX(l, srcFilename, string(fileBytes))

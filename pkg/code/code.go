@@ -3,7 +3,6 @@ package code
 import (
 	"bytes"
 	_ "embed"
-	"net/http"
 
 	"github.com/alecthomas/chroma/v2"
 	"github.com/alecthomas/chroma/v2/formatters/html"
@@ -31,7 +30,7 @@ func init() {
 	highlightStyle = styles.Get(styleName)
 }
 
-func LoadLib(l *lua.LState, b *bhp.Instance, r *http.Request) int {
+func LoadLib(l *lua.LState) int {
 	mod := l.SetFuncs(l.NewTable(), map[string]lua.LGFunction{
 		"highlight": func(l *lua.LState) int {
 			var lang, src string
