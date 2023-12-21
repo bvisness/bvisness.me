@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/bvisness/bvisness.me/bhp"
-	"github.com/bvisness/bvisness.me/bhp2"
 	"github.com/bvisness/bvisness.me/utils"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -34,7 +33,7 @@ func SrcSet(r *http.Request, abspath string, scale int) string {
 	for candidateScale := scale; candidateScale >= 1; candidateScale-- {
 		candidates = append(candidates, fmt.Sprintf(
 			"%s?%s %dx",
-			bhp2.AbsURL(r, abspath),
+			bhp.AbsURL(r, abspath),
 			url.Values{
 				"orig":  {strconv.Itoa(scale)},
 				"scale": {strconv.Itoa(candidateScale)},
@@ -57,7 +56,7 @@ func vec2p(l *lua.LState, p image.Point) lua.LValue {
 	return v
 }
 
-func LoadLib(l *lua.LState, b *bhp2.Instance, r *http.Request) int {
+func LoadLib(l *lua.LState, b *bhp.Instance, r *http.Request) int {
 	utils.Must(l.DoString("require(\"vec\")"))
 	mod := l.SetFuncs(l.NewTable(), map[string]lua.LGFunction{
 		"variants": func(l *lua.LState) int {
@@ -70,14 +69,14 @@ func LoadLib(l *lua.LState, b *bhp2.Instance, r *http.Request) int {
 
 			filepath, _, _, err := b.ResolveFile(abspath)
 			if err != nil {
-				return bhp2.Raise(l, err)
+				return bhp.Raise(l, err)
 			}
 
 			processed, err := imageCache.GetOrStore(cacheKey(filepath, scale), func() (ProcessedImage, error) {
 				return ProcessImage(filepath, scale, ImageOptions{})
 			})
 			if err != nil {
-				return bhp2.Raise(l, err)
+				return bhp.Raise(l, err)
 			}
 
 			variants := l.NewTable()
@@ -107,7 +106,7 @@ func LoadLib(l *lua.LState, b *bhp2.Instance, r *http.Request) int {
 	})
 	l.SetGlobal("images", mod)
 
-	loader := utils.Must1(bhp2.LoadLuaX(l, "images.luax", impl))
+	loader := utils.Must1(bhp.LoadLuaX(l, "images.luax", impl))
 	l.Push(loader)
 	l.Call(0, lua.MultRet)
 

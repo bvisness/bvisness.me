@@ -1,4 +1,4 @@
-package bhp2
+package bhp
 
 import (
 	"bytes"
@@ -21,7 +21,7 @@ var staticFileExts = []string{".svg"}
 //go:embed lua/*
 var builtins embed.FS
 
-func LoadBHP2Lib(l *lua.LState) int {
+func LoadbhpLib(l *lua.LState) int {
 	bhpSource := utils.Must1(builtins.ReadFile("lua/bhp.lua"))
 	bhp := utils.Must1(l.Load(bytes.NewBuffer(bhpSource), "bhp"))
 	l.Push(bhp)

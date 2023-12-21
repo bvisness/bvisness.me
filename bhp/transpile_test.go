@@ -1,4 +1,4 @@
-package bhp2
+package bhp
 
 import (
 	"fmt"

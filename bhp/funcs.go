@@ -1,21 +1,17 @@
 package bhp
 
 import (
-	"bytes"
+	"errors"
 	"fmt"
-	"html/template"
 	"io/fs"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
-)
+	"strings"
 
-func Eval(t *template.Template, templateName string, data any) string {
-	var buf bytes.Buffer
-	must(t.ExecuteTemplate(&buf, templateName, data))
-	return buf.String()
-}
+	lua "github.com/yuin/gopher-lua"
+)
 
 // Takes a path relative to the current request path and produces an absolute path.
 func RelPath(r *http.Request, path string) string {
@@ -40,50 +36,82 @@ func RelURL(r *http.Request, path string) string {
 	return newurl.String()
 }
 
-func (b Instance[any]) ResolveFileOrDir(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
+func Bust(resourceUrl string) string {
+	resUrlParsed, err := url.Parse(resourceUrl)
+	if err != nil {
+		panic(err)
+	}
+	q := resUrlParsed.Query()
+	q.Set("v", Hash)
+	resUrlParsed.RawQuery = q.Encode()
+	return resUrlParsed.String()
+}
+
+// Resolves the file to serve from a URL path. For a path like /foo/bar, this
+// will look for the following:
+//
+//   - /foo/bar (the file itself)
+//   - /foo/bar.luax (a .luax file with the same name)
+//   - /foo/bar/index.luax (a directory index)
+//
+// Some paths should not be directly resolved by the browser without a
+// redirect. On the other hand, when resolving a path internally (e.g. in
+// middleware) you may not care. If a redirect should occur, the redirectPath
+// parameter will contain the absolute URL path to redirect to.
+func (b Instance) ResolveFile(abspath string) (srcFilename string, fileInfo fs.FileInfo, redirectPath string, err error) {
+	var filename string
+	if abspath == "" || abspath == "/" {
+		filename = ""
+	} else {
+		filename = strings.TrimLeft(abspath, "/")
+	}
+
+	srcFilename, fileInfo, err = b.ResolveRawFileOrDir(filename)
+	if errors.Is(err, fs.ErrNotExist) {
+		srcFilename, fileInfo, err = b.ResolveRawFileOrDir(filename + ".luax")
+	}
+	if err != nil {
+		return
+	}
+
+	if fileInfo.IsDir() {
+		// Redirect http://example.org/foo/bar to http://example.org/foo/bar/.
+		// Only folders are subject to this behavior, and must be valid
+		// folders.
+		//
+		// Note that this does not abort this function.
+		pathEndsInSlash := len(abspath) > 0 && abspath[len(abspath)-1] == '/'
+		if !pathEndsInSlash {
+			redirectPath = abspath + "/"
+		}
+
+		// Resolve directory index.
+		srcFilename, fileInfo, err = b.ResolveRawFileOrDir(abspath + "/index.luax")
+		if err != nil {
+			return
+		}
+		if fileInfo.IsDir() {
+			err = fmt.Errorf("expected valid index file at %s, but got a directory", abspath)
+			return
+		}
+	}
+	return
+}
+
+// Get a file or directory for the given website path without resolving
+// indexes, redirects, or other shenanigans. The name helps emphasize that you
+// may in fact get back a directory instead of a file you can actually return.
+func (b Instance) ResolveRawFileOrDir(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
 	srcFilename = filepath.Join(b.SrcDir, abspath)
 	fileInfo, err = os.Stat(srcFilename)
 	if err != nil {
-		return "", nil, fmt.Errorf("could not resolve file: %w", err)
+		return "", nil, fmt.Errorf("could not resolve file for path %s: %w", abspath, err)
 	}
 	return
 }
 
-func (b Instance[any]) ResolveDirectoryIndex(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
-	abspath += "/index.html" // who knows, maybe someday we could support other kinds of indexes
-	srcFilename, fileInfo, err = b.ResolveFileOrDir(abspath)
-	if err != nil {
-		return
-	}
-	if fileInfo.IsDir() {
-		return "", nil, fmt.Errorf("expected valid index file at %s, but got a directory", abspath)
-	}
-	return
-}
-
-func (b Instance[any]) ResolveFile(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
-	srcFilename, fileInfo, err = b.ResolveFileOrDir(abspath)
-	if err != nil {
-		return
-	}
-	if fileInfo.IsDir() {
-		return b.ResolveDirectoryIndex(abspath)
-	}
-	return
-}
-
-func MergeFuncMaps(funcMaps ...template.FuncMap) template.FuncMap {
-	result := make(template.FuncMap)
-	for _, funcs := range funcMaps {
-		for name, f := range funcs {
-			result[name] = f
-		}
-	}
-	return result
-}
-
-func ChainMiddleware[UserData any](middlewares ...Middleware[UserData]) Middleware[UserData] {
-	return func(b Instance[UserData], r Request[UserData], w http.ResponseWriter, m MiddlewareData[UserData]) bool {
+func ChainMiddleware(middlewares ...Middleware) Middleware {
+	return func(b Instance, r *http.Request, w http.ResponseWriter, m MiddlewareData) bool {
 		for _, middleware := range middlewares {
 			didHandle := middleware(b, r, w, m)
 			if didHandle {
@@ -92,4 +120,22 @@ func ChainMiddleware[UserData any](middlewares ...Middleware[UserData]) Middlewa
 		}
 		return false
 	}
+}
+
+func LoadURLLib(l *lua.LState, r *http.Request) int {
+	l.SetGlobal("relpath", l.NewClosure(WrapS_S(func(path string) string {
+		return RelPath(r, path)
+	})))
+	l.SetGlobal("absurl", l.NewClosure(WrapS_S(func(path string) string {
+		return AbsURL(r, path)
+	})))
+	l.SetGlobal("relurl", l.NewClosure(WrapS_S(func(path string) string {
+		return RelURL(r, path)
+	})))
+	l.SetGlobal("bust", l.NewClosure(WrapS_S(Bust)))
+	l.SetGlobal("permalink", l.NewClosure(WrapS_S(func(s string) string {
+		return RelURL(r, "/")
+	})))
+
+	return 0
 }

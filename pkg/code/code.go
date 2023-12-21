@@ -9,7 +9,7 @@ import (
 	"github.com/alecthomas/chroma/v2/formatters/html"
 	"github.com/alecthomas/chroma/v2/lexers"
 	"github.com/alecthomas/chroma/v2/styles"
-	"github.com/bvisness/bvisness.me/bhp2"
+	"github.com/bvisness/bvisness.me/bhp"
 	"github.com/bvisness/bvisness.me/utils"
 	lua "github.com/yuin/gopher-lua"
 )
@@ -28,7 +28,7 @@ func init() {
 	highlightStyle = styles.Get(styleName)
 }
 
-func LoadLib(l *lua.LState, b *bhp2.Instance, r *http.Request) int {
+func LoadLib(l *lua.LState, b *bhp.Instance, r *http.Request) int {
 	mod := l.SetFuncs(l.NewTable(), map[string]lua.LGFunction{
 		"highlight": func(l *lua.LState) int {
 			lang := l.ToString(1)
@@ -42,12 +42,12 @@ func LoadLib(l *lua.LState, b *bhp2.Instance, r *http.Request) int {
 
 			it, err := lex.Tokenise(nil, src)
 			if err != nil {
-				return bhp2.RaiseMsg(l, err, "failed to highlight code")
+				return bhp.RaiseMsg(l, err, "failed to highlight code")
 			}
 
 			var b bytes.Buffer
 			if err := htmlFormatter.Format(&b, highlightStyle, it); err != nil {
-				return bhp2.RaiseMsg(l, err, "failed to highlight code")
+				return bhp.RaiseMsg(l, err, "failed to highlight code")
 			}
 
 			l.Push(lua.LString(b.String()))
@@ -56,7 +56,7 @@ func LoadLib(l *lua.LState, b *bhp2.Instance, r *http.Request) int {
 	})
 	l.SetGlobal("code", mod)
 
-	loader := utils.Must1(bhp2.LoadLuaX(l, "code.luax", impl))
+	loader := utils.Must1(bhp.LoadLuaX(l, "code.luax", impl))
 	l.Push(loader)
 	l.Call(0, lua.MultRet)
 

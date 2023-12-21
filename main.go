@@ -7,7 +7,7 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/bvisness/bvisness.me/bhp2"
+	"github.com/bvisness/bvisness.me/bhp"
 	"github.com/bvisness/bvisness.me/pkg/code"
 	"github.com/bvisness/bvisness.me/pkg/images"
 )
@@ -66,18 +66,18 @@ type Desmos struct {
 	JS   template.JS
 }
 
-var bvisnessIncludes = bhp2.FSSearcher{
+var bvisnessIncludes = bhp.FSSearcher{
 	FS: os.DirFS("include"),
 }
 
 func main() {
-	b := bhp2.Instance{
+	b := bhp.Instance{
 		SrcDir:      "site",
 		FourOhFour:  "404.luax",
-		FSSearchers: []bhp2.FSSearcher{bvisnessIncludes},
+		FSSearchers: []bhp.FSSearcher{bvisnessIncludes},
 		StaticPaths: []string{"apps/"},
-		Middleware:  bhp2.ChainMiddleware(images.Middleware),
-		Libs: map[string]bhp2.GoLibLoader{
+		Middleware:  bhp.ChainMiddleware(images.Middleware),
+		Libs: map[string]bhp.GoLibLoader{
 			"images": images.LoadLib,
 			"code":   code.LoadLib,
 		},
