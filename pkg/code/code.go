@@ -10,12 +10,15 @@ import (
 	"github.com/alecthomas/chroma/v2/lexers"
 	"github.com/alecthomas/chroma/v2/styles"
 	"github.com/bvisness/bvisness.me/bhp"
+	"github.com/bvisness/bvisness.me/pkg/lru"
 	"github.com/bvisness/bvisness.me/utils"
 	lua "github.com/yuin/gopher-lua"
 )
 
 //go:embed code.luax
 var impl string
+
+var highlightCache = lru.New[string](1000)
 
 var (
 	htmlFormatter  *html.Formatter
@@ -31,26 +34,38 @@ func init() {
 func LoadLib(l *lua.LState, b *bhp.Instance, r *http.Request) int {
 	mod := l.SetFuncs(l.NewTable(), map[string]lua.LGFunction{
 		"highlight": func(l *lua.LState) int {
-			lang := l.ToString(1)
-			src := l.ToString(2)
-
-			lex := lexers.Get(lang)
-			if lex == nil {
-				lex = lexers.Fallback
+			var lang, src string
+			if s, ok := l.Get(1).(lua.LString); ok {
+				lang = string(s)
 			}
-			lex = chroma.Coalesce(lex)
+			src = l.CheckString(2)
 
-			it, err := lex.Tokenise(nil, src)
+			key := lang + "/" + src
+
+			highlighted, err := highlightCache.GetOrStore(key, func() (string, error) {
+				lex := lexers.Get(lang)
+				if lex == nil {
+					lex = lexers.Fallback
+				}
+				lex = chroma.Coalesce(lex)
+
+				it, err := lex.Tokenise(nil, src)
+				if err != nil {
+					return "", err
+				}
+
+				var b bytes.Buffer
+				if err := htmlFormatter.Format(&b, highlightStyle, it); err != nil {
+					return "", err
+				}
+
+				return b.String(), nil
+			})
 			if err != nil {
 				return bhp.RaiseMsg(l, err, "failed to highlight code")
 			}
 
-			var b bytes.Buffer
-			if err := htmlFormatter.Format(&b, highlightStyle, it); err != nil {
-				return bhp.RaiseMsg(l, err, "failed to highlight code")
-			}
-
-			l.Push(lua.LString(b.String()))
+			l.Push(lua.LString(highlighted))
 			return 1
 		},
 	})
