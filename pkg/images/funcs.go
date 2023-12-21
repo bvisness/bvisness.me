@@ -78,7 +78,8 @@ func LoadLib(l *lua.LState) int {
 	})
 	l.SetGlobal("images", mod)
 
-	loader := utils.Must1(bhp.LoadLuaX(l, "images.luax", impl))
+	// TODO: Cache this?
+	loader, _ := utils.Must2(bhp.LoadLuaX(l, "images.luax", impl))
 	l.Push(loader)
 	l.Call(0, lua.MultRet)
 

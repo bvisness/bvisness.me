@@ -70,7 +70,8 @@ func LoadLib(l *lua.LState) int {
 	})
 	l.SetGlobal("code", mod)
 
-	loader := utils.Must1(bhp.LoadLuaX(l, "code.luax", impl))
+	// TODO: Cache this somehow? Seems like I need to streamline the compile-or-cache workflow.
+	loader, _ := utils.Must2(bhp.LoadLuaX(l, "code.luax", impl))
 	l.Push(loader)
 	l.Call(0, lua.MultRet)
 

@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"os"
 	"runtime/debug"
 	"time"
 
 	"github.com/bvisness/bvisness.me/bhp"
 	"github.com/bvisness/bvisness.me/pkg/code"
+	"github.com/bvisness/bvisness.me/pkg/config"
 	"github.com/bvisness/bvisness.me/pkg/images"
 )
 
@@ -28,45 +28,7 @@ func init() {
 	time.Local = time.UTC
 }
 
-type Bvisness struct {
-	BaseData // shut up, errors
-
-	Desmos DesmosData
-}
-
-type BaseData struct {
-	Title          string
-	Description    string
-	OpenGraphImage string // Relative URL within site folder
-	Banner         string // Relative URL within site folder
-	BannerScale    int    // e.g. 2 for a 2x resolution source image
-	LightOnly      bool
-}
-
-type Article struct {
-	BaseData
-	Date time.Time
-	Slug string
-	Url  string
-}
-
-type DesmosData struct {
-	NextThreegraphID int
-	NextDesmosID     int
-}
-
-type Threegraph struct {
-	ID int
-	JS template.JS
-}
-
-type Desmos struct {
-	ID   int
-	Opts template.JS
-	JS   template.JS
-}
-
-var bvisnessIncludes = bhp.FSSearcher{
+var bvisnessIncludes = &bhp.FSSearcher{
 	FS: os.DirFS("include"),
 }
 
@@ -83,6 +45,8 @@ func main() {
 		},
 		StaticPaths: []string{"apps/"},
 		Middleware:  bhp.ChainMiddleware(images.Middleware),
+
+		Dev: config.Config.Dev,
 	}
 	b.Run()
 }

@@ -1,7 +1,6 @@
 package bhp
 
 import (
-	"bytes"
 	"embed"
 	_ "embed"
 	"errors"
@@ -22,7 +21,7 @@ var staticFileExts = []string{".svg"}
 //go:embed lua/*
 var builtins embed.FS
 
-var builtinSearcher = &EmbedFSSearcher{
+var builtinSearcher = &FSSearcher{
 	FS:     builtins,
 	Prefix: "lua/",
 }
@@ -67,6 +66,12 @@ func safeFilename(filename string) string {
 	return strings.ReplaceAll(filename, "\\", "/")
 }
 
+func saveSource(l *lua.LState, filename, source string) {
+	filename = safeFilename(filename)
+	sources := l.GetGlobal("bhp").(*lua.LTable).RawGetString("_sources").(*lua.LTable)
+	sources.RawSetString(filename, lua.LString(source))
+}
+
 func CompileLuaX(source, filename string) (*lua.FunctionProto, error) {
 	filename = safeFilename(filename)
 
@@ -78,18 +83,48 @@ func CompileLuaX(source, filename string) (*lua.FunctionProto, error) {
 	return CompileLua(strings.NewReader(transpiled), filename)
 }
 
-func LoadLuaX(l *lua.LState, filename, source string) (*lua.LFunction, error) {
+func LoadLuaX(l *lua.LState, filename, source string) (*lua.LFunction, *lua.FunctionProto, error) {
 	filename = safeFilename(filename)
 
 	proto, err := CompileLuaX(source, filename)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
+	saveSource(l, filename, source)
 
-	sources := l.GetGlobal("bhp").(*lua.LTable).RawGetString("_sources").(*lua.LTable)
-	sources.RawSetString(filename, lua.LString(source))
+	return l.NewFunctionFromProto(proto), proto, nil
+}
 
-	return l.NewFunctionFromProto(proto), nil
+//
+// Cache
+//
+
+type fileCache struct {
+	m    map[string]cachedFile
+	lock sync.RWMutex
+}
+
+func (c *fileCache) initIfNecessary() {
+	if c.m == nil {
+		c.lock.Lock()
+		defer c.lock.Unlock()
+		c.m = make(map[string]cachedFile)
+	}
+}
+
+func (c *fileCache) get(name string) (cachedFile, bool) {
+	c.initIfNecessary()
+	c.lock.RLock()
+	defer c.lock.RUnlock()
+	cached, ok := c.m[name]
+	return cached, ok
+}
+
+func (c *fileCache) save(name string, f cachedFile) {
+	c.initIfNecessary()
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	c.m[name] = f
 }
 
 //
@@ -102,94 +137,32 @@ type Searcher interface {
 	//
 	// That is, it should return a loader function, a string explaining why it
 	// did not find anything, or nil.
-	Search(l *lua.LState) int
+	Search(l *lua.LState, b *Instance) int
 }
 
 type FSSearcher struct {
 	FS     fs.FS
 	Prefix string // Path prefix to prepend to `require` string before lookup, e.g. `lua/`
+
+	cache fileCache
 }
 
-func (s FSSearcher) Search(l *lua.LState) int {
-	if s.searchPlainLua(l) || s.searchLuaX(l) {
-		return 1
-	}
-
-	if searchStaticFile(l, s.FS) {
-		return 1
-	}
-
-	l.Push(lua.LString(fmt.Sprintf("no file found for '%s'", s.Prefix+l.CheckString(1))))
-	return 1
+type cachedFile struct {
+	Proto    *lua.FunctionProto
+	Source   string
+	Filename string
 }
 
-func (s FSSearcher) searchPlainLua(l *lua.LState) bool {
+func (s *FSSearcher) Search(l *lua.LState, b *Instance) int {
 	name := l.CheckString(1)
-	filename := s.Prefix + name + ".lua"
-	f, err := s.FS.Open(filename)
-	if errors.Is(err, fs.ErrNotExist) {
-		return false
-	} else if err != nil {
-		l.Push(lua.LString(fmt.Sprintf("error opening file: %v", err)))
-		return true
-	}
-
-	b, err := io.ReadAll(f)
-	if err != nil {
-		l.Push(lua.LString(fmt.Sprintf("error reading file: %v", err)))
-		return true
-	}
-
-	loader, err := l.Load(bytes.NewBuffer(b), name)
-	if err != nil {
-		l.Push(lua.LString(fmt.Sprintf("error in file: %v", err)))
-		return true
-	}
-
-	l.Push(loader)
-	return true
-}
-
-func (s FSSearcher) searchLuaX(l *lua.LState) bool {
-	name := l.CheckString(1)
-	filename := s.Prefix + name + ".luax"
-	f, err := s.FS.Open(filename)
-	if errors.Is(err, fs.ErrNotExist) {
-		return false
-	} else if err != nil {
-		l.Push(lua.LString(fmt.Sprintf("error opening file: %v", err)))
-		return true
-	}
-
-	source, err := io.ReadAll(f)
-	if err != nil {
-		l.Push(lua.LString(fmt.Sprintf("error reading file: %v", err)))
-		return true
-	}
-
-	loader, err := LoadLuaX(l, filename, string(source))
-	if err != nil {
-		l.Push(lua.LString(err.Error()))
-		return true
-	}
-
-	l.Push(loader)
-	return true
-}
-
-type EmbedFSSearcher struct {
-	FS     embed.FS
-	Prefix string // Path prefix to prepend to `require` string before lookup, e.g. `lua/`
-
-	protos map[string]*lua.FunctionProto
-	lock   sync.RWMutex
-}
-
-func (s *EmbedFSSearcher) Search(l *lua.LState) int {
-	name := l.CheckString(1)
-	if proto, ok := s.getProto(name); ok {
-		l.Push(l.NewFunctionFromProto(proto))
-		return 1
+	if !b.Dev {
+		if cached, ok := s.cache.get(name); ok {
+			if cached.Source != "" {
+				saveSource(l, cached.Filename, cached.Source)
+			}
+			l.Push(l.NewFunctionFromProto(cached.Proto))
+			return 1
+		}
 	}
 
 	if s.searchPlainLua(l, name) || s.searchLuaX(l, name) {
@@ -200,34 +173,11 @@ func (s *EmbedFSSearcher) Search(l *lua.LState) int {
 		return 1
 	}
 
-	l.Push(lua.LString(fmt.Sprintf("no embedded file found for '%s'", s.Prefix+name)))
+	l.Push(lua.LString(fmt.Sprintf("no file found for '%s'", s.Prefix+name)))
 	return 1
 }
 
-func (s *EmbedFSSearcher) ensureProtos() {
-	if s.protos == nil {
-		s.lock.Lock()
-		defer s.lock.Unlock()
-		s.protos = make(map[string]*lua.FunctionProto)
-	}
-}
-
-func (s *EmbedFSSearcher) getProto(name string) (*lua.FunctionProto, bool) {
-	s.ensureProtos()
-	s.lock.RLock()
-	defer s.lock.RUnlock()
-	proto, ok := s.protos[name]
-	return proto, ok
-}
-
-func (s *EmbedFSSearcher) saveProto(name string, proto *lua.FunctionProto) {
-	s.ensureProtos()
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	s.protos[name] = proto
-}
-
-func (s *EmbedFSSearcher) searchPlainLua(l *lua.LState, name string) bool {
+func (s *FSSearcher) searchPlainLua(l *lua.LState, name string) bool {
 	filename := s.Prefix + name + ".lua"
 	f, err := s.FS.Open(filename)
 	if errors.Is(err, fs.ErrNotExist) {
@@ -242,13 +192,15 @@ func (s *EmbedFSSearcher) searchPlainLua(l *lua.LState, name string) bool {
 		l.Push(lua.LString(fmt.Sprintf("error compiling file: %v", err)))
 		return true
 	}
-	s.saveProto(name, proto)
+	s.cache.save(name, cachedFile{
+		Proto: proto,
+	})
 
 	l.Push(l.NewFunctionFromProto(proto))
 	return true
 }
 
-func (s *EmbedFSSearcher) searchLuaX(l *lua.LState, name string) bool {
+func (s *FSSearcher) searchLuaX(l *lua.LState, name string) bool {
 	filename := s.Prefix + name + ".luax"
 	f, err := s.FS.Open(filename)
 	if errors.Is(err, fs.ErrNotExist) {
@@ -269,7 +221,12 @@ func (s *EmbedFSSearcher) searchLuaX(l *lua.LState, name string) bool {
 		l.Push(lua.LString(err.Error()))
 		return true
 	}
-	s.saveProto(name, proto)
+	s.cache.save(name, cachedFile{
+		Proto:    proto,
+		Source:   string(source),
+		Filename: filename,
+	})
+	saveSource(l, filename, string(source))
 
 	l.Push(l.NewFunctionFromProto(proto))
 	return true
@@ -306,7 +263,7 @@ func searchStaticFile(l *lua.LState, files fs.FS) bool {
 
 type GoSearcher map[string]lua.LGFunction
 
-func (s GoSearcher) Search(l *lua.LState) int {
+func (s GoSearcher) Search(l *lua.LState, b *Instance) int {
 	name := l.CheckString(1)
 	if lib, ok := s[name]; ok {
 		l.Push(l.NewFunction(lib))
@@ -331,21 +288,27 @@ func (b *Instance) initSearchers(l *lua.LState) {
 
 	// Add builtin searcher
 	i++
-	l.RawSetInt(newSearchers, i, l.NewFunction(builtinSearcher.Search))
+	l.RawSetInt(newSearchers, i, l.NewFunction(func(l *lua.LState) int {
+		return builtinSearcher.Search(l, b)
+	}))
 
 	// Add built-in go libs
 	i++
 	builtinGoSearcher := GoSearcher{
 		"url": LoadURLLib,
 	}
-	l.RawSetInt(newSearchers, i, l.NewFunction(builtinGoSearcher.Search))
+	l.RawSetInt(newSearchers, i, l.NewFunction(func(l *lua.LState) int {
+		return builtinGoSearcher.Search(l, b)
+	}))
 
 	// Add user searchers
 	for _, s := range b.Searchers {
 		s := s // >:(
 
 		i++
-		l.RawSetInt(newSearchers, i, l.NewFunction(s.Search))
+		l.RawSetInt(newSearchers, i, l.NewFunction(func(l *lua.LState) int {
+			return s.Search(l, b)
+		}))
 	}
 
 	l.SetField(p, "loaders", newSearchers)

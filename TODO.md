@@ -36,3 +36,5 @@
     - Is it good enough to just have a `bhp.map` function that produces a fragment? Probably, if arrow functions are smaller...
 - [ ] Escaping
     - [ ] Use a faster replace function than gsub
+- [ ] Better static file handling? (stay out of searchers)
+    - [ ] Cache static files?

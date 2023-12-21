@@ -21,7 +21,7 @@ import (
 //go:embed builtin/*
 var builtinFS embed.FS
 
-type Middleware func(b Instance, r *http.Request, w http.ResponseWriter, m MiddlewareData) bool
+type Middleware func(b *Instance, r *http.Request, w http.ResponseWriter, m MiddlewareData) bool
 type MiddlewareData struct {
 	FilePath    string
 	ContentType string
@@ -33,6 +33,9 @@ type Instance struct {
 	Searchers   []Searcher
 	StaticPaths []string
 	Middleware  Middleware
+
+	Dev   bool // If true, files will be loaded from disk every time and never cached.
+	cache fileCache
 }
 
 type GoLibLoader func(l *lua.LState, b *Instance, r *http.Request) int
@@ -42,7 +45,7 @@ type Options struct {
 	Middleware  Middleware
 }
 
-func (b Instance) Run() {
+func (b *Instance) Run() {
 	go func() {
 		// Start up private API for pprof
 		addr := ":9494"
@@ -56,7 +59,7 @@ func (b Instance) Run() {
 }
 
 // Implements http.Handler. No mux necessary!
-func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (b *Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Printf("\nERROR: %v\n\n", r)
@@ -114,11 +117,7 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (b Instance) preloadLuaX() {
-
-}
-
-func (b Instance) serveLuaX(file fs.File, srcFilename string, r *http.Request, w http.ResponseWriter) {
+func (b *Instance) serveLuaX(file fs.File, srcFilename string, r *http.Request, w http.ResponseWriter) {
 	l := lua.NewState()
 	defer l.Close()
 	b.initSearchers(l)
@@ -127,16 +126,28 @@ func (b Instance) serveLuaX(file fs.File, srcFilename string, r *http.Request, w
 	utils.Must(l.DoString("require(\"bhp\")"))
 	utils.Must(l.DoString("require(\"url\")"))
 
-	setInstance(l, &b)
+	setInstance(l, b)
 	setRequest(l, r)
 
-	fileBytes := utils.Must1(io.ReadAll(file))
-	mainChunk, err := LoadLuaX(l, srcFilename, string(fileBytes))
-	if err != nil {
-		// TODO: Error codes and stuff for everything
-		// TODO: Report syntax errors in the browser
-		l.RaiseError("error loading main chunk %s: %v", srcFilename, err)
-		return
+	var mainChunk *lua.LFunction
+	if cached, ok := b.cache.get(srcFilename); !b.Dev && ok {
+		mainChunk = l.NewFunctionFromProto(cached.Proto)
+		saveSource(l, cached.Filename, cached.Source)
+	} else {
+		fileBytes := utils.Must1(io.ReadAll(file))
+		chunk, proto, err := LoadLuaX(l, srcFilename, string(fileBytes))
+		if err != nil {
+			// TODO: Error codes and stuff for everything
+			// TODO: Report syntax errors in the browser
+			l.RaiseError("error loading main chunk %s: %v", srcFilename, err)
+			return
+		}
+		b.cache.save(srcFilename, cachedFile{
+			Proto:    proto,
+			Source:   string(fileBytes),
+			Filename: srcFilename,
+		})
+		mainChunk = chunk
 	}
 	l.Push(mainChunk)
 	if err := l.PCall(0, lua.MultRet, nil); err != nil {
@@ -178,7 +189,7 @@ func (b Instance) serveLuaX(file fs.File, srcFilename string, r *http.Request, w
 		fmt.Printf("WARNING: Page returned nil; no content will be rendered.\n")
 	}
 
-	err = l.CallByParam(lua.P{
+	err := l.CallByParam(lua.P{
 		Fn:      l.GetGlobal("bhp").(*lua.LTable).RawGetString("render").(*lua.LFunction),
 		NRet:    1,
 		Protect: true,

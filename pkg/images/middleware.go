@@ -7,7 +7,7 @@ import (
 	"github.com/bvisness/bvisness.me/bhp"
 )
 
-func Middleware(b bhp.Instance, r *http.Request, w http.ResponseWriter, m bhp.MiddlewareData) bool {
+func Middleware(b *bhp.Instance, r *http.Request, w http.ResponseWriter, m bhp.MiddlewareData) bool {
 	isImage := false
 	for _, format := range AllFormats {
 		if m.ContentType == format {

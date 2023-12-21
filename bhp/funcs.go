@@ -58,7 +58,7 @@ func Bust(resourceUrl string) string {
 // redirect. On the other hand, when resolving a path internally (e.g. in
 // middleware) you may not care. If a redirect should occur, the redirectPath
 // parameter will contain the absolute URL path to redirect to.
-func (b Instance) ResolveFile(abspath string) (srcFilename string, fileInfo fs.FileInfo, redirectPath string, err error) {
+func (b *Instance) ResolveFile(abspath string) (srcFilename string, fileInfo fs.FileInfo, redirectPath string, err error) {
 	var filename string
 	if abspath == "" || abspath == "/" {
 		filename = ""
@@ -101,7 +101,7 @@ func (b Instance) ResolveFile(abspath string) (srcFilename string, fileInfo fs.F
 // Get a file or directory for the given website path without resolving
 // indexes, redirects, or other shenanigans. The name helps emphasize that you
 // may in fact get back a directory instead of a file you can actually return.
-func (b Instance) ResolveRawFileOrDir(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
+func (b *Instance) ResolveRawFileOrDir(abspath string) (srcFilename string, fileInfo fs.FileInfo, err error) {
 	srcFilename = filepath.Join(b.SrcDir, abspath)
 	fileInfo, err = os.Stat(srcFilename)
 	if err != nil {
@@ -111,7 +111,7 @@ func (b Instance) ResolveRawFileOrDir(abspath string) (srcFilename string, fileI
 }
 
 func ChainMiddleware(middlewares ...Middleware) Middleware {
-	return func(b Instance, r *http.Request, w http.ResponseWriter, m MiddlewareData) bool {
+	return func(b *Instance, r *http.Request, w http.ResponseWriter, m MiddlewareData) bool {
 		for _, middleware := range middlewares {
 			didHandle := middleware(b, r, w, m)
 			if didHandle {
