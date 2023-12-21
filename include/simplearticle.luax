@@ -8,7 +8,10 @@ function SimpleArticle(atts, children)
 
   return <Common
     head={ atts.head }
+    title={ atts.article.title }
+    description={ atts.article.description }
     lightOnly={ atts.article.lightOnly }
+    opengraphImage={ atts.article.opengraphImage }
     banner={ atts.article.banner }
   >
     <article>

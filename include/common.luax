@@ -2,7 +2,15 @@ require("base")
 require("images")
 
 function Common(atts, children)
-  return <Base head={ atts.head } lightOnly={ atts.lightOnly }>
+  local socialImage = atts.opengraphImage or atts.banner
+
+  return <Base
+    head={ atts.head }
+    title={ atts.title }
+    description={ atts.description }
+    lightOnly={ atts.lightOnly }
+    socialImage={ socialImage and absurl(socialImage) }
+  >
     <div class="container">
       <header class="site-header">
         <h1><a href={ absurl("/") }>Ben Visness</a></h1>

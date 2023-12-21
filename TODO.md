@@ -27,7 +27,7 @@
     - [x] Apps
     - [x] Papers
     - [ ] XML feed
-- [ ] Page titles (and other base template shenanigans)
+- [x] Page titles (and other base template shenanigans)
 - [ ] 404 page
 - [ ] Error handling
 - [ ] Resolve all the `<TODO>` components on the site

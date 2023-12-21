@@ -30,6 +30,8 @@ func LoadBHP2Lib(l *lua.LState) int {
 }
 
 func LoadLuaX(l *lua.LState, filename, source string) (*lua.LFunction, error) {
+	filename = strings.ReplaceAll(filename, "\\", "/")
+
 	transpiled, err := Transpile(source, filename)
 	if err != nil {
 		return nil, fmt.Errorf("error transpiling file: %w", err)

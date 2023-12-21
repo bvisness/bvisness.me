@@ -11,8 +11,7 @@ function Base(atts, children)
             <title>{{ atts.title and atts.title .. " | " or "" }}Ben Visness</title>
             
             <meta name="author" content="Ben Visness" />
-            {{
-                atts.description and
+            {{ atts.description and
                 <meta name="description" content={ truncate(atts.description, 160) } />
             }}
             
@@ -22,7 +21,24 @@ function Base(atts, children)
             <link rel="canonical" href={ permalink() } />
             <link rel="alternate" type="application/rss+xml" href={ absurl("/index.xml") } title="Ben Visness" />
 
-            <!-- TODO: OpenGraph info -->
+            <!-- General OpenGraph data -->
+            {{ atts.socialImage and <>
+                <link rel="image_src" href={ atts.socialImage } />
+                <meta property="og:image" content={ atts.socialImage } />
+            </> }}
+
+            <!-- Twitter metadata -->
+            {{ atts.socialImage and <>
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:image" content={ atts.socialImage } />
+            </> or <>
+                <meta name="twitter:card" content="summary" />
+            </> }}
+            <meta name="twitter:site" content="@its_bvisness" />
+            <meta name="twitter:title" content={ atts.title or "Ben Visness" } />
+            {{ atts.description and
+                <meta name="twitter:description" content={ atts.description} />
+            }}
 
             <style>
                 :root {
