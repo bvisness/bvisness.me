@@ -28,7 +28,7 @@
     - [x] Papers
     - [x] XML feed
 - [x] Page titles (and other base template shenanigans)
-- [ ] 404 page
+- [x] 404 page
 - [ ] Error handling
 - [ ] Resolve all the `<TODO>` components on the site
 - [ ] Make ranges more ergonomic

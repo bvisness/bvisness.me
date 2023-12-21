@@ -1,0 +1,7 @@
+require("common")
+
+return bhp.response({
+  code = 404,
+}, <Common>
+  404!
+</Common>)

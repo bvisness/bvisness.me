@@ -73,6 +73,7 @@ var bvisnessIncludes = bhp2.FSSearcher{
 func main() {
 	b := bhp2.Instance{
 		SrcDir:      "site",
+		FourOhFour:  "404.luax",
 		FSSearchers: []bhp2.FSSearcher{bvisnessIncludes},
 		StaticPaths: []string{"apps/"},
 		Middleware:  bhp2.ChainMiddleware(images.Middleware),
@@ -82,36 +83,4 @@ func main() {
 		},
 	}
 	b.Run()
-
-	// bhp2.Options[Bvisness]{
-	// TODO: Dunno if this is necessary any more.
-	// StaticPaths: []string{"apps/"},
-	// Funcs: func(b bhp.Instance[Bvisness], r bhp.Request[Bvisness]) template.FuncMap {
-	// 	return bhp.MergeFuncMaps(
-	// 		images.TemplateFuncs(b, r),
-	// 		markdown.TemplateFuncs,
-	// 		template.FuncMap{
-	// 			// Desmos article
-	// 			"threegraph": func(js string) template.HTML {
-	// 				result := template.HTML(bhp.Eval(r.T, "desmos/threegraph.html", Threegraph{
-	// 					ID: r.User.Desmos.NextThreegraphID,
-	// 					JS: template.JS(js),
-	// 				}))
-	// 				r.User.Desmos.NextThreegraphID++
-	// 				return result
-	// 			},
-	// 			"desmos": func(opts template.JS, js string) template.HTML {
-	// 				result := template.HTML(bhp.Eval(r.T, "desmos/desmos.html", Desmos{
-	// 					ID:   r.User.Desmos.NextDesmosID,
-	// 					Opts: opts,
-	// 					JS:   template.JS(js),
-	// 				}))
-	// 				r.User.Desmos.NextDesmosID++
-	// 				return result
-	// 			},
-	// 		},
-	// 	)
-	// },
-	// 	Middleware: bhp2.ChainMiddleware(images.Middleware[Bvisness]),
-	// },
 }
