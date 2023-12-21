@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 
 	"github.com/bvisness/bvisness.me/bhp"
 	"github.com/bvisness/bvisness.me/utils"
@@ -16,34 +15,6 @@ import (
 
 //go:embed images.luax
 var impl string
-
-// Takes the source image, rescales and re-encodes it into several useful
-// resolutions and formats, and returns a value suitable for a `srcset`
-// attribute.
-//
-// Example:
-// input: {{ srcset "/desmos/images/foo.png" 2 }}
-// output: images/foo.png?orig=2&scale=2 2x, images/foo.png?orig=2&scale=1 1x
-func SrcSet(r *http.Request, abspath string, scale int) string {
-	if scale < 1 {
-		scale = 1
-	}
-
-	var candidates []string
-	for candidateScale := scale; candidateScale >= 1; candidateScale-- {
-		candidates = append(candidates, fmt.Sprintf(
-			"%s?%s %dx",
-			bhp.AbsURL(r, abspath),
-			url.Values{
-				"orig":  {strconv.Itoa(scale)},
-				"scale": {strconv.Itoa(candidateScale)},
-			}.Encode(),
-			candidateScale,
-		))
-	}
-
-	return strings.Join(candidates, ", ")
-}
 
 func vec2p(l *lua.LState, p image.Point) lua.LValue {
 	constructor := l.GetGlobal("Vec2").(*lua.LTable).RawGetString("new").(*lua.LFunction)
