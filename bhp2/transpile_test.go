@@ -401,7 +401,7 @@ func TestTags(t *testing.T) {
 }
 
 func TestTranspile(t *testing.T) {
-	tests := []string{"children", "video"}
+	tests := []string{"children", "video", "xml"}
 
 	for _, test := range tests {
 		t.Run(test, func(t *testing.T) {

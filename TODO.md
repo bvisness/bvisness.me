@@ -22,11 +22,11 @@
     - [x] Handmade Manifesto history
     - [x] Tradeoffs
     - [x] "You can't"
-- [ ] Port other pages
+- [x] Port other pages
     - [x] About
     - [x] Apps
     - [x] Papers
-    - [ ] XML feed
+    - [x] XML feed
 - [x] Page titles (and other base template shenanigans)
 - [ ] 404 page
 - [ ] Error handling

@@ -134,18 +134,34 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		toRender := l.CheckAny(-1)
 
+		code := http.StatusOK
+
 		if t, ok := toRender.(*lua.LTable); ok {
-			if action, ok := t.RawGetString("action").(lua.LString); ok && action == "redirect" {
-				code := int(t.RawGetString("code").(lua.LNumber))
-				location := string(t.RawGetString("url").(lua.LString))
+			if action, ok := t.RawGetString("action").(lua.LString); ok {
+				switch action {
+				case "redirect":
+					code := int(t.RawGetString("code").(lua.LNumber))
+					location := string(t.RawGetString("url").(lua.LString))
 
-				w.Header().Add("Location", location)
-				w.WriteHeader(code)
-				return
+					w.Header().Add("Location", location)
+					w.WriteHeader(code)
+					return
+				case "full-response":
+					code = int(t.RawGetString("code").(lua.LNumber))
+					luaHeaders := t.RawGetString("headers").(*lua.LTable)
+					luaHeaders.ForEach(func(l1, l2 lua.LValue) {
+						name := string(l1.(lua.LString))
+						value := string(l2.(lua.LString))
+						// TODO: Error handling
+						w.Header().Add(name, value)
+					})
+					toRender = t.RawGetString("content")
+				}
+			} else {
+				// Default to rendering HTML
+				w.Header().Add("Content-Type", "text/html")
 			}
-		}
-
-		if toRender == lua.LNil {
+		} else if toRender == lua.LNil {
 			fmt.Printf("WARNING: Page returned nil; no content will be rendered.\n")
 		}
 
@@ -162,13 +178,8 @@ func (b Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		rendered := l.CheckString(-1)
 
-		w.Header().Add("Content-Type", "text/html")
+		w.WriteHeader(code)
 		w.Write([]byte(rendered))
-	case "text/xml":
-		// Stupid hacks 😑
-		w.Write([]byte("<?xml version=\"1.0\" standalone=\"yes\" ?>\n"))
-		// TODO: fix RSS
-		// must(t.Execute(w, b.UserData))
 	default:
 		w.Header().Add("Content-Type", contentType)
 		http.ServeContent(w, r, fileInfo.Name(), fileInfo.ModTime(), file)

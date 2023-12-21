@@ -87,7 +87,8 @@ local function renderRec(node, b)
             renderRec(node.children[i], b)
         end
 
-        if not void[node.name] then
+        local hasChildren = node.children.len or #node.children
+        if hasChildren or not void[node.name] then
             b:add("</")
             b:add(node.name)
             b:add(">")
@@ -125,6 +126,15 @@ function bhp.redirect(url, code)
         action = "redirect",
         url = url,
         code = code or 301,
+    }
+end
+
+function bhp.response(opts, content)
+    return {
+        action = "full-response",
+        code = opts.code or 200,
+        headers = opts.headers or {},
+        content = content,
     }
 end
 

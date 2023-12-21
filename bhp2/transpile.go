@@ -364,11 +364,11 @@ func (t *Transpiler) expectName(desc string) string {
 	return tok
 }
 
-func (t *Transpiler) expectAttName() string {
-	name := t.expectName("of attribute")
-	for t.peekToken() == "-" {
+func (t *Transpiler) expectTagOrAttName(desc string) string {
+	name := t.expectName(desc)
+	for t.peekToken() == "-" || t.peekToken() == ":" {
 		name += t.nextToken()
-		name += t.expectName("of attribute")
+		name += t.expectName(desc)
 	}
 	return name
 }
@@ -752,10 +752,10 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 		t.b.WriteString(`{ type = "doctype" }`)
 	} else {
 		// named tag
-		tagName := t.expectName("of tag")
+		tagName := t.expectTagOrAttName("of tag")
 		var atts []TagAttribute
 		for isName(t.peekToken()) {
-			att := TagAttribute{Name: t.expectAttName()}
+			att := TagAttribute{Name: t.expectTagOrAttName("of attribute")}
 			if t.peekToken() == "=" {
 				t.nextToken()
 				if isString(t.peekToken()) {
@@ -800,7 +800,7 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 				t.b.WriteString(indent)
 				t.b.WriteString("    ")
 				t.b.WriteString("    ")
-				if strings.Contains(att.Name, "-") {
+				if strings.Contains(att.Name, "-") || strings.Contains(att.Name, ":") {
 					t.b.WriteString(`["`)
 					t.b.WriteString(att.Name)
 					t.b.WriteString(`"]`)
