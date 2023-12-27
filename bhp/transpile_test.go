@@ -384,6 +384,11 @@ var tagTests = []TagTest{
 		`local tag = <script>const foo = { "bar": {{ pizza }} };</script>`,
 		`local tag = { type = "html", name = "script", atts = {}, children = { { type = "source", file = "javascript 😑 but with template values", 20, 41 }, pizza, { type = "source", file = "javascript 😑 but with template values", 52, 55 }, len = 3 }, }`,
 	},
+	{
+		"spooky Lua operators",
+		`local tag = <span>=</span>`,
+		`local tag = { type = "html", name = "span", atts = {}, children = { { type = "source", file = "spooky Lua operators", 18, 19 }, len = 1 }, }`,
+	},
 }
 
 func TestTags(t *testing.T) {
@@ -401,7 +406,7 @@ func TestTags(t *testing.T) {
 }
 
 func TestTranspile(t *testing.T) {
-	tests := []string{"children", "video", "xml"}
+	tests := []string{"children", "video", "xml", "chroma"}
 
 	for _, test := range tests {
 		t.Run(test, func(t *testing.T) {

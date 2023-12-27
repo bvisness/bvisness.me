@@ -340,6 +340,27 @@ func (t *Transpiler) peekTokenN(n int) string {
 	return res
 }
 
+// Looks for a literal string instead of a Lua token.
+func (t *Transpiler) nextIsRaw(s string) bool {
+	if len(t.source[t.cur:]) < len(s) {
+		return false
+	}
+	return t.source[t.cur:t.cur+len(s)] == s
+}
+
+func (t *Transpiler) expectRaw(s string) {
+	if !t.nextIsRaw(s) {
+		actual := t.source[t.cur:]
+		if len(actual) >= len(s) {
+			actual = actual[:len(s)]
+		}
+		panic(t.fail("expected to see '%s' but saw '%s' instead", s, actual))
+	}
+	t.lastCur = t.cur
+	t.cur += len(s)
+	t.skipWhitespace()
+}
+
 func (t *Transpiler) nextToken() string {
 	t.skipWhitespace()
 	tok := t.peekToken()
@@ -719,9 +740,9 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 	}
 
 	t.expect("<")
-	if t.peekToken() == ">" {
+	if t.nextIsRaw(">") {
 		// fragment
-		t.expect(">")
+		t.expectRaw(">")
 		t.unwindWhitespace()
 
 		t.b.WriteString("{\n")
@@ -747,7 +768,7 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 		if doctype != "html" {
 			panic(t.fail("`html` is the only supported doctype"))
 		}
-		t.expect(">")
+		t.expectRaw(">")
 
 		t.b.WriteString(`{ type = "doctype" }`)
 	} else {
@@ -823,7 +844,7 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 			t.nextToken()
 			hasChildren = false
 		}
-		t.expect(">")
+		t.expectRaw(">")
 		t.unwindWhitespace()
 
 		t.b.WriteString(indent)
@@ -898,7 +919,7 @@ func (t *Transpiler) parseTagChildren(tagName string, allowTags bool, indent str
 					panic(t.fail("expected </%s> but got </%s>", tagName, name))
 				}
 			}
-			t.expect(">")
+			t.expectRaw(">")
 			t.unwindWhitespace()
 			break
 		} else if isComment {

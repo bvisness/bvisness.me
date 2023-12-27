@@ -10,6 +10,12 @@ end
 
 return slugify({
     {
+        title = "I made JSX for Lua (because I hate static sites)",
+        description = "This site now runs on a custom dialect of Lua.",
+        slug = "luax",
+        date = os.time({ year = 2023, month = 12, day = 27 }),
+    },
+    {
         title = "“You can’t do that because I hate you.”",
         description = "An infuriating pattern that devs need to stop.",
         slug = "you-cant",

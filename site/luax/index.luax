@@ -1,0 +1,636 @@
+local article = require("articles")["luax"]
+require("simplearticle")
+
+require("code")
+
+function Head(atts, children)
+  -- This is all copied from the Dreams article.
+  -- I should really make it part of the core site styles.
+  return <>
+    <link rel="stylesheet" href={ relurl("tachyons.min.css") } />
+    <style>
+      :root {
+        --spacing-0: 0;
+        --spacing-1: .25rem;
+        --spacing-2: .5rem;
+        --spacing-3: 1rem;
+        --spacing-4: 2rem;
+        --spacing-5: 4rem;
+        --spacing-6: 8rem;
+        --spacing-7: 16rem;
+      }
+
+      body {
+        overflow-x: hidden; /* lol */
+      }
+
+      .flex-fair {
+        flex-basis: 1px;
+        flex-grow: 1;
+        flex-shrink: 1;
+      }
+
+      .g1 { gap: var(--spacing-1); }
+      .g2 { gap: var(--spacing-2); }
+      .g3 { gap: var(--spacing-3); }
+      .g4 { gap: var(--spacing-4); }
+
+      .wide > * {
+        width: 100%;
+      }
+
+      .p-dumb > :first-child {
+        margin-top: 0;
+      }
+
+      .p-dumb > :last-child {
+        margin-bottom: 0;
+      }
+
+      /* large */
+      @media screen and (min-width: 60em) {
+        .flex-fair-l {
+          flex-basis: 1px;
+          flex-grow: 1;
+          flex-shrink: 1;
+        }
+        
+        .g1-l { gap: var(--spacing-1); }
+        .g2-l { gap: var(--spacing-2); }
+        .g3-l { gap: var(--spacing-3); }
+        .g4-l { gap: var(--spacing-4); }
+        
+        .wide {
+          --wideness: 10rem;
+          margin-left: calc(var(--wideness) * -1);
+          margin-right: calc(var(--wideness) * -1);
+          display: flex;
+          justify-content: center;
+        }
+        
+        .wide > * {
+          max-width: calc(100vw - calc(calc(2 * var(--spacing-3)) + var(--spacing-4)));
+        }
+      }
+    </style>
+  </>
+end
+
+function Wide(atts, children)
+  children = bhp.nosource(children)
+
+  if #children ~= 2 then
+    error("requires exactly two children")
+  end
+
+  return <div class="wide flex justify-center mv4">
+    <div class={{
+      "flex flex-column flex-row-l",
+      "g4",
+      atts.class,
+    }}>
+      <div class="w-100 flex-fair-l p-dumb overflow-hidden">
+        {{ children[1] }}
+      </div>
+      <div class="w-100 flex-fair-l p-dumb overflow-hidden">
+        {{ children[2] }}
+      </div>
+    </div>
+  </div>
+end
+
+
+return <SimpleArticle article={ article } head={ Head }>
+  <p>
+    This website now runs on a custom language called <strong>LuaX</strong>.
+  </p>
+  
+  <p>
+    It’s like JSX, but for Lua. You just write a Lua file that returns a chunk of HTML. You can compose more interesting pages by writing functions that return HTML. Here’s what the home page of my site looks like in LuaX:
+  </p>
+
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="c1">-- I can define whatever data I like in plain old Lua.</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">articles</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">title</span> <span class="o">=</span> <span class="s2">"{{ article.title }}"</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">description</span> <span class="o">=</span> <span class="s2">"{{ article.description }}"</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">slug</span> <span class="o">=</span> <span class="s2">"{{ article.slug }}"</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">date</span> <span class="o">=</span> <span class="n">os.time</span><span class="p">({</span> <span class="n">year</span> <span class="o">=</span> <span class="mi">2023</span><span class="p">,</span> <span class="n">month</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span> <span class="n">day</span> <span class="o">=</span> <span class="mi">27</span> <span class="p">}),</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- more articles...</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- "Components" are just Lua functions that return HTML.</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- Lua expressions can be placed in attributes or text.</span>
+</span></span><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">Article</span><span class="p">(</span><span class="n">atts</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">local</span> <span class="n">a</span> <span class="o">=</span> <span class="n">atts.article</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">return</span> <span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">article</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">header</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s"><span class="p">{</span> <span class="n">absurl</span><span class="p">(</span><span class="n">a.slug</span><span class="p">)</span> <span class="p">}</span></span><span class="p">&gt;</span><span class="p">{{ "{{" }}</span> <span class="n">a.title</span> <span class="p">{{ "}}" }}</span><span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">span</span> <span class="na">class</span><span class="o">=</span><span class="s">"post-details"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;</span><span class="nt">time</span> <span class="na">datetime</span><span class="o">=</span><span class="p">{</span> <span class="cl"><span class="n">os.date</span><span class="p">(</span><span class="s2">"%Y-%m-%dT%H:%M:%S%z"</span><span class="p">,</span> <span class="n">atts.date</span><span class="p">)</span></span> <span class="p">}</span> <span class="na">itemprop</span><span class="o">=</span><span class="s">"datePublished"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="p">{{ "{{" }}</span> <span class="n">os.date</span><span class="p">(</span><span class="s2">"%B %-d, %Y"</span><span class="p">,</span> <span class="n">atts.date</span><span class="p">)</span> <span class="p">{{ "}}" }}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">&lt;/</span><span class="nt">time</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">{{ "{{" }}</span> <span class="n">a.description</span> <span class="p">{{ "}}" }}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">article</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- I can use Lua's package system to organize my templates.</span>
+</span></span><span class="line"><span class="cl"><span class="n">require</span><span class="p">(</span><span class="s2">"base"</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- Whatever the file returns will be rendered and sent to the browser.</span>
+</span></span><span class="line"><span class="cl"><span class="kr">return <span class="p">&lt;</span><span class="nt">Base</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"list"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{{ "{{" }}</span> <span class="n">map</span><span class="p">(</span><span class="n">articles</span><span class="p">,</span> <span class="kr">function</span> <span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">Article</span> <span class="na">article</span><span class="o">=</span><span class="p">{</span> <span class="n">a</span> <span class="p">}</span> <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">end</span><span class="p">)</span> <span class="p">{{ "}}" }}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">Base</span><span class="p">&gt;</span>
+</span></span></span></span></span></code></pre>
+
+  <h2 id="butwhy">But…why?</h2>
+
+  <p>Because I hate static sites. No, seriously. I actually hate static sites.</p>
+  <p>I got into programming because I wanted to make websites. When I started out, you could just copy HTML files up to your server and you had a website. It was magical! And PHP made it even better; you could just throw in a little snippet of server-side code and you had a dynamic page.</p>
+  <p>Those days are gone. Today I spend my time organizing Markdown files into folders so a janky tool can cobble them together into a website. I spend my time learning weird template languages with weird functions and bad control flow. I spend my time in cloud control panels getting confused by bucket permissions and CDN settings.</p>
+  <p>It feels like we’ve regressed. 15 years ago it was fine to run a script from scratch on every single request, but today we insist that we have to serve every personal website from a CDN. That means no fun allowed—if you so much as want the &copy;{{ os.date("!%Y") }} in the footer to update, you’ll need to rebuild and redeploy the site.</p>
+  <p>I don’t want that. I want my &copy;{{ os.date("!%Y") }} to update dynamically, dammit.</p>
+  <p>What’s saddest to me is that when people <em>do</em> want that dynamism (and they often do), they end up doing it with JavaScript, making their pages heavier and slower. Then to compensate for this, they’ll add some kind of “serverless” backend, server-side rendering + hydration, and a pile of extra complexity. Instead of just doing a little server-side code, they’re wasting people’s CPU time and their own money.</p>
+  <p>I don’t miss PHP, of course. But I do miss the workflow. For my own personal site, I don’t want to worry about a “backend” and “frontend”—I just want to send some HTML and JavaScript to the browser. I want a “deployment” to be as simple as copying a new batch of files to my server, but I want to be able to do interesting logic in those files too.</p>
+  <p>I want a dynamic site, not a static one.</p>
+
+  <h2 id="butwhy-jsx">But…why JSX?</h2>
+  <p>Because I like it.</p>
+  <p>I have tried so many template languages over the years. I’ve used <a href="https://mustache.github.io/">mustache</a>, <a href="https://jekyllrb.com/docs/liquid/">Liquid</a>, <a href="https://mozilla.github.io/nunjucks/">nunjucks</a>, <a href="https://laravel.com/docs/5.0/templates">Blade</a>, <a href="https://docs.djangoproject.com/en/1.11/ref/templates/">Django</a>, and of course <a href="https://pkg.go.dev/text/template">Go templates</a> (commonly seen in systems like <a href="https://gohugo.io/">Hugo</a>).</p>
+  <p>All of these languages have basically the same design, which I’ll call the <strong>preprocessor model</strong>. They all start with the assumption that a “template” is a mostly static piece of content (in this case HTML) with some slots to paste in dynamic values. It’s more or less just the C preprocessor, a simple find-and-replace pass over the original content.</p>
+  <p>But this is never actually enough. You start out with simple values and ranges, but rapidly escalate to tricky conditional logic, weird inheritance systems, and eventually custom functions written in the host language that are injected into the template language.</p>
+  <p>Just like the C preprocessor, these template languages are not real languages. They are inflexible and inextensible. The few tools they provide for reuse and composition are incredibly weak. And just like C macros, these languages aren’t powerful enough to manipulate the data they’re given, only to blindly spit it back out.</p>
+  <p>Basically, these languages are too weak to do anything interesting. When writing my article about doing <a href="https://bvisness.me/advent-of-dreams/">Advent of Code on a PS5</a>, I found myself frequently reusing specific layouts, e.g. a wide layout that displayed two columns side-by-side but reflowed to vertical on mobile. In Go templates, this was an utter disaster:</p>
+
+  <Code lang="html" src=[[
+<!-- Template definitions -->
+{{ define "wide-start" }}
+<div class="wide flex justify-center mv4">
+  <div class="flex flex-column flex-row-l {{ if not . }}items-center{{ else }}{{ . }}{{ end }} g4">
+    <div class="w-100 flex-fair-l p-dumb">
+{{ end }}
+{{ define "wide-middle" }}
+    </div>
+    <div class="w-100 flex-fair-l p-dumb">
+{{ end }}
+{{ define "wide-end" }}
+    </div>
+  </div>
+</div>
+{{ end }}
+
+<!-- Later in the article -->
+{{ template "wide-start" }}
+<p>Before we go further, let me introduce you to programming in Dreams...</p>
+{{ template "wide-middle" . }}
+{{ template "video" "basics" }}
+{{ template "wide-end" . }}
+  ]] />
+
+  <p>The problem is that no preprocessor-style template language actually allows you to manipulate the HTML <em>as data</em>. The HTML is opaque; the template language doesn’t understand it. But web pages are complex documents that often need serious logic to assemble—logic that requires the template language to work with the document structure instead of just text.</p>
+  <p>Even PHP falls short of this standard. <a href="https://www.php.net/manual/en/types.comparisons.php#60202">Language jank</a> and <a href="http://phpsadness.com/">terrible design</a> aside, PHP is at least a “real” programming language. It has arrays and loops and functions and so on. But it still doesn’t understand HTML. It’s basically just a fancier version of the preprocessor model, and it suffers from the same problems. (This design also can be blamed for the long history of XSS vulnerabilities in PHP apps. PHP itself doesn’t understand how to escape things, so the developer must be constantly vigilant.)</p>
+  <p>The preprocessor model is fundamentally wrong. HTML documents should be built with a system that understands HTML.</p>
+  <p>This is why JSX is so much better. Instead of JS-inside-HTML, it’s HTML-inside-JS. It flips the ownership around. When you need to do something interesting, you don’t need to learn some underpowered language, or contort your work to fit a broken system, or remember which escaping functions to use. You just <em>write code</em> and the rest sorts itself out.</p>
+  <p>It’s important to note that JSX is distinct from React, or Svelte, or whatever other frontend framework it is usually associated with. I’m not a fan of those frameworks; they have lots of ideas about client-side reactivity that I don’t like and don’t care about. But I really like writing HTML inside a real programming language.</p>
+  <h2 id="butwhy-lua">But…why Lua?</h2>
+  <p>Because I like it.</p>
+  <p>I considered just using JSX. But my website is built in Go, and I wanted to keep it that way. I find Go’s tooling to be best-in-class when it comes to deploying on a server—build a binary, start it up, the end. In contrast, every time I’ve deployed a Node app, I have suffered immensely.</p>
+  <p>What I wanted was something I could embed easily in an existing app. Lua fit the bill nicely. But even more importantly, Lua is <em>extremely</em> easy to parse. The <a href="https://www.lua.org/manual/5.1/manual.html#8">entire language grammar</a> fits on one screen, and the <a href="https://www.lua.org/source/5.1/lparser.c.html">official parser</a> is less than 1500 lines of code. Furthermore, Lua didn’t use <code>&lt;</code> for anything except comparisons, so there was no ambiguity—HTML tags could be used wherever tables were used.</p>
+  <p>It was therefore very easy to create a custom recursive descent parser. I mostly just ported the official parser to Go, and modified <code>parseSimpleExp</code> to parse tags as well as tables.</p>
+
+  <Code lang="go" src=[[
+func (t *Transpiler) parseSimpleExp() {
+  switch tok := t.peekToken(); tok {
+  case "nil", "true", "false", "...":
+    t.nextToken()
+  case "{":
+    t.parseTable()
+  case "<":                    // these two lines were all I needed to add :)
+    t.parseTag(t.indent, true) // (well and t.parseTag itself obviously)
+  case "function":
+    t.nextToken()
+    t.parseFuncBody()
+  default:
+    if isNumber(tok) || isString(tok) {
+      t.nextToken()
+      return
+    }
+    t.parseSuffixedExp()
+  }
+}
+  ]] />
+
+  <p>My transpiler doesn’t even produce an abstract syntax tree. It doesn’t need to. It just emits the vanilla Lua code as-is, and converts HTML tags to Lua tables as it goes.</p>
+
+  <pre class="chroma"><code><span class="line"><span class="cl"><span class="c1">-- Before:</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">image</span> <span class="o">=</span> <span class="p">&lt;</span><span class="nt">img</span> <span class="na">class</span><span class="o">=</span><span class="s">"w-100"</span> <span class="na">src</span><span class="o">=</span><span class="s">"cool.png"</span> <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- After:</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">image</span> <span class="o">=</span> <span class="p">{</span> <span class="n">type</span> <span class="o">=</span> <span class="s2">"html"</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">"img"</span><span class="p">,</span> <span class="n">atts</span> <span class="o">=</span> <span class="p">{</span> <span class="n">class</span> <span class="o">=</span> <span class="s2">"w-100"</span><span class="p">,</span> <span class="n">src</span> <span class="o">=</span> <span class="s2">"cool.png"</span> <span class="p">},</span> <span class="n">children</span> <span class="o">=</span> <span class="p">{}</span><span class="p">,</span> <span class="p">}</span></span></span></code></pre>
+
+  <p>The <a href="https://github.com/bvisness/bvisness.me/blob/2719c40e620f5721801758d4d4e6714abfaabc2b/bhp/transpile.go">end result</a> is less than 1000 lines of code. About 700 of them are just parsing Lua, with the remaining ~300 being used for my new features. And it took me only a couple days!</p>
+
+  <h2 id="before-and-after">Before and after</h2>
+  <p>I’ve ported every page of this website over to LuaX, and the more I use it, the more I like it. It elegantly handles all the things that were so painful to do in previous template systems.</p>
+  <p>For example: I have an image-resizing system built into my site, designed for use with the HTML <code>&lt;picture&gt;</code> tag. When using this system with Go templates, I couldn’t include the <code>&lt;picture&gt;</code> tag in the template because I needed to be able to set arbitrary CSS classes on it. This meant that using the template required me to manually write the outer tag, then use the template on the inside. Furthermore, I had to built a custom “options” system for the <code>alt</code> attribute, and of course I had to implement all this in a custom template function written in Go. This is all easy now and I don’t have to switch languages.</p>
+
+  <Wide>
+    <>
+      <h3>Before (Go templates)</h3>
+      <Code lang="go" src=[[
+"picturesource": func(abspath string, scale int, opts ...PictureOpt) (template.HTML, error) {
+  if scale < 1 {
+    scale = 1
+  }
+
+  // code to fetch image variants omitted
+
+  optionsByType := make(map[string][]string)
+  for _, variant := range processed.Variants {
+    options := optionsByType[variant.ContentType]
+    optionsByType[variant.ContentType] = append(options, fmt.Sprintf(
+      `%s %dx`,
+      variant.url, variant.Scale,
+    ))
+  }
+
+  var altAttr string
+  for _, opt := range opts {
+    if opt.ImgAlt != "" {
+      altAttr = fmt.Sprintf("alt=\"%s\"", html.EscapeString(opt.ImgAlt))
+    }
+  }
+
+  var b strings.Builder
+  for contentType, options := range optionsByType {
+    b.WriteString(fmt.Sprintf(
+      `<source srcset="%s" type="%s">`,
+      strings.Join(options, ", "), contentType,
+    ))
+  }
+  b.WriteString(fmt.Sprintf(`<img src="%s"%s>`, AbsURL(r.R, abspath), altAttr))
+
+  return template.HTML(b.String()), nil
+},
+      ]] />
+      <Code lang="html" src=[[
+<picture class="w-100">
+    {{
+        picturesource "triangle.png" 1
+        (alt "Performance, Velocity, and Adaptability")
+    }}
+</picture>
+      ]] />
+    </>
+    <>
+      <h3>After (LuaX)</h3>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">Picture</span><span class="p">(</span><span class="n">atts</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">atts.scale</span> <span class="o">=</span> <span class="n">atts.scale</span> <span class="ow">or</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="kd">local</span> <span class="n">variants</span> <span class="o">=</span> <span class="n">images.variants</span><span class="p">(</span><span class="n">atts.src</span><span class="p">,</span> <span class="n">atts.scale</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="kd">local</span> <span class="n">optsByType</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">variant</span> <span class="kr">in</span> <span class="n">ipairs</span><span class="p">(</span><span class="n">variants</span><span class="p">)</span> <span class="kr">do</span>
+</span></span><span class="line"><span class="cl">    <span class="n">opts</span> <span class="o">=</span> <span class="n">optsByType</span><span class="p">[</span><span class="n">variant.contentType</span><span class="p">]</span> <span class="ow">or</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">table.insert</span><span class="p">(</span><span class="n">opts</span><span class="p">,</span> <span class="n">string.format</span><span class="p">(</span><span class="s2">"%s %dx"</span><span class="p">,</span> <span class="n">variant.url</span><span class="p">,</span> <span class="n">variant.scale</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">optsByType</span><span class="p">[</span><span class="n">variant.contentType</span><span class="p">]</span> <span class="o">=</span> <span class="n">opts</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="kd">local</span> <span class="n">sources</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">for</span> <span class="n">contentType</span><span class="p">,</span> <span class="n">opts</span> <span class="kr">in</span> <span class="n">pairs</span><span class="p">(</span><span class="n">optsByType</span><span class="p">)</span> <span class="kr">do</span>
+</span></span><span class="line"><span class="cl">    <span class="n">table.insert</span><span class="p">(</span><span class="n">sources</span><span class="p">,</span> <span class="p">&lt;</span><span class="nt">source</span>
+</span></span><span class="line"><span class="cl">      <span class="na">srcset</span><span class="o">=</span><span class="p">{</span> <span class="n">table.concat</span><span class="p">(</span><span class="n">opts</span><span class="p">,</span> <span class="s2">", "</span><span class="p">)</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="na">type</span><span class="o">=</span><span class="p">{</span> <span class="n">contentType</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">/&gt;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="kr">return</span> <span class="p">&lt;</span><span class="nt">picture</span> <span class="na">class</span><span class="o">=</span><span class="p">{</span> <span class="n">atts.class</span> <span class="p">}</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{{ "{{" }}</span> <span class="n">sources</span> <span class="p">{{ "}}" }}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="p">{</span> <span class="n">absurl</span><span class="p">(</span><span class="n">atts.src</span><span class="p">)</span> <span class="p">}</span> <span class="na">src</span><span class="o">=</span><span class="p">{</span> <span class="n">atts.alt</span> <span class="p">}</span> <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">picture</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span></span></span></code></pre>
+    <Code lang="html" src=[[
+<Picture
+  class="w-100"
+  src="triangle.png"
+  alt="Performance, Velocity, and Adaptability"
+/>
+    ]] />
+    </>
+  </Wide>
+
+  <p>My <a href="https://bvisness.me/desmos/">Desmos 3D</a> article required me to generate unique IDs for each Desmos graph. In Hugo I had to use the <a href="https://gohugo.io/methods/page/scratch/">“scratch”</a> system to store and manipulate data in Hugo itself. Now I can just do a global  in my LuaX file. Furthermore, I had to register a new <code>desmos</code> <a href="https://gohugo.io/content-management/shortcodes/">shortcode</a> globally across my entire site; this is now just a Lua function specific to that article.</p>
+
+  <Wide>
+    <>
+      <h3>Before (Hugo, Go templates)</h3>
+      <Code lang="html" src=[[
+{{/*
+  hooray, a whole new set of math functions specifically
+  for Hugo's scratch system
+/*}}
+{{ .Page.Scratch.Add "desmosid" 1 }}
+{{ $did := print "desmos-" (.Page.Scratch.Get "desmosid") }}
+
+<div class="desmos-container">
+  <div class="desmos" id="desmos-{{ $did }}"></div>
+  <a class="desmos-reset" href="#" onClick="desmosReset('desmos-{{ $did }}'); return false;">
+    Reset
+  </a>
+</div>
+
+<script>
+  desmosConfigs['{{ $did }}'] = function() {
+    var elt = document.getElementById('desmos-{{ $did }}');
+    var d = Desmos.GraphingCalculator(elt, {
+      border: false,
+      {{ .Get "opts" | safeJS }}
+    });
+    {{ .Inner | safeJS }}
+  };
+  desmosReset('desmos-{{ $did }}');
+</script>
+      ]] />
+
+      <pre class="chroma"><code><span class="line"><span class="cl">{{ "{{" }}&lt; desmos &gt;{{ "}}" }}
+</span></span><span class="line"><span class="cl"><span class="nx">d</span><span class="p">.</span><span class="nx">setExpression</span><span class="p">({</span> <span class="nx">latex</span><span class="o">:</span> <span class="s1">'\\left\\{x&lt;n:\\sin(x),-x\\right\\}'</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="nx">d</span><span class="p">.</span><span class="nx">setExpression</span><span class="p">({</span> <span class="nx">latex</span><span class="o">:</span> <span class="s1">'n=0'</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl">{{ "{{" }}&lt; /desmos &gt;{{ "}}" }}</span></span></code></pre>
+    </>
+    <>
+      <h3>After (LuaX)</h3>
+
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">desmosID</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">Desmos</span><span class="p">(</span><span class="n">atts</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">desmosID</span> <span class="o">=</span> <span class="n">desmosID</span> <span class="o">+</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">return</span> <span class="p">&lt;&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"desmos-container"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"desmos"</span> <span class="na">id</span><span class="o">=</span><span class="p">{</span> <span class="s2">"desmos-"</span><span class="o">..</span><span class="n">desmosID</span> <span class="p">}</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">a</span>
+</span></span><span class="line"><span class="cl">        <span class="na">class</span><span class="o">=</span><span class="s">"desmos-reset"</span>
+</span></span><span class="line"><span class="cl">        <span class="na">href</span><span class="o">=</span><span class="s">"#"</span>
+</span></span><span class="line"><span class="cl">        <span class="na">onClick</span><span class="o">=</span><span class="p">{</span> <span class="s2">"desmosReset('desmos-"</span><span class="o">..</span><span class="n">desmosID</span><span class="o">..</span><span class="s2">"'); return false;"</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Reset</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">desmosConfigs</span><span class="p">[</span><span class="s1">'desmos-</span><span class="p">{{ "{{" }}</span> <span class="n">desmosID</span> <span class="p">{{ "}}" }}</span><span class="s1">'</span><span class="p">]</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">elt</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'desmos-</span><span class="p">{{ "{{" }}</span> <span class="n">desmosID</span> <span class="p">{{ "}}" }}</span><span class="s1">'</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="nx">Desmos</span><span class="p">.</span><span class="nx">GraphingCalculator</span><span class="p">(</span><span class="nx">elt</span><span class="p">,</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">          <span class="nx">border</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">          <span class="p">{{ "{{" }}</span> <span class="n">atts.opts</span> <span class="p">{{ "}}" }}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">});</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{{ "{{" }}</span> <span class="n">atts.js</span> <span class="p">{{ "}}" }}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">};</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">desmosReset</span><span class="p">(</span><span class="s1">'desmos-</span><span class="p">{{ "{{" }}</span> <span class="n">desmosID</span> <span class="p">{{ "}}" }}</span><span class="s1">'</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span></span></span></code></pre>
+
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">Desmos</span> <span class="na">js</span><span class="o">=</span><span class="s">[[
+</span></span></span><span class="line"><span class="cl"><span class="s">  d.setExpression({ latex: '\\left\\{x&lt;n:\\sin(x),-x\\right\\}' });
+</span></span></span><span class="line"><span class="cl"><span class="s">  d.setExpression({ latex: 'n=0' });
+</span></span></span><span class="line"><span class="cl"><span class="s">]]</span> <span class="p">/&gt;</span></span></span></code></pre>
+    </>
+  </Wide>
+
+  <p>A tag’s children can be accessed programmatically, enabling me to make wrapper components like <code>Wide</code> with ease. This was extraordinarily painful in Go templates, requiring me to define separate templates for the beginning, middle, and end of the HTML.</p>
+
+  <Wide>
+    <>
+      <h3>Before (Go templates)</h3>
+      <Code lang="html" src=[[
+{{ define "wide-start" }}
+<div class="wide flex justify-center mv4">
+  <div class="flex flex-column flex-row-l {{ if not . }}items-center{{ else }}{{ . }}{{ end }} g4">
+    <div class="w-100 flex-fair-l p-dumb">
+{{ end }}
+{{ define "wide-middle" }}
+    </div>
+    <div class="w-100 flex-fair-l p-dumb">
+{{ end }}
+{{ define "wide-end" }}
+    </div>
+  </div>
+</div>
+{{ end }}
+      ]] />
+      <Code lang="html" src=[[
+{{ template "wide-start" }}
+<p>
+  Widgets can be snapped onto a Microchip...
+</p>
+{{ template "wide-middle" . }}
+{{ template "video" "microchips" }}
+{{ template "wide-end" . }}
+      ]] />
+    </>
+    <>
+      <h3>After (LuaX)</h3>
+      <pre class="chroma"><code><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">Wide</span><span class="p">(</span><span class="n">atts</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">return</span> <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"wide flex justify-center mv4"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="p">{{ "{{" }}</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">"flex flex-column flex-row-l"</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">atts.class</span> <span class="ow">or</span> <span class="s2">"items-center"</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="s2">"g4"</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{{ "}}" }}</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"w-100 flex-fair-l p-dumb"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{{ "{{" }}</span> <span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">{{ "}}" }}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"w-100 flex-fair-l p-dumb"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{{ "{{" }}</span> <span class="n">children</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">{{ "}}" }}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span></span></span></code></pre>
+
+      <Code lang="html" src=[[
+<Wide>
+  <p>
+    Widgets can be snapped onto a Microchip...
+  </p>
+  <Video slug="microchips" />
+</Wide>
+      ]] />
+    </>
+  </Wide>
+
+  <p>But by far the biggest impact was on my <a href="https://bvisness.me/advent-of-dreams/">Advent of Code on a PlayStation</a> article. Before, due to the limited expressiveness of Go templates, I had to carefully construct all the HTML for each day of Advent of Code, with templates only for smaller reusable chunks. Doing things differently with Go templates would have required me to encode all the data in my Go code and then pass it into the template, which might be reasonable but didn’t fit my workflow. With LuaX, though, I can just loop over a Lua table and call it a day—no need to switch languages.</p>
+
+  <Wide>
+    <>
+      <h3>Before (Go templates)</h3>
+      <Code lang="html" src=[[
+{{ define "preview-start" }}
+<div class="preview flex-column flex-row-l items-center g4 ph3 pv4 dn" data-day="{{ . }}">
+  <div class="flex-fair-l w-100">
+{{ end }}
+{{ define "preview-middle" }}
+  </div>
+  <div class="flex-fair-l w-100">
+{{ end }}
+{{ define "preview-end" }}
+  </div>
+</div>
+{{ end }}
+      ]] />
+      <Code lang="html" src=[[
+<div class="week mb3 dn flex-l">
+  <div class="heading">Sunday</div>
+  <div class="heading">Monday</div>
+  <div class="heading">Tuesday</div>
+  <div class="heading">Wednesday</div>
+  <div class="heading">Thursday</div>
+  <div class="heading">Friday</div>
+  <div class="heading">Saturday</div>
+</div>
+<div class="week dn flex-l">
+  <div class="day"></div>
+  <div class="day"></div>
+  <div class="day"></div>
+  <div class="day"></div>
+  {{ template "day" "1/Calorie Counting" }}
+  {{ template "day" "2/Rock Paper Scissors" }}
+  {{ template "day" "3/Rucksack Reorganization" }}
+</div>
+<div class="previews">
+  <div class="preview-container">
+    {{ template "preview-start" "1" }}
+    <h2>Day 1: Calorie Counting</h2>
+    <!-- note the redundant day number and title -->
+    <!-- preview info, manually entered -->
+    {{ template "preview-middle" }}
+    {{ template "youtube-deferred" "5s55Ks7wdcc/6862" }}
+    {{ template "preview-end" }}
+
+    {{ template "preview-start" "2" }}
+    <h2>Day 2: Rock Paper Scissors</h2>
+    <!-- preview info, manually entered -->
+    {{ template "preview-middle" }}
+    {{ template "youtube" "07GstsK8Aos?start=6890" }}
+    {{ template "preview-end" }}
+  </div>
+</div>
+<div class="week dn flex-l">
+  {{ template "day" "4/Camp Cleanup/*" }}
+  {{ template "day" "5/Supply Stacks/*" }}
+  {{ template "day" "6/Tuning Trouble" }}
+  {{ template "day" "7/No Space Left On Device" }}
+  {{ template "day" "8/Treetop Tree House/*" }}
+  {{ template "day" "9/Rope Bridge/*" }}
+  {{ template "day" "10/Cathode-Ray Tube" }}
+</div>
+<!-- and so on...week, previews, week, previews -->
+      ]] />
+    </>
+    <>
+      <h3>After (LuaX)</h3>
+
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">days</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">num</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">name</span> <span class="o">=</span> <span class="s2">"Calorie Counting"</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tdreams</span> <span class="o">=</span> <span class="s2">"1:45:00"</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">tjs</span> <span class="o">=</span> <span class="s2">"~15:00"</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dreamsid</span> <span class="o">=</span> <span class="s2">"dAFfSQkZJKq"</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">vods</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"5s55Ks7wdcc"</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">    <span class="n">highlightid</span> <span class="o">=</span> <span class="s2">"5s55Ks7wdcc"</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">highlightts</span> <span class="o">=</span> <span class="s2">"6862"</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">desc</span> <span class="o">=</span> <span class="p">&lt;&gt;</span><span class="c">&lt;!-- description here --&gt;</span><span class="p">&lt;/&gt;,</span>
+</span></span><span class="line"><span class="cl">  <span class="p">},</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- ...</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">weeks</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span><span class="kc">false</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="n">days</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">days</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">days</span><span class="p">[</span><span class="mi">3</span><span class="p">]},</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span><span class="n">days</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">days</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">days</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">days</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">days</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">days</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">days</span><span class="p">[</span><span class="mi">10</span><span class="p">]},</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span><span class="n">days</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">days</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span> <span class="n">days</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="n">days</span><span class="p">[</span><span class="mi">14</span><span class="p">],</span> <span class="n">days</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span> <span class="kc">false</span><span class="p">,</span> <span class="kc">false</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">Preview</span><span class="p">(</span><span class="n">atts</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">-- automatically compute preview info from table entry</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kr">return</span> <span class="p">&lt;</span><span class="nt">div</span>
+</span></span><span class="line"><span class="cl">    <span class="na">class</span><span class="o">=</span><span class="s">"preview flex-column flex-row-l items-center g4 ph3 pv4 dn"</span>
+</span></span><span class="line"><span class="cl">    <span class="na">data-day</span><span class="o">=</span><span class="p">{</span> <span class="n">atts.day</span><span class="p">.</span><span class="n">num</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"flex-fair-l w-100"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Day <span class="p">{{ "{{" }}</span> <span class="n">atts.day</span><span class="p">.</span><span class="n">num</span> <span class="p">{{ "}}" }}</span>: <span class="p">{{ "{{" }}</span> <span class="n">atts.day</span><span class="p">.</span><span class="n">name</span> <span class="p">{{ "}}" }}</span><span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"info"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{{ "{{" }}</span> <span class="n">join</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">          <span class="n">map</span><span class="p">(</span><span class="n">infos</span><span class="p">,</span> <span class="kr">function</span> <span class="p">(</span><span class="n">info</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="kr">return</span> <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span><span class="p">{{ "{{" }}</span> <span class="n">info</span> <span class="p">{{ "}}" }}</span><span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="kr">end</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">          <span class="s2">" / "</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span> <span class="p">{{ "}}" }}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"desc mt3 p-dumb"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{{ "{{" }}</span> <span class="n">atts.day</span><span class="p">.</span><span class="n">desc</span> <span class="p">{{ "}}" }}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"flex-fair-l w-100"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">YouTube</span> <span class="na">id</span><span class="o">=</span><span class="p">{</span> <span class="n">atts.day</span><span class="p">.</span><span class="n">highlightid</span> <span class="p">}</span> <span class="na">start</span><span class="o">=</span><span class="p">{</span> <span class="n">atts.day</span><span class="p">.</span><span class="n">highlightts</span> <span class="p">}</span> <span class="na">deferred</span> <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">Week</span><span class="p">(</span><span class="n">atts</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">return</span> <span class="p">&lt;&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"week dn flex-l"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">{{ "{{" }}</span> <span class="n">map</span><span class="p">(</span><span class="n">atts.week</span><span class="p">,</span> <span class="kr">function</span> <span class="p">(</span><span class="n">day</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">if</span> <span class="n">day</span> <span class="kr">then</span>
+</span></span><span class="line"><span class="cl">          <span class="kr">return</span> <span class="p">&lt;</span><span class="nt">Day</span> <span class="na">day</span><span class="o">=</span><span class="p">{</span> <span class="n">day</span> <span class="p">}</span> <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">else</span>
+</span></span><span class="line"><span class="cl">          <span class="kr">return</span> <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"day"</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">      <span class="kr">end</span><span class="p">)</span> <span class="p">{{ "}}" }}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;</span><span class="nt">div</span> <span class="n">class</span><span class="o">=</span><span class="s">"previews"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"preview-container"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{{ "{{" }}</span> <span class="n">map</span><span class="p">(</span><span class="n">atts.week</span><span class="p">,</span> <span class="kr">function</span> <span class="p">(</span><span class="n">day</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          <span class="kr">if</span> <span class="n">day</span> <span class="kr">then</span>
+</span></span><span class="line"><span class="cl">            <span class="kr">return</span> <span class="p">&lt;</span><span class="nt">Preview</span> <span class="na">day</span><span class="o">=</span><span class="p">{</span> <span class="n">day</span> <span class="p">}</span> <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl">          <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">        <span class="kr">end</span><span class="p">)</span> <span class="p">{{ "}}" }}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span></span></span></code></pre>
+
+<pre class="chroma"><code><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"week mb3 dn flex-l"</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"heading"</span><span class="p">&gt;</span>Sunday<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"heading"</span><span class="p">&gt;</span>Monday<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"heading"</span><span class="p">&gt;</span>Tuesday<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"heading"</span><span class="p">&gt;</span>Wednesday<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"heading"</span><span class="p">&gt;</span>Thursday<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"heading"</span><span class="p">&gt;</span>Friday<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"heading"</span><span class="p">&gt;</span>Saturday<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">{{ "{{" }}</span> <span class="n">map</span><span class="p">(</span><span class="n">weeks</span><span class="p">,</span> <span class="kr">function</span> <span class="p">(</span><span class="n">week</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">return</span> <span class="p">&lt;</span><span class="nt">Week</span> <span class="na">week</span><span class="o">=</span><span class="p">{</span> <span class="n">week</span> <span class="p">}</span> <span class="p">/&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span><span class="p">)</span> <span class="p">{{ "}}" }}</span></span></span></code></pre>
+
+    </>
+  </Wide>
+
+  <h2 id="closing-thoughts">Closing thoughts</h2>
+  <p>My goal with this project was to make myself happy, and I think I succeeded. 🙂</p>
+  <p>I’m very happy with how LuaX feels so far. It’s not “ready for production”, in the sense that I have cut several corners on the parser, but it meets all my needs right now and I love using it.</p>
+  <p>Taking a step back, though, it’s very gratifying to be able to bang out a transpiler in a weekend. Earlier in my career I would have started with lex and yacc and probably gotten lost. (This has happened to me multiple times.) These days though I understand compilers well enough to just sit down and write one, and it feels great.</p>
+  <p>I spent almost all of this year working on projects for other people. While I am proud of the work I did, and enjoyed it, there’s still something special about making tools for yourself. Does anyone else in the world want to make their websites in a weird dialect of Lua? Maybe not. But I do, and that’s enough.</p>
+  <p>I don’t know what the future holds for LuaX. It’s not ready for other people to use, and I’m not sure it will ever be. So rather than tell you all to go to luax dot dev and start building your websites with my tool, here’s what I’ll say instead:</p>
+  <p><strong>Try building something for yourself.</strong> Try writing code for you, and you alone. Don’t worry about whether it will look good on your resumé or attract lots of stars on GitHub. Just write something that feels good to you. Explore a weird idea and see where it takes you.</p>
+  <p>Who knows—maybe someday other people will like it too.</p>
+
+</SimpleArticle>
