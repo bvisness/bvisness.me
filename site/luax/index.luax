@@ -61,7 +61,7 @@ function Head(atts, children)
         .g4-l { gap: var(--spacing-4); }
         
         .wide {
-          --wideness: 10rem;
+          --wideness: 18rem;
           margin-left: calc(var(--wideness) * -1);
           margin-right: calc(var(--wideness) * -1);
           display: flex;
