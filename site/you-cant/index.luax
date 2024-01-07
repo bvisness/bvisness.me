@@ -41,7 +41,7 @@ Use exit() or Ctrl-D (i.e. EOF) to exit
     </p>
 
     <ul>
-        <li>Print <code>&lt;function exit&gt;</code>.</li>
+        <li>Print <code>&lt;built-in function exit&gt;</code>.</li>
         <li>Exit.</li>
     </ul>
 
@@ -50,7 +50,7 @@ Use exit() or Ctrl-D (i.e. EOF) to exit
     </p>
 
     <p>
-        I understand that <code>&lt;function exit&gt;</code> might be confusing for newcomers, and exiting might be too destructive. But denying you the normal REPL behavior <em>and</em> denying you the ability to exit is just insulting.
+        I understand that <code>&lt;built-in function exit&gt;</code> might be confusing for newcomers, and exiting might be too destructive. But denying you the normal REPL behavior <em>and</em> denying you the ability to exit is just insulting.
     </p>
 
     <h1>Formatting Rust files</h1>
