@@ -8,5 +8,9 @@ function Code(atts, children)
         src = src:gsub("^%s+", "")
         src = src:gsub("%s+$", "")
     end
-    return code.highlight(atts.lang or "plain", src)
+    local el = code.highlight(atts.lang or "plain", src)
+    if atts.bare then
+        el = el:gsub("class=\"chroma\"", "class=\"chroma bare\"")
+    end
+    return el
 end

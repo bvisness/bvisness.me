@@ -1,0 +1,76 @@
+local article = require("articles")["spectre"]
+require("simplearticle")
+
+require("code")
+
+function Head()
+  return <>
+    <script src="script.js"></script>
+
+    <style>
+      table {
+        border-collapse: collapse;
+        border-style: hidden;
+      }
+
+      td, th {
+        padding: var(--spacing-2);
+        border: 1px solid white;
+      }
+    </style>
+  </>
+end
+
+function Timing()
+  return <div class="wide">
+    <div class="flex flex-column items-center g2">
+      <!-- Computers -->
+      <div class="flex g2">
+        <div class="flex flex-column g2 ba pa3 br3 overflow-hidden">
+          <div>Log in</div>
+          <input placeholder="Username" value="alice@example.com" />
+          <input type="password" placeholder="Password" value="hunter2" />
+          <button>Submit</button>
+        </div>
+        <div class="ba pa3 br3 overflow-hidden">
+          <Code lang="python" bare src=[[
+  user = database.get(req.username)
+  if not user:
+    return "user not found"
+  if not checkPassword(user.password, req.password):
+    return "incorrect password"
+  return "success!"
+        ]] />
+        </div>
+        <div class="ba br3">
+          <table class="h-100">
+            <tr>
+              <th>username</th>
+              <th>password</th>
+            </tr>
+            <tr>
+              <td>alice@example.com</td>
+              <td>hunter2</td>
+            </tr>
+            <tr>
+              <td>bob@example.com</td>
+              <td>dolphins</td>
+            </tr>
+            <tr>
+              <td>charlie@example.com</td>
+              <td>Password1!</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="ba"></div>
+    </div>
+  </div>
+end
+
+return <SimpleArticle article={ article } head={ Head }>
+  <p>Blerp</p>
+  <Timing />
+</SimpleArticle>

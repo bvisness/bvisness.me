@@ -3,79 +3,6 @@ require("simplearticle")
 
 require("code")
 
-function Head(atts, children)
-  -- This is all copied from the Dreams article.
-  -- I should really make it part of the core site styles.
-  return <>
-    <link rel="stylesheet" href={ relurl("tachyons.min.css") } />
-    <style>
-      :root {
-        --spacing-0: 0;
-        --spacing-1: .25rem;
-        --spacing-2: .5rem;
-        --spacing-3: 1rem;
-        --spacing-4: 2rem;
-        --spacing-5: 4rem;
-        --spacing-6: 8rem;
-        --spacing-7: 16rem;
-      }
-
-      body {
-        overflow-x: hidden; /* lol */
-      }
-
-      .flex-fair {
-        flex-basis: 1px;
-        flex-grow: 1;
-        flex-shrink: 1;
-      }
-
-      .g1 { gap: var(--spacing-1); }
-      .g2 { gap: var(--spacing-2); }
-      .g3 { gap: var(--spacing-3); }
-      .g4 { gap: var(--spacing-4); }
-
-      .wide > * {
-        width: 100%;
-      }
-
-      .p-dumb > :first-child {
-        margin-top: 0;
-      }
-
-      .p-dumb > :last-child {
-        margin-bottom: 0;
-      }
-
-      /* large */
-      @media screen and (min-width: 60em) {
-        .flex-fair-l {
-          flex-basis: 1px;
-          flex-grow: 1;
-          flex-shrink: 1;
-        }
-        
-        .g1-l { gap: var(--spacing-1); }
-        .g2-l { gap: var(--spacing-2); }
-        .g3-l { gap: var(--spacing-3); }
-        .g4-l { gap: var(--spacing-4); }
-        
-        .wide {
-          --wideness: 18rem;
-          margin-left: calc(var(--wideness) * -1);
-          margin-right: calc(var(--wideness) * -1);
-          display: flex;
-          justify-content: center;
-        }
-        
-        .wide > * {
-          max-width: calc(100vw - calc(calc(2 * var(--spacing-3)) + var(--spacing-4)));
-        }
-      }
-    </style>
-  </>
-end
-
 function Wide(atts, children)
   children = bhp.nosource(children)
 
@@ -99,8 +26,7 @@ function Wide(atts, children)
   </div>
 end
 
-
-return <SimpleArticle article={ article } head={ Head }>
+return <SimpleArticle article={ article }>
   <p>
     This website now runs on a custom language called <strong>LuaX</strong>.
   </p>

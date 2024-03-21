@@ -1,0 +1,95 @@
+:root {
+  --spacing-0: 0;
+  --spacing-1: .25rem;
+  --spacing-2: .5rem;
+  --spacing-3: 1rem;
+  --spacing-4: 2rem;
+  --spacing-5: 4rem;
+  --spacing-6: 8rem;
+  --spacing-7: 16rem;
+}
+
+body {
+  /* lol */
+  overflow-x: hidden;
+}
+
+.flex-fair {
+  flex-basis: 1px;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+.g1 {
+  gap: var(--spacing-1);
+}
+
+.g2 {
+  gap: var(--spacing-2);
+}
+
+.g3 {
+  gap: var(--spacing-3);
+}
+
+.g4 {
+  gap: var(--spacing-4);
+}
+
+.wide>* {
+  width: 100%;
+}
+
+.p-dumb> :first-child {
+  margin-top: 0;
+}
+
+.p-dumb> :last-child {
+  margin-bottom: 0;
+}
+
+/* large */
+@media screen and (min-width: 60em) {
+  .flex-fair-l {
+    flex-basis: 1px;
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+
+  .g1-l {
+    gap: var(--spacing-1);
+  }
+
+  .g2-l {
+    gap: var(--spacing-2);
+  }
+
+  .g3-l {
+    gap: var(--spacing-3);
+  }
+
+  .g4-l {
+    gap: var(--spacing-4);
+  }
+
+  .wide {
+    --wideness: 18rem;
+    margin-left: calc(var(--wideness) * -1);
+    margin-right: calc(var(--wideness) * -1);
+    display: flex;
+    justify-content: center;
+  }
+
+  .wide>* {
+    max-width: calc(100vw - calc(calc(2 * var(--spacing-3)) + var(--spacing-4)));
+  }
+}
+
+article .chroma.bare {
+  line-height: 1.25;
+  margin: initial;
+  padding: initial;
+  background-color: initial;
+  border-radius: initial;
+  overflow-x: initial;
+}

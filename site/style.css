@@ -923,29 +923,6 @@ article blockquote {
   border-left: 0.25em solid var(--blockquote-bar);
 }
 
-article table {
-  border-collapse: collapse;
-}
-
-article table tr {
-  background-color: #fff;
-  border-top: 1px solid #c6cbd1;
-}
-
-article table tr:nth-child(2n) {
-  background-color: #f6f8fa;
-}
-
-article table th,
-article table td {
-  padding: 6px 13px;
-  border: 1px solid #dfe2e5;
-}
-
-article table th {
-  font-weight: 600;
-}
-
 article nav {
   background-color: #eee;
   display: inline-block;

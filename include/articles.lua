@@ -10,6 +10,12 @@ end
 
 return slugify({
     {
+        title = "How does Spectre work?",
+        description = "An interactive explainer of Spectre, and my submission for the 2024 Handmade Learning Jam.",
+        slug = "spectre",
+        date = os.time({ year = 2024, month = 3, day = 24 }),
+    },
+    {
         title = "I made JSX for Lua (because I hate static sites)",
         description = "This site now runs on a custom dialect of Lua.",
         slug = "luax",
