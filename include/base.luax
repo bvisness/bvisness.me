@@ -51,6 +51,7 @@ function Base(atts, children)
                     --footer-text-color: #999;
                     --hr-color: #ccc;
                     --text-color: black;
+                    --border-color: black;
 
                     {{ darkEnabled and "color-scheme: light dark" }}
                 }
@@ -66,6 +67,7 @@ function Base(atts, children)
                                 --codeblock-background: #171717;
                                 --hr-color: #525252;
                                 --text-color: white;
+                                --border-color: white;
                             }
 
                             a {
@@ -74,6 +76,10 @@ function Base(atts, children)
                         }
                     ]]
                 }}
+
+                .bg--codeblock {
+                    background-color: var(--codeblock-background);
+                }
             </style>
 
             {{ atts.head and atts.head() }}
