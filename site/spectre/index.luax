@@ -2,89 +2,109 @@ local article = require("articles")["spectre"]
 require("simplearticle")
 
 require("code")
+require("util")
+local json = require("json")
 
 function Head()
   return <>
-    <script src="script.js"></script>
-
-    <style>
-      table {
-        border-collapse: collapse;
-        border-style: hidden;
-      }
-
-      td, th {
-        padding: var(--spacing-2);
-        border: 1px solid var(--border-color);
-      }
-
-      .instrs .instr {
-        height: 1rem;
-        /* background-color: var(--text-color); */
-        border-radius: 2px;
-      }
-    </style>
+    <script src="dom.js"></script>
+    <link rel="stylesheet" href="style.css" />
   </>
 end
 
-function Timing()
-  return <div class="wide">
-    <div class="flex flex-column items-center g2">
-      <!-- Computers -->
-      <div class="flex g2">
-        <div class="flex flex-column g2 ba pa3 br3 overflow-hidden">
-          <div>Log in</div>
-          <input placeholder="Username" value="alice@example.com" />
-          <input type="password" placeholder="Password" value="hunter2" />
-          <button>Submit</button>
-        </div>
-        <div class="ba pa3 br3 overflow-hidden bg--codeblock">
-          <Code lang="python" bare src=[[
-user = database.get(req.username)
-if not user:
-  return "user not found"
-if not checkPassword(user.password, req.password):
-  return "incorrect password"
-return "success!"
-        ]] />
-        </div>
-        <div class="ba br3">
-          <table class="h-100">
-            <tr>
-              <th>username</th>
-              <th>password</th>
-            </tr>
-            <tr>
-              <td>alice@example.com</td>
-              <td>hunter2</td>
-            </tr>
-            <tr>
-              <td>bob@example.com</td>
-              <td>dolphins</td>
-            </tr>
-            <tr>
-              <td>charlie@example.com</td>
-              <td>Password1!</td>
-            </tr>
-          </table>
-        </div>
-      </div>
+local timingMessage = "bad login"
+local timingDb = {
+  { username = "alpha@example.com", password = "hunter2" },
+  { username = "bravo@example.com", password = "dolphins" },
+  { username = "charlie@example.com", password = "Password1!" },
+  { username = "delta@example.com", password = "delta" },
+}
 
-      <!-- Timeline -->
-      <div class="bb flex">
-        <div class="bl h1 pl4"></div>
-        <div class="bl h1 pl4"></div>
-        <div class="bl h1 pl4"></div>
-        <div class="bl h1 pl4"></div>
-        <div class="bl h1 pl4"></div>
+function Timing()
+  return <div class="timing-demo flex flex-column g2">
+    <!-- Client -->
+    <div class="flex g2">
+      <div class="flex flex-column g2 ba pa3 br3 overflow-hidden">
+        <h3 class="mt0">Log in</h3>
+        <input id="timing-username" placeholder="Username" value={ timingDb[1].username } />
+        <input type="password" placeholder="Password" value={ timingDb[1].password } />
+        <button id="timing-go">Submit</button>
+      </div>
+      <div class="flex-grow-1 flex flex-column ba br3">
+        <h3 class="mt0 pt3 ph3">Attempts</h3>
+        <table>
+          <tr>
+            <th>username</th>
+            <th>response</th>
+            <th>timeline</th>
+          </tr>
+          <tr class="attempt empty">
+            <td><span class="hidden">{{ timingDb[1].username }}</span></td>
+            <td><span class="hidden">{{ timingMessage }}</span></td>
+            <td></td>
+          </tr>
+          <tr class="attempt empty">
+            <td>&nbsp</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class="attempt empty">
+            <td>&nbsp;</td>
+            <td></td>
+            <td></td>
+          </tr>
+        </table>
       </div>
     </div>
+
+    <div class="self-center">
+      <input type="checkbox" id="timing-hide-server" /><label class="pl2" for="timing-hide-server">Hide server details</label>
+    </div>
+
+    <!-- Server -->
+    <div class="flex g2 relative">
+      <div class="ba pa3 br3 overflow-x-scroll bg--codeblock">
+        <Code lang="python" bare src={[[
+user = database.get(req.username)
+if not user:
+  return "]]..timingMessage..[["
+if not checkPassword(user.password, req.password):
+  return "]]..timingMessage..[["
+return "success!"
+      ]]} />
+      </div>
+      <div class="flex-grow-1 ba br3">
+        <table class="w-100 h-100">
+          <tr>
+            <th>username</th>
+            <th>password</th>
+          </tr>
+          {{ bhp.map(slice(timingDb, 1, #timingDb - 1), function (row)
+            return <tr>
+              <td>{{ row.username }}</td>
+              <td>{{ row.password }}</td>
+            </tr>
+          end) }}
+          <tr>
+            <td>???</td>
+            <td>???</td>
+          </tr>
+        </table>
+      </div>
+      <div id="timing-server-cover" class="absolute absolute--fill flex justify-center items-center bg-white ba br3 o-100 o-0">Mysterious server</div>
+    </div>
+    <script>
+      window.timingDb = JSON.parse({{ bhp.json(timingDb) }});
+    </script>
   </div>
 end
 
 return <SimpleArticle article={ article } head={ Head }>
-  <p>
-    <i>Due to time constraints, this article does not work well on mobile. Sorry!</i>
+  <p class="i">
+    This article is my submission for the Handmade Network's 2024 <a href="https://handmade.network/jam/learning-2024">Learning Jam</a>. As such, it is the from the perspective of a recent learner, NOT the perspective of an expert on CPUs or CPU vulnerabilities. I have attempted to verify the article's contents as well as I can, but please do not consider it an authoritative source.
+  </p>
+  <p class="i">
+    Also, due to time constraints, this article does not work well on mobile. Sorry!
   </p>
 
   <p>
@@ -162,7 +182,7 @@ arr[1] = arr[1] / 3;
     However, conditionals present a problem. If the code contains an if statement, the CPU cannot know whether the if statement will be true or false. This creates a bottleneck where the CPU must fully compute the condition before it can proceed.
   </p>
   <p>
-    Or that would be true, if not for <i>speculative execution</i>. Rather than wait for a condition to be resolved, the CPU instead predicts (speculates) whether the condition will be true or false, and proceeds accordingly. If it guesses correctly, then it saves time. If it guesses incorrectly, then it discards the incorrect work and tries again, costing a small amount of extra time. In the following example, the CPU will predict that the condition is true, which may or may not be correct.
+    Or that would be true, if not for <i>speculative execution</i>. Rather than wait for a condition to be resolved, the CPU instead predicts (speculates) whether the condition will be true or false, and proceeds accordingly. If it guesses correctly, then it saves time. If it guesses incorrectly, then it discards the incorrect work and tries again, at a small penalty. In the following example, the CPU will predict that the condition is true, which may or may not be correct.
   </p>
 
   <div class="flex justify-center mv4">
@@ -192,7 +212,7 @@ if (n % 2 == 0) {
           <div class="h1"><div class="instr bg-blue" style="width: 2rem; margin-left: 5rem"></div></div>
           <div class="h1"><div class="instr bg-red" style="width: 2rem; margin-left: 6rem"></div></div>
           <div class="h1"><div class="instr bg-blue" style="width: 4rem; margin-left: 7rem"></div></div>
-          <div class="h1"><div class="instr bg-green" style="width: 1rem; margin-left: 8rem"></div></div>
+          <div class="h1"><div class="instr bg-green" style="width: 1rem; margin-left: 11rem"></div></div>
         </div>
       </div>
 
@@ -208,6 +228,7 @@ if (n % 2 == 0) {
           <div class="h1">Roll back</div>
           <div class="h1">Compute <code>n * 3 + 1</code></div>
           <div class="h1">Store <code>n * 3 + 1</code></div>
+          <div class="h1">Commit results</div>
         </div>
         <div class="instrs flex flex-column g2">
           <div class="h1"><div class="instr bg-blue" style="width: 4rem; margin-left: 0"></div></div>
@@ -218,10 +239,45 @@ if (n % 2 == 0) {
           <div class="h1"><div class="instr bg-red" style="width: 1rem; margin-left: 8rem"></div></div>
           <div class="h1"><div class="instr bg-blue" style="width: 2rem; margin-left: 9rem"></div></div>
           <div class="h1"><div class="instr bg-blue" style="width: 4rem; margin-left: 11rem"></div></div>
+          <div class="h1"><div class="instr bg-green" style="width: 1rem; margin-left: 15rem"></div></div>
         </div>
       </div>
     </div>
   </div>
 
+  <p>
+    Speculative execution is critical for out-of-order execution, and out-of-order execution is critical for performance. And as long as the CPU can perfectly roll back a bad speculation, there should be no problems!
+  </p>
+  <p>
+    ...CPUs <em>can</em> perfectly roll back a bad speculation, right?
+  </p>
+
+  <h2>No they cannot</h2>
+
+  <p>
+    When a CPU rolls back work, it restores the contents of all the registers and discards any pending work. In theory, this should be completely invisible to the program—it should not be able to tell that the CPU did anything unusual. However, CPUs are real devices with real limits, speculative execution is real execution, and the effects of speculative execution can in practice be observed in clever ways.
+  </p>
+  <p>
+    For the simplest Spectre exploit, we will look at the effect of speculative execution on the cache. As mentioned, main memory is extremely slow, so CPUs have a cache for recently-accessed memory. This cache makes memory accesses hundreds of times faster, but it has an important property for Spectre:
+  </p>
+  <p class="b">
+    On a bad speculation, the cache does not get rolled back.
+  </p>
+  <p>
+    Speculative loads are real loads that will cause main memory to be fetched and stored in the cache. This is nominally invisible to the program, but the whole point of the cache is to improve performance—and performance is observable.
+  </p>
+
+  <h2>Timing attacks!</h2>
+
+  <p>
+    Timing can tell you a surprising amount about a system. Consider the following interactive example, which simulates a simple login page.
+  </p>
+
   <Timing />
+
+  <p>
+    Notice that, despite the message "{{ timingMessage }}", the timing of the response reveals whether the username exists in the system or not. When a user is not found in the database, it returns quickly, but when a user is found, it will also run an expensive password check. See if you can figure out the username of the hidden user in the database using this information.
+  </p>
+
+  <script src="script.js"></script>
 </SimpleArticle>

@@ -125,6 +125,18 @@ func isUnop(tok string) bool {
 	}
 }
 
+func isKeyword(tok string) bool {
+	switch tok {
+	case "do", "while", "repeat", "until", "for", "in",
+		"if", "then", "elseif", "else", "end",
+		"function", "local", "return", "break",
+		"nil", "false", "true", "and", "or", "not":
+		return true
+	default:
+		return false
+	}
+}
+
 func (t *Transpiler) nextIs(s string) bool {
 	return len(t.source[t.cur:]) >= len(s) && t.source[t.cur:t.cur+len(s)] == s
 }
@@ -821,7 +833,7 @@ func (t *Transpiler) parseTag(indent string, fromLua bool) {
 				t.b.WriteString(indent)
 				t.b.WriteString("    ")
 				t.b.WriteString("    ")
-				if strings.Contains(att.Name, "-") || strings.Contains(att.Name, ":") {
+				if isKeyword(att.Name) || strings.Contains(att.Name, "-") || strings.Contains(att.Name, ":") {
 					t.b.WriteString(`["`)
 					t.b.WriteString(att.Name)
 					t.b.WriteString(`"]`)

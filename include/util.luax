@@ -78,3 +78,7 @@ function split(s, sep, limit, plain)
 
     return res
 end
+
+function slice(t, i, j)
+    return { unpack(t, i, j) }
+end

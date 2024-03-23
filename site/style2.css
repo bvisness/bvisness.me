@@ -48,6 +48,10 @@ body {
   margin-bottom: 0;
 }
 
+.hidden {
+  visibility: hidden;
+}
+
 /* large */
 @media screen and (min-width: 60em) {
   .flex-fair-l {

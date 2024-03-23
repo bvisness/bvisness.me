@@ -1,3 +1,4 @@
+local json = require("json")
 require("pprint")
 
 bhp = {
@@ -181,6 +182,11 @@ function bhp.join(t, sep)
         table.insert(res, t[len])
     end
     return bhp.expand(res)
+end
+
+function bhp.json(val)
+    local str = json.encode(val)
+    return json.encode_string(str)
 end
 
 ---
