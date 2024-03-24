@@ -296,5 +296,20 @@ if (n % 2 == 0) {
     Notice that, despite the message "{{ timingMessageError }}", the timing of the response reveals whether the username exists in the system or not. When a user is not found in the database, it returns quickly, but when a user is found, it will also run an expensive password check. See if you can figure out the username of the hidden user in the database using this information.
   </p>
 
+  <p>
+    This idea extends to many other systems. Generally, timing a system can tell you something about the work being done, even if you can't observe that work directly. So, it's now time to combine this idea with our knowledge of CPU caches and speculative execution.
+  </p>
+
+  <Code lang="js" src=[[
+// all in normal JS code you can load from a website
+const myArray = new Uint8Array(1024);
+const probeArray = new Uint8Array(256);
+
+if (i < myArray.length) {
+  const definitelyNotSecretValue = myArray[i];
+  return probeArray[definitelyNotSecretValue];
+}
+  ]] />
+
   <script src="script.js"></script>
 </SimpleArticle>
