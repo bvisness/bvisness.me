@@ -1,4 +1,12 @@
 :root {
+  --size-1: 1rem;
+  --size-2: 2rem;
+  --size-3: 4rem;
+  --size-4: 8rem;
+  --size-5: 16rem;
+  --size-6: 32rem;
+  --size-7: 64rem;
+
   --spacing-0: 0;
   --spacing-1: .25rem;
   --spacing-2: .5rem;
@@ -34,6 +42,122 @@ body {
 
 .g4 {
   gap: var(--spacing-4);
+}
+
+.minw-1 {
+  min-width: var(--size-1);
+}
+
+.minw-2 {
+  min-width: var(--size-2);
+}
+
+.minw-3 {
+  min-width: var(--size-3);
+}
+
+.minw-4 {
+  min-width: var(--size-4);
+}
+
+.minw-5 {
+  min-width: var(--size-5);
+}
+
+.minw-6 {
+  min-width: var(--size-6);
+}
+
+.minw-7 {
+  min-width: var(--size-7);
+}
+
+.maxw-1 {
+  max-width: var(--size-1);
+}
+
+.maxw-2 {
+  max-width: var(--size-2);
+}
+
+.maxw-3 {
+  max-width: var(--size-3);
+}
+
+.maxw-4 {
+  max-width: var(--size-4);
+}
+
+.maxw-5 {
+  max-width: var(--size-5);
+}
+
+.maxw-6 {
+  max-width: var(--size-6);
+}
+
+.maxw-7 {
+  max-width: var(--size-7);
+}
+
+.minh-1 {
+  min-height: var(--size-1);
+}
+
+.minh-2 {
+  min-height: var(--size-2);
+}
+
+.minh-3 {
+  min-height: var(--size-3);
+}
+
+.minh-4 {
+  min-height: var(--size-4);
+}
+
+.minh-5 {
+  min-height: var(--size-5);
+}
+
+.minh-6 {
+  min-height: var(--size-6);
+}
+
+.minh-7 {
+  min-height: var(--size-7);
+}
+
+.maxh-1 {
+  max-height: var(--size-1);
+}
+
+.maxh-2 {
+  max-height: var(--size-2);
+}
+
+.maxh-3 {
+  max-height: var(--size-3);
+}
+
+.maxh-4 {
+  max-height: var(--size-4);
+}
+
+.maxh-5 {
+  max-height: var(--size-5);
+}
+
+.maxh-6 {
+  max-height: var(--size-6);
+}
+
+.maxh-7 {
+  max-height: var(--size-7);
+}
+
+.pointer-events-none {
+  pointer-events: none;
 }
 
 .wide>* {
@@ -82,6 +206,14 @@ body {
     margin-right: calc(var(--wideness) * -1);
     display: flex;
     justify-content: center;
+  }
+
+  .wide-md {
+    --wideness: 12rem;
+  }
+
+  .wide-sm {
+    --wideness: 6rem;
   }
 
   .wide>* {

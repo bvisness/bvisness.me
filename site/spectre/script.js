@@ -1,10 +1,23 @@
 const SECOND_WIDTH_REM = 4;
 
-const timingUsernameField = document.querySelector("#timing-username");
 const timingDemo = document.querySelector(".timing-demo");
+const timingUsernameField = document.querySelector("#timing-username");
+const timingPasswordField = document.querySelector("#timing-password");
 const timingButton = document.querySelector("#timing-go");
+const timingAttemptsContainer = document.querySelector("#timing-attempts-container");
+const timingRows = document.querySelector("#timing-attempts");
 const timingServerCoverCheckbox = document.querySelector("#timing-hide-server");
 const timingServerCover = document.querySelector("#timing-server-cover");
+
+function TimingRow() {
+  return E("tr", ["attempt"], [
+    E("td"),
+    E("td"),
+    E("td", [], [
+      Timeline(),
+    ]),
+  ]);
+}
 
 function Timeline() {
   function Tick(big) {
@@ -33,10 +46,6 @@ function Timeline() {
       ]),
     ])
   ]);
-}
-
-for (const attempt of timingDemo.querySelectorAll(".attempt")) {
-  attempt.children[2].appendChild(Timeline());
 }
 
 function sleep(ms) {
@@ -78,7 +87,7 @@ class Timer {
 }
 
 timingServerCoverCheckbox.addEventListener("change", e => {
-  timingServerCover.classList.toggle("o-0", !e.target.checked);
+  timingDemo.classList.toggle("hide-server", e.target.checked);
 });
 timingServerCoverCheckbox.checked = false;
 
@@ -86,9 +95,11 @@ timingButton.addEventListener("click", async () => {
   timingButton.setAttribute("disabled", "disabled");
 
   const inputUsername = timingUsernameField.value;
+  const inputPassword = timingPasswordField.value;
   console.log("looking up", inputUsername);
 
   const stages = [];
+  let response = timingMessageError;
   stages.push({ name: "send request", duration: 250, color: "bg-blue" });
   stages.push({ name: "database lookup", duration: 250, color: "bg-red" });
   stages.push({ name: "database lookup", duration: 500, color: "bg-red" });
@@ -97,14 +108,25 @@ timingButton.addEventListener("click", async () => {
   if (user) {
     console.log("found user", user);
     stages.push({ name: "password check", duration: 1000, color: "bg-green" });
+    if (user.password === inputPassword) {
+      response = timingMessageSuccess;
+    }
   }
   stages.push({ name: "receive response", duration: 250, color: "bg-blue" });
 
   // TODO: Find an empty one or whatever
-  const row = timingDemo.querySelector(".attempt");
+  let row = timingDemo.querySelector(".attempt.empty");
+  if (!row) {
+    row = TimingRow();
+    timingRows.appendChild(row);
+  }
+  row.classList.remove("empty");
+  row.children[0].innerText = inputUsername;
+  timingAttemptsContainer.scrollTo(0, timingAttemptsContainer.scrollHeight);
 
   const playhead = row.querySelector(".timer-playhead");
   const bars = row.querySelector(".timer-bars");
+  const display = row.querySelector(".timer-time");
   let currentStageStartTime = 0;
   let currentBar = row.querySelector(".timer-bar");
   let currentStage = null;
@@ -126,6 +148,7 @@ timingButton.addEventListener("click", async () => {
     await frame(() => {
       playhead.style.left = `${timer.elapsedSec() * SECOND_WIDTH_REM}rem`;
       currentBar.style.width = `${(timer.elapsed() - currentStageStartTime) / 1000 * SECOND_WIDTH_REM}rem`;
+      display.innerText = `${timer.elapsedSec().toFixed(1)}s`;
     });
 
     if (timer.elapsed() >= currentStageStartTime + currentStage.duration) {
@@ -136,5 +159,11 @@ timingButton.addEventListener("click", async () => {
       newStage(timer.elapsed(), stages[newStageIndex]);
     }
   }
+
+  row.children[1].innerText = response;
   timingButton.removeAttribute("disabled");
 });
+
+for (const attempt of timingDemo.querySelectorAll(".attempt")) {
+  attempt.children[2].appendChild(Timeline());
+}

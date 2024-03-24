@@ -3,9 +3,28 @@ table {
   border-style: hidden;
 }
 
-td, th {
+td,
+th {
   padding: var(--spacing-2);
   border: 1px solid var(--border-color);
+}
+
+.sticky-table th {
+  position: sticky;
+  top: 0;
+  background-color: var(--body-background);
+  z-index: 1;
+}
+
+/* this is what we have to do to get borders on sticky table headers?? */
+.sticky-table th::after {
+  content: '';
+  box-shadow: 0px 1px var(--border-color);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .instrs .instr {
@@ -17,7 +36,7 @@ td, th {
 .timing-demo .timer-playhead {
   border: 1rem solid transparent;
   border-width: 0.5rem 0.3rem;
-  border-top-color: black;
+  border-top-color: var(--border-color);
   position: absolute;
   margin-left: -0.3rem;
   margin-top: -0.5rem;
@@ -29,4 +48,12 @@ td, th {
 
 .timing-demo .timer-bar {
   height: 0.4rem;
+}
+
+.timing-demo.hide-server #timing-server-cover {
+  opacity: 1;
+}
+
+.timing-demo.hide-server .timer-bar {
+  background-color: var(--border-color);
 }

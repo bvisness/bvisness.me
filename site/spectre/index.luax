@@ -12,7 +12,8 @@ function Head()
   </>
 end
 
-local timingMessage = "bad login"
+local timingMessageSuccess = "success!"
+local timingMessageError = "bad login"
 local timingDb = {
   { username = "alpha@example.com", password = "hunter2" },
   { username = "bravo@example.com", password = "dolphins" },
@@ -23,37 +24,45 @@ local timingDb = {
 function Timing()
   return <div class="timing-demo flex flex-column g2">
     <!-- Client -->
-    <div class="flex g2">
+    <div class="flex g2 items-stretch">
       <div class="flex flex-column g2 ba pa3 br3 overflow-hidden">
         <h3 class="mt0">Log in</h3>
-        <input id="timing-username" placeholder="Username" value={ timingDb[1].username } />
-        <input type="password" placeholder="Password" value={ timingDb[1].password } />
-        <button id="timing-go">Submit</button>
+        <form id="timing-form" class="flex flex-column g2">
+          <input class="ph2 pv1" id="timing-username" placeholder="Username" value={ timingDb[1].username } />
+          <input class="ph2 pv1" id="timing-password" type="password" placeholder="Password" value={ timingDb[1].password } />
+          <input type="submit" class="ph2 pv1" id="timing-go" value="Submit" />
+        </form>
       </div>
-      <div class="flex-grow-1 flex flex-column ba br3">
-        <h3 class="mt0 pt3 ph3">Attempts</h3>
-        <table>
-          <tr>
-            <th>username</th>
-            <th>response</th>
-            <th>timeline</th>
-          </tr>
-          <tr class="attempt empty">
-            <td><span class="hidden">{{ timingDb[1].username }}</span></td>
-            <td><span class="hidden">{{ timingMessage }}</span></td>
-            <td></td>
-          </tr>
-          <tr class="attempt empty">
-            <td>&nbsp</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr class="attempt empty">
-            <td>&nbsp;</td>
-            <td></td>
-            <td></td>
-          </tr>
-        </table>
+      <div id="timing-attempts-container" class="flex-grow-1 ba br3 overflow-y-scroll relative">
+        <div class="absolute absolute--fill flex flex-column">
+          <h3 class="mt0 pt3 ph3">Attempts</h3>
+          <table class="sticky-table">
+            <thead>
+              <tr>
+                <th>username</th>
+                <th>response</th>
+                <th>timeline</th>
+              </tr>
+            </thead>
+            <tbody id="timing-attempts" class="overflow-y-auto maxh-3">
+              <tr class="attempt empty">
+                <td><span class="hidden">{{ timingDb[1].username }}</span></td>
+                <td><span class="hidden">{{ timingMessage }}</span></td>
+                <td></td>
+              </tr>
+              <tr class="attempt empty">
+                <td>&nbsp</td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr class="attempt empty">
+                <td>&nbsp;</td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -63,14 +72,16 @@ function Timing()
 
     <!-- Server -->
     <div class="flex g2 relative">
-      <div class="ba pa3 br3 overflow-x-scroll bg--codeblock">
-        <Code lang="python" bare src={[[
+      <div class="ba pa3 br3 overflow-x-auto bg--codeblock relative">
+        <div class="absolute left-0 w-100 bg-red o-30" style="height: 1.2rem; top: 1.1rem"></div>
+        <div class="absolute left-0 w-100 bg-green o-30" style="height: 1.2rem; top: 4.9rem"></div>
+        <Code lang="python" bare class="relative" src={[[
 user = database.get(req.username)
 if not user:
-  return "]]..timingMessage..[["
+  return "]]..timingMessageError..[["
 if not checkPassword(user.password, req.password):
-  return "]]..timingMessage..[["
-return "success!"
+  return "]]..timingMessageError..[["
+return "]]..timingMessageSuccess..[["
       ]]} />
       </div>
       <div class="flex-grow-1 ba br3">
@@ -91,9 +102,13 @@ return "success!"
           </tr>
         </table>
       </div>
-      <div id="timing-server-cover" class="absolute absolute--fill flex justify-center items-center bg-white ba br3 o-100 o-0">Mysterious server</div>
+      <div id="timing-server-cover" class="absolute absolute--fill flex justify-center items-center bg--body ba br3 o-0 pointer-events-none">
+        Mysterious server
+      </div>
     </div>
     <script>
+      window.timingMessageSuccess = {{ bhp.json(timingMessageSuccess) }};
+      window.timingMessageError = {{ bhp.json(timingMessageError) }};
       window.timingDb = JSON.parse({{ bhp.json(timingDb) }});
     </script>
   </div>
@@ -272,11 +287,13 @@ if (n % 2 == 0) {
   <p>
     Timing can tell you a surprising amount about a system. Consider the following interactive example, which simulates a simple login page.
   </p>
-
-  <Timing />
+  
+  <div class="wide wide-sm">
+    <Timing />
+  </div>
 
   <p>
-    Notice that, despite the message "{{ timingMessage }}", the timing of the response reveals whether the username exists in the system or not. When a user is not found in the database, it returns quickly, but when a user is found, it will also run an expensive password check. See if you can figure out the username of the hidden user in the database using this information.
+    Notice that, despite the message "{{ timingMessageError }}", the timing of the response reveals whether the username exists in the system or not. When a user is not found in the database, it returns quickly, but when a user is found, it will also run an expensive password check. See if you can figure out the username of the hidden user in the database using this information.
   </p>
 
   <script src="script.js"></script>

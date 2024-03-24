@@ -10,7 +10,10 @@ function Code(atts, children)
     end
     local el = code.highlight(atts.lang or "plain", src)
     if atts.bare then
-        el = el:gsub("class=\"chroma\"", "class=\"chroma bare\"")
+        el = el:gsub("class=\"chroma", "class=\"chroma bare")
+    end
+    if atts.class then
+        el = el:gsub("class=\"chroma", "class=\"chroma "..atts.class)
     end
     return el
 end

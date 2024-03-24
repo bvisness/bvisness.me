@@ -80,6 +80,10 @@ function Base(atts, children)
                 .bg--codeblock {
                     background-color: var(--codeblock-background);
                 }
+
+                .bg--body {
+                    background-color: var(--body-background);
+                }
             </style>
 
             {{ atts.head and atts.head() }}
