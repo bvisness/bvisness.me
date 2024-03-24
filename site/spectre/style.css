@@ -1,0 +1,32 @@
+table {
+  border-collapse: collapse;
+  border-style: hidden;
+}
+
+td, th {
+  padding: var(--spacing-2);
+  border: 1px solid var(--border-color);
+}
+
+.instrs .instr {
+  height: 1rem;
+  /* background-color: var(--text-color); */
+  border-radius: 2px;
+}
+
+.timing-demo .timer-playhead {
+  border: 1rem solid transparent;
+  border-width: 0.5rem 0.3rem;
+  border-top-color: black;
+  position: absolute;
+  margin-left: -0.3rem;
+  margin-top: -0.5rem;
+}
+
+.timing-demo .timer-playhead-spacer {
+  height: 0.5rem;
+}
+
+.timing-demo .timer-bar {
+  height: 0.4rem;
+}
