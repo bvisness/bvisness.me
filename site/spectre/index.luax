@@ -222,17 +222,16 @@ if (n % 2 == 0) {
           <div class="h1">Commit results</div>
         </div>
         <div class="instrs flex flex-column g2">
-          <div class="h1"><div class="instr bg-red" style="width: 4rem; margin-left: 0"></div></div>
-          <div class="h1"><div class="instr bg-red" style="width: 2rem; margin-left: 4rem"></div></div>
+          <div class="h1"><div class="instr bg-blue" style="width: 4rem; margin-left: 0"></div></div>
+          <div class="h1"><div class="instr bg-blue" style="width: 2rem; margin-left: 4rem"></div></div>
           <div class="h1"><div class="instr bg-blue" style="width: 2rem; margin-left: 5rem"></div></div>
-          <div class="h1"><div class="instr bg-red" style="width: 2rem; margin-left: 6rem"></div></div>
+          <div class="h1"><div class="instr bg-blue" style="width: 2rem; margin-left: 6rem"></div></div>
           <div class="h1"><div class="instr bg-blue" style="width: 4rem; margin-left: 7rem"></div></div>
           <div class="h1"><div class="instr bg-green" style="width: 1rem; margin-left: 11rem"></div></div>
         </div>
       </div>
 
       <h3>Incorrect prediction (n is odd)</h3>
-      <TODO>Colors</TODO>
       <div class="flex g3">
         <div class="flex flex-column g2">
           <div class="h1">Load <code>arr[i]</code> from memory</div>
@@ -300,16 +299,108 @@ if (n % 2 == 0) {
     This idea extends to many other systems. Generally, timing a system can tell you something about the work being done, even if you can't observe that work directly. So, it's now time to combine this idea with our knowledge of CPU caches and speculative execution.
   </p>
 
-  <Code lang="js" src=[[
-// all in normal JS code you can load from a website
-const myArray = new Uint8Array(1024);
-const probeArray = new Uint8Array(256);
+  <h2>Reading memory with only a timer</h2>
 
-if (i < myArray.length) {
-  const definitelyNotSecretValue = myArray[i];
-  return probeArray[definitelyNotSecretValue];
+  <p>
+    While it may be interesting that timing a system can reveal some insights about how it works, it's not clear how this can be used to actually do anything serious. However, it is actually possible to extract the contents of memory using nothing but a timer.
+  </p>
+  <p>
+    Suppose we have the following code:
+  </p>
+  <Code lang="c" src=[[
+char dereferenceAndLookup(char* p) {
+  return probeArray[*p];
 }
   ]] />
+  <p>
+    This code will dereference a pointer, then use the value it finds to index into an array. Because accesses to memory are cached, this means that some element of <code>probeArray</code> will be in cache—specifically the index corresponding to <code>*p</code>.
+  </p>
+  <p>
+    This is now exploitable via a timing attack. <b>Whichever index of <code>probeArray</code> loads fastest is the value of <code>*p</code>.</b>
+  </p>
+  <p>
+    You can see this in the demo below. Choose an address to run the function with, then click on the elements of <code>probeArray</code> to see how quickly they load.
+  </p>
+  <p>
+    <TODO>Actual demo instead of this sketch ha ha</TODO>
+  </p>
+  <p>
+    <img class="maxw-6" src="number_demo.jpg" />
+  </p>
+  <p class="i">
+    Note for pedants: yes, I know that CPUs do not cache individual integers. I will address this later, I promise.
+  </p>
+  <p>
+    Things are now more serious. The stage has been set for a proper Spectre exploit.
+  </p>
+
+  <h2>The (almost) real deal</h2>
+
+  <p>
+    The roadmap for our exploit is as follows:
+  </p>
+  <ol>
+    <li>Make the CPU load from an address containing a secret byte <code>s</code></li>
+    <li>Make the CPU use <code>s</code> to index an array</li>
+    <li>Find the fast element in the array to learn the value of <code>s</code></li>
+  </ol>
+  <p>
+    Step 1 might seem potentially difficult to achieve in languages without pointers. In JavaScript, for example, we can't just write <code>int s = *(int*)(0xDA7A)</code> to access a memory address directly. However, in nearly any language, we can simply use arrays to bypass this limitation.
+  </p>
+  <p>
+    In a sense, you can think of an array index as a relative pointer—an address relative to the start of the array. If we can determine the address of the array itself, we can use it to access whatever data we like. For example, if the array is at address 1000, and we would like to read memory address 1234, we can simply access <code>array[234]</code>. Or, we can just throw random indexes at the array and see what we find out of bounds.
+  </p>
+  <p>
+    Of course, well-written programs have bounds checks to ensure that you cannot read an array out of bounds. But speculative execution can bypass this limitation, as we saw before. The CPU can speculatively load the out-of-bounds data <em>before</em> it knows that it is out of bounds—and this will be reflected in the cache.
+  </p>
+  <p>
+    We can therefore modify our prior example to look like this:
+  </p>
+  <Code lang="c" src=[[
+char probeArray[255];
+
+char exploitable(int i) {
+  if (0 <= i && i < arraySize) {
+    char secret = pointerishArray[i];
+    return probeArray[secret];
+  }
+  return -1;
+}
+  ]] />
+
+  <p>
+    If CPUs never ran code out of order, this code would be completely fine. Any out-of-bounds value for <code>i</code> would be handled correctly, and secret data would never be loaded. But this is not what actually happens.
+  </p>
+  <p>
+    Suppose we call <code>exploitable</code> with a malicious, out-of-bounds value for <code>i</code>. If the CPU speculates that the if statement will be true, it is assuming that <code>i</code> is in bounds and the data is safe to look up. It will then <em>speculatively</em> load <code>pointerishArray[i]</code>, and <em>speculatively</em> load <code>probeArray[secret]</code> based on the result, making <code>probeArray[secret]</code> the fastest-loading element—even after the incorrect work is rolled back!
+  </p>
+  <p>
+    <TODO>Picture or demo or something :(</TODO>
+  </p>
+  <p>
+    This technique is surprisingly portable. The previous examples have been in C, but the authors of the Spectre paper also demonstrated a JavaScript version of the exploit that could run in browsers. They were able to read data belonging to the browser process itself, simply by using JavaScript's <code>Uint8Array</code>. This means that a web page could potentially exploit the browser itself, just by running malicious JavaScript code that never actually triggers an error!
+  </p>
+
+  <h2>The fussy real-life details</h2>
+
+  <p>
+    The previous examples have simplified various aspects of the exploit. However, getting the exploit to work practically requires a few more tweaks that are worth addressing now.
+  </p>
+  <p>
+    First, CPUs do not actually cache individual integers. Instead they cache in larger units called <i>cache lines</i>, e.g. 128 bytes at a time. This means that loading a single element of <code>probeArray</code> will actually result in 128 values of <code>probeArray</code> being loaded into cache—not ideal for later determining the value of <code>secret</code>. This is why, in the Spectre paper, <code>probeArray</code> is much larger and <code>secret</code> is multiplied by 4096—this ensures that each access to <code>probeArray</code> will get its own cache line.
+  </p>
+  <p>
+    Second, running this exploit in practice requires you to force the CPU to speculate the way you want; specifically, you must train the CPU to predict that <code>i</code> is in bounds, and you must ensure that <code>pointerishArray[i]</code> is cached but <code>arraySize</code> is not. This ensures that the CPU will choose the correct path, and that it will speculate for a substantial amount of time while it waits for <code>arraySize</code> to load from memory. This can generally be achieved by deliberately reading from other memory addresses in such a way that <code>arraySize</code> is evicted from the cache.
+  </p>
+  <p>
+    Finally, <code>probeArray</code> must also be completely evicted from cache so that you can use the cache timings to determine the value of <code>secret</code>. This can be done the same way as for <code>arraySize</code>.
+  </p>
+
+  <h2>In conclusion</h2>
+
+  <p>
+    I wish I had more time to make interactive demos for this but oh well!!
+  </p>
 
   <script src="script.js"></script>
 </SimpleArticle>
