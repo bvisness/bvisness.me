@@ -10,6 +10,12 @@ end
 
 return slugify({
     {
+        title = "Micro-libraries need to die already",
+        description = "Somehow people are still putting tiny libraries on npm, and it really needs to stop.",
+        slug = "microlibraries",
+        date = os.time({ year = 2024, month = 8, day = 18 }),
+    },
+    {
         title = "How does Spectre work?",
         description = "An interactive explainer of Spectre, and my submission for the 2024 Handmade Learning Jam.",
         slug = "spectre",
