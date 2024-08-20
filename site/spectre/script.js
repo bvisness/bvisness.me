@@ -10,6 +10,7 @@ const timingServerCoverCheckbox = document.querySelector("#timing-hide-server");
 const timingServerCover = document.querySelector("#timing-server-cover");
 
 const cpuSecret = [1,3,3,7];
+const cpuDemo = document.querySelector("#cpu-demo");
 const cpuSecretIndex = document.querySelector("#cpu-secret-index");
 const cpuLookup = document.querySelector("#cpu-lookup");
 const cpuProbe = document.querySelector("#cpu-probe");
@@ -284,9 +285,11 @@ cpuUnlockVault.addEventListener('click', e => {
       cpuVaultPadlockUnlocked.classList.remove("dn-l"); // Show
   }
 });
-cpuCoverCheckbox.addEventListener('change', e => {
-  cpuCPUCover.style.opacity = e.target.checked? 1 : 0;
+
+cpuCoverCheckbox.addEventListener("change", e => {
+  cpuDemo.classList.toggle("hide-cpu", e.target.checked);
 });
+cpuCoverCheckbox.checked = false;
 
 for (const cpuProbe of document.querySelectorAll(".cpu-probe")) {
   cpuProbe.children[1].appendChild(Timeline());

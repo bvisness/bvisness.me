@@ -116,7 +116,7 @@ end
 
 
 function CPUDemo()
-  return  <div id="timing-demo-cpu" class="timing-demo flex flex-column g2">
+  return  <div id="cpu-demo" class="timing-demo flex flex-column g2">
             <div class="flex g2 items-stretch">
               <div class="flex flex-column g2 ba pa3 br3 overflow-hidden">
                 <h3 class="mt0">CPU</h3>
