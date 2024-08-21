@@ -57,3 +57,11 @@ th {
 .timing-demo.hide-server .timer-bar {
   background-color: var(--border-color);
 }
+
+.timing-demo.hide-cpu #cpu-cover {
+  opacity: 1;
+}
+
+.timing-demo.hide-cpu .timer-bar {
+  background-color: var(--border-color);
+}
