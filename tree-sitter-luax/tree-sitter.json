@@ -1,0 +1,40 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "luax",
+      "camelcase": "LuaX",
+      "title": "LuaX",
+      "scope": "source.luax",
+      "file-types": [
+        "luax"
+      ],
+      "injection-regex": "^luax$",
+      "class-name": "TreeSitterLuax"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Luax grammar for tree-sitter",
+    "authors": [
+      {
+        "name": "Ben Visness",
+        "email": "ben@bvisness.me",
+        "url": "https://bvisness.me/"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/bvisness/bvisness.me"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": true,
+    "node": true,
+    "python": true,
+    "rust": true,
+    "swift": true,
+    "zig": false
+  }
+}
