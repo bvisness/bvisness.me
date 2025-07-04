@@ -79,95 +79,46 @@
     }
   },
   {
-    "type": "exprstat",
+    "type": "expr",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "binop",
           "named": true
         },
         {
-          "type": "breakstat",
+          "type": "expr",
           "named": true
         },
         {
-          "type": "constructor_",
-          "named": true
-        },
-        {
-          "type": "dostat",
-          "named": true
-        },
-        {
-          "type": "exprstat",
-          "named": true
-        },
-        {
-          "type": "forstat",
-          "named": true
-        },
-        {
-          "type": "funcargs",
-          "named": true
-        },
-        {
-          "type": "funcstat",
-          "named": true
-        },
-        {
-          "type": "gotostat",
-          "named": true
-        },
-        {
-          "type": "ifstat",
-          "named": true
-        },
-        {
-          "type": "label",
-          "named": true
-        },
-        {
-          "type": "localstat",
-          "named": true
-        },
-        {
-          "type": "name",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "parlist",
-          "named": true
-        },
-        {
-          "type": "repeatstat",
-          "named": true
-        },
-        {
-          "type": "retstat",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "tag",
+          "type": "simpleexp",
           "named": true
         },
         {
           "type": "unop",
           "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "exprstat",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
         },
         {
-          "type": "whilestat",
+          "type": "suffixedexp",
           "named": true
         }
       ]
@@ -179,90 +130,14 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
-          "type": "binop",
-          "named": true
-        },
-        {
-          "type": "breakstat",
-          "named": true
-        },
-        {
-          "type": "constructor_",
-          "named": true
-        },
-        {
-          "type": "dostat",
-          "named": true
-        },
-        {
-          "type": "exprstat",
-          "named": true
-        },
-        {
-          "type": "forstat",
-          "named": true
-        },
-        {
-          "type": "funcargs",
-          "named": true
-        },
-        {
-          "type": "funcstat",
-          "named": true
-        },
-        {
-          "type": "gotostat",
-          "named": true
-        },
-        {
-          "type": "ifstat",
-          "named": true
-        },
-        {
-          "type": "label",
-          "named": true
-        },
-        {
-          "type": "localstat",
+          "type": "expr",
           "named": true
         },
         {
           "type": "name",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "parlist",
-          "named": true
-        },
-        {
-          "type": "repeatstat",
-          "named": true
-        },
-        {
-          "type": "retstat",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "tag",
-          "named": true
-        },
-        {
-          "type": "unop",
-          "named": true
-        },
-        {
-          "type": "whilestat",
           "named": true
         }
       ]
@@ -277,19 +152,15 @@
       "required": true,
       "types": [
         {
-          "type": "binop",
-          "named": true
-        },
-        {
           "type": "breakstat",
           "named": true
         },
         {
-          "type": "constructor_",
+          "type": "dostat",
           "named": true
         },
         {
-          "type": "dostat",
+          "type": "expr",
           "named": true
         },
         {
@@ -298,10 +169,6 @@
         },
         {
           "type": "forstat",
-          "named": true
-        },
-        {
-          "type": "funcargs",
           "named": true
         },
         {
@@ -329,31 +196,11 @@
           "named": true
         },
         {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "parlist",
-          "named": true
-        },
-        {
           "type": "repeatstat",
           "named": true
         },
         {
           "type": "retstat",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "tag",
-          "named": true
-        },
-        {
-          "type": "unop",
           "named": true
         },
         {
@@ -372,87 +219,15 @@
       "required": false,
       "types": [
         {
-          "type": "binop",
-          "named": true
-        },
-        {
-          "type": "breakstat",
-          "named": true
-        },
-        {
           "type": "constructor_",
           "named": true
         },
         {
-          "type": "dostat",
-          "named": true
-        },
-        {
-          "type": "exprstat",
-          "named": true
-        },
-        {
-          "type": "forstat",
-          "named": true
-        },
-        {
-          "type": "funcargs",
-          "named": true
-        },
-        {
-          "type": "funcstat",
-          "named": true
-        },
-        {
-          "type": "gotostat",
-          "named": true
-        },
-        {
-          "type": "ifstat",
-          "named": true
-        },
-        {
-          "type": "label",
-          "named": true
-        },
-        {
-          "type": "localstat",
-          "named": true
-        },
-        {
-          "type": "name",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "parlist",
-          "named": true
-        },
-        {
-          "type": "repeatstat",
-          "named": true
-        },
-        {
-          "type": "retstat",
+          "type": "expr",
           "named": true
         },
         {
           "type": "string",
-          "named": true
-        },
-        {
-          "type": "tag",
-          "named": true
-        },
-        {
-          "type": "unop",
-          "named": true
-        },
-        {
-          "type": "whilestat",
           "named": true
         }
       ]
@@ -565,22 +340,18 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
-        {
-          "type": "binop",
-          "named": true
-        },
         {
           "type": "breakstat",
           "named": true
         },
         {
-          "type": "constructor_",
+          "type": "dostat",
           "named": true
         },
         {
-          "type": "dostat",
+          "type": "expr",
           "named": true
         },
         {
@@ -589,10 +360,6 @@
         },
         {
           "type": "forstat",
-          "named": true
-        },
-        {
-          "type": "funcargs",
           "named": true
         },
         {
@@ -616,35 +383,11 @@
           "named": true
         },
         {
-          "type": "name",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "parlist",
-          "named": true
-        },
-        {
           "type": "repeatstat",
           "named": true
         },
         {
           "type": "retstat",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "tag",
-          "named": true
-        },
-        {
-          "type": "unop",
           "named": true
         },
         {
@@ -678,19 +421,15 @@
       "required": true,
       "types": [
         {
-          "type": "binop",
-          "named": true
-        },
-        {
           "type": "breakstat",
           "named": true
         },
         {
-          "type": "constructor_",
+          "type": "dostat",
           "named": true
         },
         {
-          "type": "dostat",
+          "type": "expr",
           "named": true
         },
         {
@@ -699,10 +438,6 @@
         },
         {
           "type": "forstat",
-          "named": true
-        },
-        {
-          "type": "funcargs",
           "named": true
         },
         {
@@ -730,10 +465,6 @@
           "named": true
         },
         {
-          "type": "number",
-          "named": true
-        },
-        {
           "type": "parlist",
           "named": true
         },
@@ -743,18 +474,6 @@
         },
         {
           "type": "retstat",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "tag",
-          "named": true
-        },
-        {
-          "type": "unop",
           "named": true
         },
         {
@@ -780,27 +499,42 @@
     }
   },
   {
+    "type": "primaryexp",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "repeatstat",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
-        {
-          "type": "binop",
-          "named": true
-        },
         {
           "type": "breakstat",
           "named": true
         },
         {
-          "type": "constructor_",
+          "type": "dostat",
           "named": true
         },
         {
-          "type": "dostat",
+          "type": "expr",
           "named": true
         },
         {
@@ -809,10 +543,6 @@
         },
         {
           "type": "forstat",
-          "named": true
-        },
-        {
-          "type": "funcargs",
           "named": true
         },
         {
@@ -836,35 +566,11 @@
           "named": true
         },
         {
-          "type": "name",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "parlist",
-          "named": true
-        },
-        {
           "type": "repeatstat",
           "named": true
         },
         {
           "type": "retstat",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "tag",
-          "named": true
-        },
-        {
-          "type": "unop",
           "named": true
         },
         {
@@ -880,90 +586,29 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
-          "type": "binop",
+          "type": "expr",
           "named": true
-        },
-        {
-          "type": "breakstat",
-          "named": true
-        },
-        {
-          "type": "constructor_",
-          "named": true
-        },
-        {
-          "type": "dostat",
-          "named": true
-        },
-        {
-          "type": "exprstat",
-          "named": true
-        },
-        {
-          "type": "forstat",
-          "named": true
-        },
-        {
-          "type": "funcargs",
-          "named": true
-        },
-        {
-          "type": "funcstat",
-          "named": true
-        },
-        {
-          "type": "gotostat",
-          "named": true
-        },
-        {
-          "type": "ifstat",
-          "named": true
-        },
-        {
-          "type": "label",
-          "named": true
-        },
-        {
-          "type": "localstat",
-          "named": true
-        },
-        {
-          "type": "name",
-          "named": true
-        },
+        }
+      ]
+    }
+  },
+  {
+    "type": "simpleexp",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
         {
           "type": "number",
           "named": true
         },
         {
-          "type": "parlist",
-          "named": true
-        },
-        {
-          "type": "repeatstat",
-          "named": true
-        },
-        {
-          "type": "retstat",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "tag",
-          "named": true
-        },
-        {
-          "type": "unop",
-          "named": true
-        },
-        {
-          "type": "whilestat",
+          "type": "suffixedexp",
           "named": true
         }
       ]
@@ -1030,15 +675,27 @@
     }
   },
   {
-    "type": "tag",
+    "type": "suffixedexp",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
-      "required": false,
+      "multiple": true,
+      "required": true,
       "types": [
         {
+          "type": "expr",
+          "named": true
+        },
+        {
+          "type": "funcargs",
+          "named": true
+        },
+        {
           "type": "name",
+          "named": true
+        },
+        {
+          "type": "primaryexp",
           "named": true
         }
       ]
@@ -1055,22 +712,18 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
-        {
-          "type": "binop",
-          "named": true
-        },
         {
           "type": "breakstat",
           "named": true
         },
         {
-          "type": "constructor_",
+          "type": "dostat",
           "named": true
         },
         {
-          "type": "dostat",
+          "type": "expr",
           "named": true
         },
         {
@@ -1079,10 +732,6 @@
         },
         {
           "type": "forstat",
-          "named": true
-        },
-        {
-          "type": "funcargs",
           "named": true
         },
         {
@@ -1106,35 +755,11 @@
           "named": true
         },
         {
-          "type": "name",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "parlist",
-          "named": true
-        },
-        {
           "type": "repeatstat",
           "named": true
         },
         {
           "type": "retstat",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "tag",
-          "named": true
-        },
-        {
-          "type": "unop",
           "named": true
         },
         {
@@ -1193,10 +818,6 @@
     "named": false
   },
   {
-    "type": "/>",
-    "named": false
-  },
-  {
     "type": ":",
     "named": false
   },
@@ -1210,10 +831,6 @@
   },
   {
     "type": "<",
-    "named": false
-  },
-  {
-    "type": "<!DOCTYPE",
     "named": false
   },
   {
@@ -1273,10 +890,6 @@
     "named": false
   },
   {
-    "type": "false",
-    "named": false
-  },
-  {
     "type": "for",
     "named": false
   },
@@ -1309,10 +922,6 @@
     "named": true
   },
   {
-    "type": "nil",
-    "named": false
-  },
-  {
     "type": "not",
     "named": false
   },
@@ -1338,10 +947,6 @@
   },
   {
     "type": "then",
-    "named": false
-  },
-  {
-    "type": "true",
     "named": false
   },
   {

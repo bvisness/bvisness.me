@@ -12,7 +12,7 @@
  *
  * https://www.lua.org/manual/5.2/manual.html#9
  * https://www.lua.org/source/5.2/lparser.c.html
- * 
+ *
  * Note that the parser actually disagrees pretty substantially with the
  * grammar, so that's cool. The parser source is annotated with grammar rules
  * to make it about as easy to follow as the EBNF grammar.
@@ -43,10 +43,10 @@ module.exports = grammar({
     ),
 
     ifstat: $ => seq(
-      "if", $._subexpr, "then",
+      "if", $.expr, "then",
       optional($._block),
       repeat(seq(
-        "elseif", $._subexpr, "then",
+        "elseif", $.expr, "then",
         optional($._block),
       )),
       optional(seq(
@@ -57,7 +57,7 @@ module.exports = grammar({
     ),
 
     whilestat: $ => seq(
-      "while", $._subexpr, "do",
+      "while", $.expr, "do",
       optional($._block),
       "end",
     ),
@@ -72,7 +72,7 @@ module.exports = grammar({
       "for",
       choice(
         seq( // fornum
-          $.name, "=", $._subexpr, ",", $._subexpr, optional(seq(",", $._subexpr)),
+          $.name, "=", $.expr, ",", $.expr, optional(seq(",", $.expr)),
         ),
         seq( // forlist
           $.name, repeat(seq(",", $.name)), "in", $._explist,
@@ -87,7 +87,7 @@ module.exports = grammar({
       "repeat",
       optional($._block),
       "until",
-      $._subexpr,
+      $.expr,
     ),
 
     funcstat: $ => seq("function", $.funcname, $._body),
@@ -117,13 +117,13 @@ module.exports = grammar({
     gotostat: $ => seq("goto", $.name),
     
     exprstat: $ => seq(
-      $._suffixedexp,
-      repeat(seq(",", $._suffixedexp)),
+      $.suffixedexp,
+      repeat(seq(",", $.suffixedexp)),
       optional(seq("=", $._explist)),
     ),
     
     _explist: $ => seq(
-      $._subexpr, repeat(seq(",", $._subexpr)),
+      $.expr, repeat(seq(",", $.expr)),
     ),
     parlist: $ => seq(
       $._param, repeat(seq(",", $._param)),
@@ -132,29 +132,30 @@ module.exports = grammar({
     _fieldsel: $ => seq(choice(".", ":"), $.name),
     _param: $ => choice($.name, "..."),
 
-    _primaryexp: $ => choice($.name, seq("(", $._subexpr, ")")),
-    _suffixedexp: $ => prec.left(seq(
-      $._primaryexp,
+    primaryexp: $ => choice($.name, seq("(", $.expr, ")")),
+    suffixedexp: $ => prec.left(seq(
+      $.primaryexp,
       repeat(choice(
         seq(".", $.name),
-        seq("[", $._subexpr, "]"),
+        seq("[", $.expr, "]"),
         seq(":", $.name, $.funcargs),
         $.funcargs,
       )),
     )),
-    _subexpr: $ => prec.left(seq(
+    expr: $ => prec.left(seq(
       choice(
-        seq($.unop, $._subexpr),
-        seq($._simpleexp)
+        seq($.unop, $.expr),
+        seq($.simpleexp)
       ),
-      repeat(seq($.binop, $._subexpr)),
+      repeat(seq($.binop, $.expr)),
     )),
-    _simpleexp: $ => choice(
-      $.number, $.string, "nil", "true", "false", "...",
-      $.constructor_,
-      $.tag,
-      seq("function", $._body),
-      $._suffixedexp,
+    simpleexp: $ => choice(
+      $.number,
+      // $.string, "nil", "true", "false", "...",
+      // $.constructor_,
+      // $.tag,
+      // seq("function", $._body),
+      $.suffixedexp,
     ),
 
     funcargs: $ => choice(
@@ -173,9 +174,9 @@ module.exports = grammar({
       "}",
     ),
     field: $ => choice(
-      $._subexpr,
+      $.expr,
       seq(
-        choice($.name, seq("[", $._subexpr, "]")), "=", $._subexpr,
+        choice($.name, seq("[", $.expr, "]")), "=", $.expr,
       ),
     ),
 
@@ -194,15 +195,14 @@ module.exports = grammar({
     tag: $ => choice(
       seq("<!DOCTYPE", $.name, ">"),
       seq(
-        "<",
-        choice(
-          ">",
-          "/>",
-          seq(
-            $.name, ">",
-          ),
-        ),
+        "<>",
+        optional($.tagchildren),
+        "</>",
       ),
+    ),
+
+    tagchildren: $ => repeat1(
+      /[^<]+/,
     ),
   },
 });

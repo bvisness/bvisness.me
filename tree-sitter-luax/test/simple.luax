@@ -18,4 +18,5 @@ a, b, c = 3
 a = 3
 
 local a = 3
+local foo = <>Hello!</>
 local foo = <p>Hello!</p>
