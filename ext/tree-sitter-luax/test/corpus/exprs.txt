@@ -1,0 +1,17 @@
+=====
+Dunno
+=====
+
+foo("foo")
+
+---
+
+(source_file
+  (block
+    (exprstat
+      (suffixedexp
+        (name)))
+    (exprstat
+      (suffixedexp
+        (expr
+          (string))))))

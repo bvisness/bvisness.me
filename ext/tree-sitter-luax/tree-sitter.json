@@ -10,7 +10,8 @@
         "luax"
       ],
       "injection-regex": "^luax$",
-      "class-name": "TreeSitterLuax"
+      "class-name": "TreeSitterLuax",
+      "highlights": "queries/highlights.scm"
     }
   ],
   "metadata": {

@@ -1,0 +1,87 @@
+===================
+Function statements
+===================
+
+function foo(a, b)
+  return a + b
+end
+
+function foo(a, ...) end
+
+function foo.bar:baz() end
+
+---
+
+(source_file
+  (block
+    (funcstat
+      name: (funcname (name))
+      params: (params
+        (name)
+        (name))
+      body: (block
+        (retstat
+          (expr
+            (suffixedexp
+              (name))
+            (binop)
+            (expr
+              (suffixedexp
+                (name)))))))
+    (funcstat
+      name: (funcname (name))
+      params: (params
+        (name)
+        (ellipsis)))
+    (funcstat
+      name: (funcname
+        (name)
+        (name)
+        (method_name))
+      params: (params))))
+
+===============
+Local functions
+===============
+
+local function foo()
+  return 3
+end
+
+---
+
+(source_file
+  (block
+    (localstat
+      name: (name)
+      params: (params)
+      body: (block
+        (retstat
+          (expr
+            (number)))))))
+
+====================
+Function expressions
+====================
+
+foo.bar = function(a, b)
+  return 3
+end
+
+---
+
+(source_file
+  (block
+    (exprstat
+      (suffixedexp
+        (name)
+        (getfield
+          (name)))
+      (expr
+        params: (params
+          (name)
+          (name))
+        body: (block
+          (retstat
+            (expr
+              (number))))))))

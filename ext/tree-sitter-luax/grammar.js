@@ -22,9 +22,9 @@ module.exports = grammar({
   name: "luax",
 
   rules: {
-    source_file: $ => optional($._block),
+    source_file: $ => optional($.block),
 
-    _block: $ => repeat1($._stat),
+    block: $ => repeat1($._stat),
 
     _stat: $ => choice(
       ";",
@@ -44,27 +44,27 @@ module.exports = grammar({
 
     ifstat: $ => seq(
       "if", $.expr, "then",
-      optional($._block),
+      optional($.block),
       repeat(seq(
         "elseif", $.expr, "then",
-        optional($._block),
+        optional($.block),
       )),
       optional(seq(
         "else",
-        optional($._block),
+        optional($.block),
       )),
       "end",
     ),
 
     whilestat: $ => seq(
       "while", $.expr, "do",
-      optional($._block),
+      optional($.block),
       "end",
     ),
 
     dostat: $ => seq(
       "do",
-      optional($._block),
+      optional($.block),
       "end",
     ),
 
@@ -79,31 +79,33 @@ module.exports = grammar({
         ),
       ),
       "do",
-      optional($._block),
+      optional($.block),
       "end",
     ),
 
     repeatstat: $ => seq(
       "repeat",
-      optional($._block),
+      optional($.block),
       "until",
       $.expr,
     ),
 
-    funcstat: $ => seq("function", $.funcname, $._body),
+    funcstat: $ => seq("function", field("name", $.funcname), _body($)),
     funcname: $ => seq(
       $.name, repeat($._fieldsel), prec(1, optional(seq(":", alias($.name, $.method_name)))),
     ),
-    _body: $ => seq(
-      "(", $.parlist, ")",
-      optional($._block),
-      "end",
+    params: $ => seq(
+      "(",
+      optional(seq(
+        $._param, repeat(seq(",", $._param)),
+      )),
+      ")",
     ),
 
     localstat: $ => seq(
       "local",
       choice(
-        seq("function", $.name, $._body),
+        seq("function", field("name", $.name), _body($)),
         seq(
           $.name, repeat(seq(",", $.name)),
           optional(seq("=", $._explist)),
@@ -125,38 +127,38 @@ module.exports = grammar({
     _explist: $ => seq(
       $.expr, repeat(seq(",", $.expr)),
     ),
-    parlist: $ => seq(
-      $._param, repeat(seq(",", $._param)),
-    ),
 
     _fieldsel: $ => seq(choice(".", ":"), $.name),
-    _param: $ => choice($.name, "..."),
+    _param: $ => choice($.name, alias("...", $.ellipsis)),
 
-    primaryexp: $ => choice($.name, seq("(", $.expr, ")")),
-    suffixedexp: $ => prec.left(seq(
-      $.primaryexp,
-      repeat(choice(
-        seq(".", $.name),
-        seq("[", $.expr, "]"),
-        seq(":", $.name, $.funcargs),
-        $.funcargs,
-      )),
-    )),
     expr: $ => prec.left(seq(
       choice(
         seq($.unop, $.expr),
-        seq($.simpleexp)
+        seq($._simpleexp)
       ),
       repeat(seq($.binop, $.expr)),
     )),
-    simpleexp: $ => choice(
+    _primaryexp: $ => choice($.name, seq("(", $.expr, ")")),
+    suffixedexp: $ => prec.left(seq(
+      $._primaryexp,
+      repeat(choice(
+        $.getfield,
+        $.getindex,
+        seq($.getmethod, $.funcargs),
+        $.funcargs,
+      )),
+    )),
+    _simpleexp: $ => choice(
       $.number,
-      // $.string, "nil", "true", "false", "...",
-      // $.constructor_,
-      // $.tag,
-      // seq("function", $._body),
+      $.string, "nil", "true", "false", "...",
+      $.constructor_,
+      $.tag,
+      seq("function", _body($)),
       $.suffixedexp,
     ),
+    getfield: $ => seq(".", $.name),
+    getindex: $ => seq("[", $.expr, "]"),
+    getmethod: $ => seq(":", $.name),
 
     funcargs: $ => choice(
       seq("(", optional($._explist), ")"),
@@ -167,13 +169,13 @@ module.exports = grammar({
     constructor_: $ => seq(
       "{",
       optional(seq(
-        $.field,
-        repeat(seq(choice(",", ";"), $.field)),
+        $.fielddef,
+        repeat(seq(choice(",", ";"), $.fielddef)),
         optional(choice(",", ";")),
       )),
       "}",
     ),
-    field: $ => choice(
+    fielddef: $ => choice(
       $.expr,
       seq(
         choice($.name, seq("[", $.expr, "]")), "=", $.expr,
@@ -193,16 +195,67 @@ module.exports = grammar({
     ),
 
     tag: $ => choice(
-      seq("<!DOCTYPE", $.name, ">"),
-      seq(
-        "<>",
-        optional($.tagchildren),
-        "</>",
+      $.fragment,
+      $.specialtag,
+      $.namedtag,
+    ),
+    fragment: $ => seq("<>", $.tagchildren),
+    specialtag: $ => seq("<!DOCTYPE", $.name, ">"),
+    htmlcomment: $ => /<!--.*?-->/,
+    namedtag: $ => seq(
+      "<",
+      choice(
+        prec(1, seq(
+          field("name", choice("script", "style")),
+          repeat($.att),
+          choice(
+            "/>",
+            seq(">", field("children", $.tagchildren_notags)),
+          )
+        )),
+        seq(
+          field("name", $.name),
+          repeat($.att),
+          choice(
+            "/>",
+            seq(">", field("children", $.tagchildren)),
+          )
+        ),
       ),
     ),
 
-    tagchildren: $ => repeat1(
-      /[^<]+/,
+    att: $ => seq(
+      $.name,
+      optional(seq("=", choice(
+        $.string,
+        seq("{", $.expr, "}"),
+      ))),
+    ),
+
+    tagchildren: $ => seq(
+      repeat(choice(
+        prec(1, seq("{{", $.expr, "}}")),
+        prec(1, $.htmlcomment),
+        prec(1, $.tag),
+        "{", /[^<{]+/,
+      )),
+      "<", "/", alias(optional($.name), "closingname"), ">",
+    ),
+    tagchildren_notags: $ => seq(
+      repeat(choice(
+        prec(1, seq("{{", $.expr, "}}")),
+        /[^<]+/,
+        seq("<", /[^\/]/),
+      )),
+      "<", "/", alias(optional($.name), "closingname"), ">",
     ),
   },
 });
+
+function _body($) {
+  return seq(
+    field("params", $.params),
+    field("body", optional($.block)),
+    "end",
+  );
+}

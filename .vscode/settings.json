@@ -2,5 +2,27 @@
     "Lua.diagnostics.globals": [
         "bhp"
     ],
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
+    "tree-sitter-vscode.languageConfigs": [
+        {
+            "lang": "luax",
+            "parser": "ext/tree-sitter-luax/tree-sitter-luax.wasm",
+            "highlights": "ext/tree-sitter-luax/queries/highlights.scm",
+            "semanticTokenTypeMappings": {
+                "vardef": {
+                    "targetTokenType": "variable",
+                    "targetTokenModifiers": [
+                        "declaration"
+                    ]
+                },
+                "parameter": {
+                    "targetTokenType": "parameter",
+                    "targetTokenModifiers": [
+                        "declaration"
+                    ]
+                }
+            }
+        }
+    ],
+    "tree-sitter-vscode.debug": true
 }

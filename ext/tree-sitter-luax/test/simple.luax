@@ -1,0 +1,41 @@
+;
+if TODO then elseif TODO then else
+end
+while TODO do
+  do if TODO then end end
+end
+function foo.bar:bar:beep(a, b, ..., a) end
+for i = 0, 1, 2 do end
+for foo, bar in a, b, c do end
+local foo, bar
+local function blep(a, b, ...) end
+repeat until TODO
+return TODO
+return TODO, TODO
+
+a, b, c
+a, b, c = 3
+a = 3
+
+local a = 3
+local foo = <>Hello!</>
+
+function foo() end
+
+local foo = <p>Hello! 2 &lt; 3</p>
+local foo = <p>{{ 1 + 2 }}</p>
+local foo = <p>Hello! You're <b>DEAD!</b></p>
+local foo = <p>Hello! You're {{ name }}!</p>
+local foo = <p>Hello! You're { name }!</p>
+local foo = <p>
+  Hello!
+  <script>
+    const foo = a < b;
+  </script>
+</p>
+
+local foo = <script>const a = 2 < 3;</script>
+
+function foo.bar:bar:beep(a, b, ..., a)
+  print("Hello!")
+end

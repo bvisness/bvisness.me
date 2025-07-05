@@ -1,0 +1,29 @@
+{
+  "name": "luax-vscode",
+  "displayName": "LuaX Language",
+  "version": "0.0.1",
+  "publisher": "bvisness",
+  "engines": {
+    "vscode": "^1.72.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "luax",
+        "aliases": [
+          "LuaX"
+        ],
+        "extensions": [
+          ".luax"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ]
+  },
+  "scripts": {
+    "package": "vsce package --allow-missing-repository"
+  }
+}
