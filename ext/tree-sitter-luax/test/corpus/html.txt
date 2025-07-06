@@ -1,0 +1,26 @@
+===============
+Attribute exprs
+===============
+
+link = <a href={ url("foo.txt") }>Hello!</a>
+
+---
+
+(source_file
+  (block
+    (exprstat
+      lhs: (suffixedexp
+        (name))
+      rhs: (expr
+        (tag
+          (namedtag
+            name: (name)
+            (att
+              (name)
+              (expr
+                (suffixedexp
+                  (name)
+                  (funcargs
+                    (expr
+                      (string))))))
+            children: (tagchildren)))))))

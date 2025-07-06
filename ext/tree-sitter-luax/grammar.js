@@ -72,10 +72,11 @@ module.exports = grammar({
       "for",
       choice(
         seq( // fornum
-          $.name, "=", $.expr, ",", $.expr, optional(seq(",", $.expr)),
+          field("forarg", $.name),
+          "=", field("formin", $.expr), ",", field("formax", $.expr), optional(seq(",", field("forstep", $.expr))),
         ),
         seq( // forlist
-          $.name, repeat(seq(",", $.name)), "in", $._explist,
+          field("forarg", $.name), repeat(seq(",", field("forarg", $.name))), "in", _explist($, "forexpr"),
         ),
       ),
       "do",
@@ -107,25 +108,20 @@ module.exports = grammar({
       choice(
         seq("function", field("name", $.name), _body($)),
         seq(
-          $.name, repeat(seq(",", $.name)),
-          optional(seq("=", $._explist)),
+          field("name", $.name), repeat(seq(",", field("name", $.name))),
+          optional(seq("=", _explist($, "val"))),
         ),
       ),
     ),
 
     label: $ => seq("::", $.name),
-    retstat: $ => seq("return", $._explist),
+    retstat: $ => seq("return", _explist($)),
     breakstat: $ => "break",
     gotostat: $ => seq("goto", $.name),
     
     exprstat: $ => seq(
-      $.suffixedexp,
-      repeat(seq(",", $.suffixedexp)),
-      optional(seq("=", $._explist)),
-    ),
-    
-    _explist: $ => seq(
-      $.expr, repeat(seq(",", $.expr)),
+      field("lhs", $.suffixedexp), repeat(seq(",", field("lhs", $.suffixedexp))),
+      optional(seq("=", _explist($, "rhs"))),
     ),
 
     _fieldsel: $ => seq(choice(".", ":"), $.name),
@@ -139,13 +135,15 @@ module.exports = grammar({
       repeat(seq($.binop, $.expr)),
     )),
     _primaryexp: $ => choice($.name, seq("(", $.expr, ")")),
-    suffixedexp: $ => prec.left(seq(
+    suffixedexp: $ =>prec.left(seq(
       $._primaryexp,
       repeat(choice(
+        prec(1, seq($.getfield, $.funcargs)),
         $.getfield,
+        prec(1, seq($.getindex, $.funcargs)),
         $.getindex,
-        seq($.getmethod, $.funcargs),
-        $.funcargs,
+        prec(1, seq($.getmethod, $.funcargs)),
+        $.funcargs
       )),
     )),
     _simpleexp: $ => choice(
@@ -161,7 +159,7 @@ module.exports = grammar({
     getmethod: $ => seq(":", $.name),
 
     funcargs: $ => choice(
-      seq("(", optional($._explist), ")"),
+      seq("(", optional(_explist($)), ")"),
       $.constructor_,
       $.string,
     ),
@@ -257,5 +255,12 @@ function _body($) {
     field("params", $.params),
     field("body", optional($.block)),
     "end",
+  );
+}
+
+function _explist($, fieldname) {
+  return seq(
+    fieldname ? field(fieldname, $.expr) : $.expr,
+    repeat(seq(",", fieldname ? field(fieldname, $.expr) : $.expr)),
   );
 }

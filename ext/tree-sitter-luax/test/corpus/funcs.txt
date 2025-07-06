@@ -73,11 +73,11 @@ end
 (source_file
   (block
     (exprstat
-      (suffixedexp
+      lhs: (suffixedexp
         (name)
         (getfield
           (name)))
-      (expr
+      rhs: (expr
         params: (params
           (name)
           (name))

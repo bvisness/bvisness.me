@@ -10,8 +10,4 @@ foo("foo")
   (block
     (exprstat
       (suffixedexp
-        (name)))
-    (exprstat
-      (suffixedexp
-        (expr
-          (string))))))
+        (pebis)))))
