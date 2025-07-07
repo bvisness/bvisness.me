@@ -21,6 +21,7 @@
     }
   },
   "scripts": {
-    "generate": "tree-sitter generate --abi 15 && tree-sitter build"
+    "build": "tree-sitter generate --abi 15 && tree-sitter build --wasm",
+    "test": "tree-sitter generate --abi 15 && tree-sitter test"
   }
 }
