@@ -18,6 +18,8 @@
 
 (htmlcomment) @comment
 [(binop) (unop)] @operator
+(string) @string
+(number) @number
 
 (params (name) @parameter)
 (suffixedexp (name) @variable)
