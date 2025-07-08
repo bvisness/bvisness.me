@@ -16,7 +16,6 @@ function Picture(atts, children)
 
     local sources = {}
     for contentType, opts in pairs(optsByType) do
-        local allOpts =
         table.insert(sources, <source
             srcset={ table.concat(opts, ", ") }
             type={ contentType }
