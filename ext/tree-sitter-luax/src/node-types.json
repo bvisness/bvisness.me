@@ -1,5 +1,220 @@
 [
   {
+    "type": "args",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "binop",
+          "named": true
+        },
+        {
+          "type": "fragment",
+          "named": true
+        },
+        {
+          "type": "functiondef",
+          "named": true
+        },
+        {
+          "type": "namedtag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "prefixexp",
+          "named": true
+        },
+        {
+          "type": "specialtag",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "tableconstructor",
+          "named": true
+        },
+        {
+          "type": "unop",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "assignstat_global",
+    "named": true,
+    "fields": {
+      "lhs": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "getindex",
+            "named": true
+          },
+          {
+            "type": "getprop",
+            "named": true
+          },
+          {
+            "type": "name",
+            "named": true
+          }
+        ]
+      },
+      "rhs": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "...",
+            "named": false
+          },
+          {
+            "type": "binop",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": false
+          },
+          {
+            "type": "fragment",
+            "named": true
+          },
+          {
+            "type": "functiondef",
+            "named": true
+          },
+          {
+            "type": "namedtag",
+            "named": true
+          },
+          {
+            "type": "nil",
+            "named": false
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "prefixexp",
+            "named": true
+          },
+          {
+            "type": "specialtag",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tableconstructor",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": false
+          },
+          {
+            "type": "unop",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "assignstat_local",
+    "named": true,
+    "fields": {
+      "lhs": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "name",
+            "named": true
+          }
+        ]
+      },
+      "rhs": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "...",
+            "named": false
+          },
+          {
+            "type": "binop",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": false
+          },
+          {
+            "type": "fragment",
+            "named": true
+          },
+          {
+            "type": "functiondef",
+            "named": true
+          },
+          {
+            "type": "namedtag",
+            "named": true
+          },
+          {
+            "type": "nil",
+            "named": false
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "prefixexp",
+            "named": true
+          },
+          {
+            "type": "specialtag",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tableconstructor",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": false
+          },
+          {
+            "type": "unop",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "att",
     "named": true,
     "fields": {},
@@ -8,7 +223,15 @@
       "required": true,
       "types": [
         {
-          "type": "expr",
+          "type": "binop",
+          "named": true
+        },
+        {
+          "type": "fragment",
+          "named": true
+        },
+        {
+          "type": "functiondef",
           "named": true
         },
         {
@@ -16,7 +239,31 @@
           "named": true
         },
         {
+          "type": "namedtag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "prefixexp",
+          "named": true
+        },
+        {
+          "type": "specialtag",
+          "named": true
+        },
+        {
           "type": "string",
+          "named": true
+        },
+        {
+          "type": "tableconstructor",
+          "named": true
+        },
+        {
+          "type": "unop",
           "named": true
         }
       ]
@@ -36,6 +283,14 @@
       "required": false,
       "types": [
         {
+          "type": "assignstat_global",
+          "named": true
+        },
+        {
+          "type": "assignstat_local",
+          "named": true
+        },
+        {
           "type": "breakstat",
           "named": true
         },
@@ -44,7 +299,7 @@
           "named": true
         },
         {
-          "type": "exprstat",
+          "type": "forinstat",
           "named": true
         },
         {
@@ -53,6 +308,10 @@
         },
         {
           "type": "funcstat",
+          "named": true
+        },
+        {
+          "type": "functioncall",
           "named": true
         },
         {
@@ -68,7 +327,7 @@
           "named": true
         },
         {
-          "type": "localstat",
+          "type": "localfuncstat",
           "named": true
         },
         {
@@ -81,21 +340,6 @@
         },
         {
           "type": "whilestat",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "constructor_",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "fielddef",
           "named": true
         }
       ]
@@ -117,30 +361,9 @@
     }
   },
   {
-    "type": "expr",
+    "type": "field",
     "named": true,
-    "fields": {
-      "body": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "block",
-            "named": true
-          }
-        ]
-      },
-      "params": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "params",
-            "named": true
-          }
-        ]
-      }
-    },
+    "fields": {},
     "children": {
       "multiple": true,
       "required": false,
@@ -150,11 +373,19 @@
           "named": true
         },
         {
-          "type": "constructor_",
+          "type": "fragment",
           "named": true
         },
         {
-          "type": "expr",
+          "type": "functiondef",
+          "named": true
+        },
+        {
+          "type": "name",
+          "named": true
+        },
+        {
+          "type": "namedtag",
           "named": true
         },
         {
@@ -162,15 +393,19 @@
           "named": true
         },
         {
+          "type": "prefixexp",
+          "named": true
+        },
+        {
+          "type": "specialtag",
+          "named": true
+        },
+        {
           "type": "string",
           "named": true
         },
         {
-          "type": "suffixedexp",
-          "named": true
-        },
-        {
-          "type": "tag",
+          "type": "tableconstructor",
           "named": true
         },
         {
@@ -181,45 +416,88 @@
     }
   },
   {
-    "type": "exprstat",
+    "type": "forinstat",
     "named": true,
     "fields": {
-      "lhs": {
+      "exp": {
         "multiple": true,
         "required": true,
         "types": [
           {
-            "type": "suffixedexp",
+            "type": "...",
+            "named": false
+          },
+          {
+            "type": "binop",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": false
+          },
+          {
+            "type": "fragment",
+            "named": true
+          },
+          {
+            "type": "functiondef",
+            "named": true
+          },
+          {
+            "type": "namedtag",
+            "named": true
+          },
+          {
+            "type": "nil",
+            "named": false
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "prefixexp",
+            "named": true
+          },
+          {
+            "type": "specialtag",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tableconstructor",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": false
+          },
+          {
+            "type": "unop",
             "named": true
           }
         ]
       },
-      "rhs": {
+      "rarg": {
         "multiple": true,
-        "required": false,
+        "required": true,
         "types": [
           {
-            "type": "expr",
+            "type": "name",
             "named": true
           }
         ]
       }
-    }
-  },
-  {
-    "type": "fielddef",
-    "named": true,
-    "fields": {},
+    },
     "children": {
-      "multiple": true,
-      "required": true,
+      "multiple": false,
+      "required": false,
       "types": [
         {
-          "type": "expr",
-          "named": true
-        },
-        {
-          "type": "name",
+          "type": "block",
           "named": true
         }
       ]
@@ -229,8 +507,8 @@
     "type": "forstat",
     "named": true,
     "fields": {
-      "forarg": {
-        "multiple": true,
+      "arg": {
+        "multiple": false,
         "required": true,
         "types": [
           {
@@ -239,42 +517,188 @@
           }
         ]
       },
-      "forexpr": {
+      "max": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "...",
+            "named": false
+          },
+          {
+            "type": "binop",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": false
+          },
+          {
+            "type": "fragment",
+            "named": true
+          },
+          {
+            "type": "functiondef",
+            "named": true
+          },
+          {
+            "type": "namedtag",
+            "named": true
+          },
+          {
+            "type": "nil",
+            "named": false
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "prefixexp",
+            "named": true
+          },
+          {
+            "type": "specialtag",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tableconstructor",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": false
+          },
+          {
+            "type": "unop",
+            "named": true
+          }
+        ]
+      },
+      "min": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "...",
+            "named": false
+          },
+          {
+            "type": "binop",
+            "named": true
+          },
+          {
+            "type": "false",
+            "named": false
+          },
+          {
+            "type": "fragment",
+            "named": true
+          },
+          {
+            "type": "functiondef",
+            "named": true
+          },
+          {
+            "type": "namedtag",
+            "named": true
+          },
+          {
+            "type": "nil",
+            "named": false
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "prefixexp",
+            "named": true
+          },
+          {
+            "type": "specialtag",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tableconstructor",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": false
+          },
+          {
+            "type": "unop",
+            "named": true
+          }
+        ]
+      },
+      "step": {
         "multiple": true,
         "required": false,
         "types": [
           {
-            "type": "expr",
-            "named": true
-          }
-        ]
-      },
-      "formax": {
-        "multiple": false,
-        "required": false,
-        "types": [
+            "type": "...",
+            "named": false
+          },
           {
-            "type": "expr",
+            "type": "binop",
             "named": true
-          }
-        ]
-      },
-      "formin": {
-        "multiple": false,
-        "required": false,
-        "types": [
+          },
           {
-            "type": "expr",
+            "type": "false",
+            "named": false
+          },
+          {
+            "type": "fragment",
             "named": true
-          }
-        ]
-      },
-      "forstep": {
-        "multiple": false,
-        "required": false,
-        "types": [
+          },
           {
-            "type": "expr",
+            "type": "functiondef",
+            "named": true
+          },
+          {
+            "type": "namedtag",
+            "named": true
+          },
+          {
+            "type": "nil",
+            "named": false
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "prefixexp",
+            "named": true
+          },
+          {
+            "type": "specialtag",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tableconstructor",
+            "named": true
+          },
+          {
+            "type": "true",
+            "named": false
+          },
+          {
+            "type": "unop",
             "named": true
           }
         ]
@@ -301,29 +725,6 @@
       "types": [
         {
           "type": "tagchildren",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "funcargs",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "constructor_",
-          "named": true
-        },
-        {
-          "type": "expr",
-          "named": true
-        },
-        {
-          "type": "string",
           "named": true
         }
       ]
@@ -372,12 +773,16 @@
           }
         ]
       },
-      "params": {
-        "multiple": false,
-        "required": true,
+      "par": {
+        "multiple": true,
+        "required": false,
         "types": [
           {
-            "type": "params",
+            "type": "ellipsis",
+            "named": true
+          },
+          {
+            "type": "name",
             "named": true
           }
         ]
@@ -385,18 +790,67 @@
     }
   },
   {
-    "type": "getfield",
+    "type": "functioncall",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "name",
-          "named": true
-        }
-      ]
+    "fields": {
+      "args": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "args",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": ":",
+            "named": false
+          },
+          {
+            "type": "name",
+            "named": true
+          },
+          {
+            "type": "prefixexp",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "functiondef",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      },
+      "par": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "ellipsis",
+            "named": true
+          },
+          {
+            "type": "name",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -404,26 +858,66 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
-          "type": "expr",
+          "type": "binop",
+          "named": true
+        },
+        {
+          "type": "fragment",
+          "named": true
+        },
+        {
+          "type": "functiondef",
+          "named": true
+        },
+        {
+          "type": "namedtag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "prefixexp",
+          "named": true
+        },
+        {
+          "type": "specialtag",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "tableconstructor",
+          "named": true
+        },
+        {
+          "type": "unop",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "getmethod",
+    "type": "getprop",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
           "type": "name",
+          "named": true
+        },
+        {
+          "type": "prefixexp",
           "named": true
         }
       ]
@@ -450,14 +944,50 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
+        {
+          "type": "binop",
+          "named": true
+        },
         {
           "type": "block",
           "named": true
         },
         {
-          "type": "expr",
+          "type": "fragment",
+          "named": true
+        },
+        {
+          "type": "functiondef",
+          "named": true
+        },
+        {
+          "type": "namedtag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "prefixexp",
+          "named": true
+        },
+        {
+          "type": "specialtag",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "tableconstructor",
+          "named": true
+        },
+        {
+          "type": "unop",
           "named": true
         }
       ]
@@ -479,7 +1009,7 @@
     }
   },
   {
-    "type": "localstat",
+    "type": "localfuncstat",
     "named": true,
     "fields": {
       "body": {
@@ -493,7 +1023,7 @@
         ]
       },
       "name": {
-        "multiple": true,
+        "multiple": false,
         "required": true,
         "types": [
           {
@@ -502,22 +1032,16 @@
           }
         ]
       },
-      "params": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "params",
-            "named": true
-          }
-        ]
-      },
-      "val": {
+      "par": {
         "multiple": true,
         "required": false,
         "types": [
           {
-            "type": "expr",
+            "type": "ellipsis",
+            "named": true
+          },
+          {
+            "type": "name",
             "named": true
           }
         ]
@@ -573,7 +1097,7 @@
     }
   },
   {
-    "type": "params",
+    "type": "prefixexp",
     "named": true,
     "fields": {},
     "children": {
@@ -581,11 +1105,59 @@
       "required": false,
       "types": [
         {
-          "type": "ellipsis",
+          "type": "binop",
+          "named": true
+        },
+        {
+          "type": "fragment",
+          "named": true
+        },
+        {
+          "type": "functioncall",
+          "named": true
+        },
+        {
+          "type": "functiondef",
+          "named": true
+        },
+        {
+          "type": "getindex",
+          "named": true
+        },
+        {
+          "type": "getprop",
           "named": true
         },
         {
           "type": "name",
+          "named": true
+        },
+        {
+          "type": "namedtag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "prefixexp",
+          "named": true
+        },
+        {
+          "type": "specialtag",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "tableconstructor",
+          "named": true
+        },
+        {
+          "type": "unop",
           "named": true
         }
       ]
@@ -597,14 +1169,50 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
+        {
+          "type": "binop",
+          "named": true
+        },
         {
           "type": "block",
           "named": true
         },
         {
-          "type": "expr",
+          "type": "fragment",
+          "named": true
+        },
+        {
+          "type": "functiondef",
+          "named": true
+        },
+        {
+          "type": "namedtag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "prefixexp",
+          "named": true
+        },
+        {
+          "type": "specialtag",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "tableconstructor",
+          "named": true
+        },
+        {
+          "type": "unop",
           "named": true
         }
       ]
@@ -616,10 +1224,46 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
-          "type": "expr",
+          "type": "binop",
+          "named": true
+        },
+        {
+          "type": "fragment",
+          "named": true
+        },
+        {
+          "type": "functiondef",
+          "named": true
+        },
+        {
+          "type": "namedtag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "prefixexp",
+          "named": true
+        },
+        {
+          "type": "specialtag",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "tableconstructor",
+          "named": true
+        },
+        {
+          "type": "unop",
           "named": true
         }
       ]
@@ -657,58 +1301,15 @@
     }
   },
   {
-    "type": "suffixedexp",
+    "type": "tableconstructor",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
-          "type": "expr",
-          "named": true
-        },
-        {
-          "type": "funcargs",
-          "named": true
-        },
-        {
-          "type": "getfield",
-          "named": true
-        },
-        {
-          "type": "getindex",
-          "named": true
-        },
-        {
-          "type": "getmethod",
-          "named": true
-        },
-        {
-          "type": "name",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "tag",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "fragment",
-          "named": true
-        },
-        {
-          "type": "namedtag",
-          "named": true
-        },
-        {
-          "type": "specialtag",
+          "type": "field",
           "named": true
         }
       ]
@@ -723,7 +1324,15 @@
       "required": false,
       "types": [
         {
-          "type": "expr",
+          "type": "binop",
+          "named": true
+        },
+        {
+          "type": "fragment",
+          "named": true
+        },
+        {
+          "type": "functiondef",
           "named": true
         },
         {
@@ -731,7 +1340,31 @@
           "named": true
         },
         {
-          "type": "tag",
+          "type": "namedtag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "prefixexp",
+          "named": true
+        },
+        {
+          "type": "specialtag",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "tableconstructor",
+          "named": true
+        },
+        {
+          "type": "unop",
           "named": true
         }
       ]
@@ -746,7 +1379,43 @@
       "required": false,
       "types": [
         {
-          "type": "expr",
+          "type": "binop",
+          "named": true
+        },
+        {
+          "type": "fragment",
+          "named": true
+        },
+        {
+          "type": "functiondef",
+          "named": true
+        },
+        {
+          "type": "namedtag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "prefixexp",
+          "named": true
+        },
+        {
+          "type": "specialtag",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "tableconstructor",
+          "named": true
+        },
+        {
+          "type": "unop",
           "named": true
         }
       ]
@@ -763,14 +1432,50 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
+        {
+          "type": "binop",
+          "named": true
+        },
         {
           "type": "block",
           "named": true
         },
         {
-          "type": "expr",
+          "type": "fragment",
+          "named": true
+        },
+        {
+          "type": "functiondef",
+          "named": true
+        },
+        {
+          "type": "namedtag",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "prefixexp",
+          "named": true
+        },
+        {
+          "type": "specialtag",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "tableconstructor",
+          "named": true
+        },
+        {
+          "type": "unop",
           "named": true
         }
       ]

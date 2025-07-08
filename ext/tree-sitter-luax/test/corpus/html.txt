@@ -8,19 +8,97 @@ link = <a href={ url("foo.txt") }>Hello!</a>
 
 (source_file
   (block
-    (exprstat
-      lhs: (suffixedexp
+    (assignstat_global
+      lhs: (name)
+      rhs: (namedtag
+        name: (name)
+        (att
+          (name)
+          (prefixexp
+            (functioncall
+              name: (prefixexp
+                (name))
+              args: (args
+                (string)))))
+        children: (tagchildren)))))
+
+===============
+Simple template
+===============
+
+require("common")
+require("article/title")
+
+function SimpleArticle(atts, children)
+    if not atts.article then
+        return <Error>article attribute is required!</Error>
+    end
+
+    return <Base>
+        <Common>
+            <article>
+                <header>
+                    <ArticleTitle article={ atts.article } />
+                </header>
+                {{ children }}
+            </article>
+        </Common>
+    </Base>
+end
+
+---
+
+(source_file
+  (block
+    (functioncall
+      name: (prefixexp
         (name))
-      rhs: (expr
-        (tag
+      args: (args
+        (string)))
+    (functioncall
+      name: (prefixexp
+        (name))
+      args: (args
+        (string)))
+    (funcstat
+      name: (funcname
+        (name))
+      par: (name)
+      par: (name)
+      body: (block
+        (ifstat
+          (unop)
+          (prefixexp
+            (getprop
+              (prefixexp
+                (name))
+              (name)))
+          (block
+            (retstat
+              (namedtag
+                name: (name)
+                children: (tagchildren)))))
+        (retstat
           (namedtag
             name: (name)
-            (att
-              (name)
-              (expr
-                (suffixedexp
-                  (name)
-                  (funcargs
-                    (expr
-                      (string))))))
-            children: (tagchildren)))))))
+            children: (tagchildren
+              (namedtag
+                name: (name)
+                children: (tagchildren
+                  (namedtag
+                    name: (name)
+                    children: (tagchildren
+                      (namedtag
+                        name: (name)
+                        children: (tagchildren
+                          (namedtag
+                            name: (name)
+                            (att
+                              (name)
+                              (prefixexp
+                                (getprop
+                                  (prefixexp
+                                    (name))
+                                  (name)))))))
+                      (prefixexp
+                        (name)))))))))))))

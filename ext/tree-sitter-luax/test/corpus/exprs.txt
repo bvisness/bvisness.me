@@ -1,13 +1,82 @@
-=====
-Dunno
-=====
+===========
+Expressions
+===========
 
+a = 1
+a = b
 foo("foo")
+a, b = "foo", bar()
+return a
 
 ---
 
 (source_file
   (block
-    (exprstat
-      (suffixedexp
-        (pebis)))))
+    (assignstat_global
+      lhs: (name)
+      rhs: (number))
+    (assignstat_global
+      lhs: (name)
+      rhs: (prefixexp
+        (name)))
+    (functioncall
+      name: (prefixexp
+        (name))
+      args: (args
+        (string)))
+    (assignstat_global
+      lhs: (name)
+      lhs: (name)
+      rhs: (string)
+      rhs: (prefixexp
+        (functioncall
+          name: (prefixexp
+            (name))
+          args: (args))))
+    (retstat
+      (prefixexp
+        (name)))))
+
+======
+Tables
+======
+
+a = {
+  "string",
+  3,
+
+  foo = bar;
+  bar = cheese();
+
+  [3] = 3,
+  ["foo"] = 8,
+}
+
+---
+
+(source_file
+  (block
+    (assignstat_global
+      lhs: (name)
+      rhs: (tableconstructor
+        (field
+          (string))
+        (field
+          (number))
+        (field
+          (name)
+          (prefixexp
+            (name)))
+        (field
+          (name)
+          (prefixexp
+            (functioncall
+              name: (prefixexp
+                (name))
+              args: (args))))
+        (field
+          (number)
+          (number))
+        (field
+          (string)
+          (number))))))

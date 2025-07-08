@@ -8,15 +8,24 @@
 // @ts-check
 
 /*
- * Modeled after the official Lua 5.2 grammar and parser:
+ * Modeled after the official Lua 5.2 grammar:
  *
  * https://www.lua.org/manual/5.2/manual.html#9
- * https://www.lua.org/source/5.2/lparser.c.html
- *
- * Note that the parser actually disagrees pretty substantially with the
- * grammar, so that's cool. The parser source is annotated with grammar rules
- * to make it about as easy to follow as the EBNF grammar.
+ * 
+ * The following Lua tree-sitter grammar was also consulted for help with
+ * precedence and other nonsense:
+ * 
+ * https://github.com/tjdevries/tree-sitter-lua/blob/4932594a24f04e4ccf046919bc354272841b0077/grammar.js
+ * 
  */
+
+const PREC = {
+  DEFAULT: 1,
+  PRIORITY: 2,
+
+  FUNCTION: 1,
+  STATEMENT: 10,
+};
 
 module.exports = grammar({
   name: "luax",
@@ -26,27 +35,57 @@ module.exports = grammar({
 
     block: $ => repeat1($._stat),
 
-    _stat: $ => choice(
+    _stat: $ => prec.right(PREC.STATEMENT, choice(
       ";",
-      $.ifstat,
-      $.whilestat,
-      $.dostat,
-      $.forstat,
-      $.repeatstat,
-      $.funcstat,
-      $.localstat,
+      $.assignstat_global,
+      $.functioncall,
       $.label,
-      $.retstat,
       $.breakstat,
       $.gotostat,
-      $.exprstat,
+      $.dostat,
+      $.whilestat,
+      $.repeatstat,
+      $.ifstat,
+      $.forstat,
+      $.forinstat,
+      $.funcstat,
+      $.localfuncstat,
+      $.assignstat_local,
+      $.retstat,
+    )),
+
+    assignstat_global: $ => prec.right(PREC.DEFAULT, seq(
+      list(() => field("lhs", $._var)), "=", list(() => field("rhs", $._exp)),
+    )),
+
+    label: $ => seq("::", $.name, "::"),
+    breakstat: $ => "break",
+    gotostat: $ => seq("goto", $.name),
+
+    dostat: $ => seq(
+      "do",
+      optional($.block),
+      "end",
+    ),
+
+    whilestat: $ => seq(
+      "while", $._exp, "do",
+      optional($.block),
+      "end",
+    ),
+
+    repeatstat: $ => seq(
+      "repeat",
+      optional($.block),
+      "until",
+      $._exp,
     ),
 
     ifstat: $ => seq(
-      "if", $.expr, "then",
+      "if", $._exp, "then",
       optional($.block),
       repeat(seq(
-        "elseif", $.expr, "then",
+        "elseif", $._exp, "then",
         optional($.block),
       )),
       optional(seq(
@@ -56,143 +95,104 @@ module.exports = grammar({
       "end",
     ),
 
-    whilestat: $ => seq(
-      "while", $.expr, "do",
-      optional($.block),
-      "end",
-    ),
-
-    dostat: $ => seq(
-      "do",
-      optional($.block),
-      "end",
-    ),
-
     forstat: $ => seq(
       "for",
-      choice(
-        seq( // fornum
-          field("forarg", $.name),
-          "=", field("formin", $.expr), ",", field("formax", $.expr), optional(seq(",", field("forstep", $.expr))),
-        ),
-        seq( // forlist
-          field("forarg", $.name), repeat(seq(",", field("forarg", $.name))), "in", _explist($, "forexpr"),
-        ),
-      ),
+      field("arg", $.name), "=", field("min", $._exp), ",", field("max", $._exp),
+      optional(seq(",", field("step", $._exp))),
       "do",
       optional($.block),
       "end",
     ),
 
-    repeatstat: $ => seq(
-      "repeat",
+    forinstat: $ => seq(
+      "for",
+      list(() => field("rarg", $.name)), "in", list(() => field("exp", $._exp)),
+      "do",
       optional($.block),
-      "until",
-      $.expr,
+      "end",
     ),
 
-    funcstat: $ => seq("function", field("name", $.funcname), _body($)),
-    funcname: $ => seq(
-      $.name, repeat($._fieldsel), prec(1, optional(seq(":", alias($.name, $.method_name)))),
+    funcstat: $ => seq(
+      "function", field("name", $.funcname), funcbody($),
     ),
-    params: $ => seq(
-      "(",
-      optional(seq(
-        $._param, repeat(seq(",", $._param)),
-      )),
-      ")",
-    ),
-
-    localstat: $ => seq(
-      "local",
-      choice(
-        seq("function", field("name", $.name), _body($)),
-        seq(
-          field("name", $.name), repeat(seq(",", field("name", $.name))),
-          optional(seq("=", _explist($, "val"))),
-        ),
-      ),
-    ),
-
-    label: $ => seq("::", $.name),
-    retstat: $ => seq("return", _explist($)),
-    breakstat: $ => "break",
-    gotostat: $ => seq("goto", $.name),
     
-    exprstat: $ => seq(
-      field("lhs", $.suffixedexp), repeat(seq(",", field("lhs", $.suffixedexp))),
-      optional(seq("=", _explist($, "rhs"))),
+    localfuncstat: $ => seq(
+      "local", "function", field("name", $.name), funcbody($),
     ),
 
-    _fieldsel: $ => seq(choice(".", ":"), $.name),
-    _param: $ => choice($.name, alias("...", $.ellipsis)),
-
-    expr: $ => prec.left(seq(
-      choice(
-        seq($.unop, $.expr),
-        seq($._simpleexp)
-      ),
-      repeat(seq($.binop, $.expr)),
+    assignstat_local: $ => prec.right(PREC.DEFAULT, seq(
+      "local", list(() => field("lhs", $.name)), "=", list(() => field("rhs", $._exp)),
     )),
-    _primaryexp: $ => choice($.name, seq("(", $.expr, ")")),
-    suffixedexp: $ =>prec.left(seq(
-      $._primaryexp,
-      repeat(choice(
-        prec(1, seq($.getfield, $.funcargs)),
-        $.getfield,
-        prec(1, seq($.getindex, $.funcargs)),
-        $.getindex,
-        prec(1, seq($.getmethod, $.funcargs)),
-        $.funcargs
+
+    retstat: $ => prec(PREC.PRIORITY, seq("return", list(() => $._exp))),
+    
+    funcname: $ => seq(
+      $.name, repeat(seq(".", $.name)), optional(seq(":", alias($.name, $.method_name))),
+    ),
+    _var: $ => prec(PREC.PRIORITY, choice(
+      $.name,
+      $.getindex,
+      $.getprop,
+    )),
+    getindex: $ => seq($.prefixexp, "[", $._exp, "]"),
+    getprop: $ => seq($.prefixexp, ".", $.name),
+    
+    _exp: $ => prec.left(choice(
+      "nil", "false", "true",
+      $.number, $.string,
+      "...",
+      $.functiondef,
+      $.prefixexp,
+      $.tableconstructor,
+      seq($._exp, $.binop, $._exp),
+      seq($.unop, $._exp),
+      // New in LuaX
+      $._tag,
+    )),
+    prefixexp: $ => choice(
+      $._var,
+      $.functioncall,
+      seq("(", $._exp, ")"),
+    ),
+
+    functioncall: $ => prec.right(PREC.FUNCTION, seq(
+      field("name", choice(
+        $.prefixexp,
+        seq($.prefixexp, ":", $.name),
       )),
+      field("args", $.args),
     )),
-    _simpleexp: $ => choice(
-      $.number,
-      $.string, "nil", "true", "false", "...",
-      $.constructor_,
-      $.tag,
-      seq("function", _body($)),
-      $.suffixedexp,
-    ),
-    getfield: $ => seq(".", $.name),
-    getindex: $ => seq("[", $.expr, "]"),
-    getmethod: $ => seq(":", $.name),
-
-    funcargs: $ => choice(
-      seq("(", optional(_explist($)), ")"),
-      $.constructor_,
+    args: $ => choice(
+      seq("(", optional(list(() => $._exp)), ")"),
+      $.tableconstructor,
       $.string,
     ),
 
-    constructor_: $ => seq(
+    functiondef: $ => seq("function", funcbody($)),
+
+    tableconstructor: $ => seq(
       "{",
-      optional(seq(
-        $.fielddef,
-        repeat(seq(choice(",", ";"), $.fielddef)),
-        optional(choice(",", ";")),
-      )),
+      optional(list(() => $.field, () => choice(",", ";"), true)),
       "}",
     ),
-    fielddef: $ => choice(
-      $.expr,
-      seq(
-        choice($.name, seq("[", $.expr, "]")), "=", $.expr,
-      ),
+    field: $ => choice(
+      seq("[", $._exp, "]", "=", $._exp),
+      seq($.name, "=", $._exp),
+      $._exp,
     ),
+
+    binop: $ => choice(
+      "+", "-", "*", "/", "^", "%", "..",
+      "<", "<=", ">", ">=", "==", "~=",
+      "and", "or",
+    ),
+    unop: $ => choice("-", "not", "#"),
 
     name: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
     string: $ => /("([^"\\]|\\.)*"|'([^'\\]|\\.)*')/,
     number: $ => /0[xX][0-9a-fA-F]+\.?[0-9a-fA-F]*[pP]?[+-]?\d*|\d+\.?\d*(?:[eE][+-]?\d*)?|\.\d+(?:[eE][+-]?\d*)?/,
 
-    unop: $ => choice("-", "not", "#"),
-    binop: $ => choice(
-      "+", "-", "*", "/", "^", "%",
-      "..",
-      "<", "<=", ">", ">=", "==", "~=",
-      "and", "or",
-    ),
-
-    tag: $ => choice(
+    _tag: $ => choice(
       $.fragment,
       $.specialtag,
       $.namedtag,
@@ -226,22 +226,22 @@ module.exports = grammar({
       $.name,
       optional(seq("=", choice(
         $.string,
-        seq("{", $.expr, "}"),
+        seq("{", $._exp, "}"),
       ))),
     ),
 
     tagchildren: $ => seq(
       repeat(choice(
-        prec(1, seq("{{", $.expr, "}}")),
+        prec(1, seq("{{", $._exp, "}}")),
         prec(1, $.htmlcomment),
-        prec(1, $.tag),
+        prec(1, $._tag),
         "{", /[^<{]+/,
       )),
       "<", "/", alias(optional($.name), "closingname"), ">",
     ),
     tagchildren_notags: $ => seq(
       repeat(choice(
-        prec(1, seq("{{", $.expr, "}}")),
+        prec(1, seq("{{", $._exp, "}}")),
         /[^<]+/,
         seq("<", /[^\/]/),
       )),
@@ -250,17 +250,22 @@ module.exports = grammar({
   },
 });
 
-function _body($) {
+function funcbody($) {
   return seq(
-    field("params", $.params),
+    "(", optional(list(() => field("par", choice($.name, alias("...", $.ellipsis))))), ")",
     field("body", optional($.block)),
     "end",
   );
 }
 
-function _explist($, fieldname) {
-  return seq(
-    fieldname ? field(fieldname, $.expr) : $.expr,
-    repeat(seq(",", fieldname ? field(fieldname, $.expr) : $.expr)),
-  );
+/** 
+ * @param {function(): RuleOrLiteral} rule
+ * @param {function(): RuleOrLiteral} sep
+ */
+function list(rule, sep = () => ",", trailing = false) {
+  const seqMembers = [rule(), repeat(seq(sep(), rule()))];
+  if (trailing) {
+    seqMembers.push(optional(sep()));
+  }
+  return seq(...seqMembers);
 }

@@ -9,17 +9,8 @@
             "parser": "ext/tree-sitter-luax/tree-sitter-luax.wasm",
             "highlights": "ext/tree-sitter-luax/queries/highlights.scm",
             "semanticTokenTypeMappings": {
-                "vardef": {
-                    "targetTokenType": "variable",
-                    "targetTokenModifiers": [
-                        "declaration"
-                    ]
-                },
-                "parameter": {
-                    "targetTokenType": "parameter",
-                    "targetTokenModifiers": [
-                        "declaration"
-                    ]
+                "brackets": {
+                    "targetTokenType": "event"
                 }
             }
         }

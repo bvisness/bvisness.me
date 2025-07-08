@@ -15,30 +15,27 @@ function foo.bar:baz() end
 (source_file
   (block
     (funcstat
-      name: (funcname (name))
-      params: (params
-        (name)
+      name: (funcname
         (name))
+      par: (name)
+      par: (name)
       body: (block
         (retstat
-          (expr
-            (suffixedexp
-              (name))
-            (binop)
-            (expr
-              (suffixedexp
-                (name)))))))
+          (prefixexp
+            (name))
+          (binop)
+          (prefixexp
+            (name)))))
     (funcstat
-      name: (funcname (name))
-      params: (params
-        (name)
-        (ellipsis)))
+      name: (funcname
+        (name))
+      par: (name)
+      par: (ellipsis))
     (funcstat
       name: (funcname
         (name)
         (name)
-        (method_name))
-      params: (params))))
+        (method_name)))))
 
 ===============
 Local functions
@@ -52,13 +49,11 @@ end
 
 (source_file
   (block
-    (localstat
+    (localfuncstat
       name: (name)
-      params: (params)
       body: (block
         (retstat
-          (expr
-            (number)))))))
+          (number))))))
 
 ====================
 Function expressions
@@ -72,16 +67,14 @@ end
 
 (source_file
   (block
-    (exprstat
-      lhs: (suffixedexp
-        (name)
-        (getfield
-          (name)))
-      rhs: (expr
-        params: (params
-          (name)
+    (assignstat_global
+      lhs: (getprop
+        (prefixexp
           (name))
+        (name))
+      rhs: (functiondef
+        par: (name)
+        par: (name)
         body: (block
           (retstat
-            (expr
-              (number))))))))
+            (number)))))))
