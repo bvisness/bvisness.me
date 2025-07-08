@@ -40,16 +40,15 @@
 (number) @number
 "nil" @macro ; it looks good ok
 
+(varname) @variable
 (prefixexp (name) @variable)
+(funcname [(name) (method_name)] @function)
+
 (getprop (name) @property)
+(tableconstructor ["{" "}"] @operator) ; ensure that we don't get bonked by {{ }} rules
 (field (name) @property)
 
+(functioncall name: (_) @function)
+
 (htmlcomment) @comment
-(specialtag) @macro
-(fragment ["<>"] @brackets)
-(namedtag ["<" "/>"] @brackets)
-(namedtag name: (name) @macro)
-(att ["{" "}"] @brackets)
 (att (name) @variable)
-(tagchildren ["{{" "}}" "<" "/" ">"] @brackets)
-(tagchildren_notags ["{{" "}}" "<" "/" ">"] @brackets)

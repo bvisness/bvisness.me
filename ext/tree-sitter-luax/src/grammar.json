@@ -486,7 +486,7 @@
           "members": [
             {
               "type": "FIELD",
-              "name": "rarg",
+              "name": "arg",
               "content": {
                 "type": "SYMBOL",
                 "name": "name"
@@ -503,7 +503,7 @@
                   },
                   {
                     "type": "FIELD",
-                    "name": "rarg",
+                    "name": "arg",
                     "content": {
                       "type": "SYMBOL",
                       "name": "name"
@@ -994,8 +994,13 @@
         "type": "CHOICE",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "name"
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "name"
+            },
+            "named": true,
+            "value": "varname"
           },
           {
             "type": "SYMBOL",
@@ -1162,34 +1167,38 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "FIELD",
-            "name": "name",
-            "content": {
-              "type": "CHOICE",
-              "members": [
-                {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "name",
+                "content": {
                   "type": "SYMBOL",
                   "name": "prefixexp"
-                },
-                {
-                  "type": "SEQ",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "prefixexp"
-                    },
-                    {
-                      "type": "STRING",
-                      "value": ":"
-                    },
-                    {
+                }
+              },
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "prefixexp"
+                  },
+                  {
+                    "type": "STRING",
+                    "value": ":"
+                  },
+                  {
+                    "type": "FIELD",
+                    "name": "name",
+                    "content": {
                       "type": "SYMBOL",
                       "name": "name"
                     }
-                  ]
-                }
-              ]
-            }
+                  }
+                ]
+              }
+            ]
           },
           {
             "type": "FIELD",
@@ -1981,12 +1990,29 @@
           "value": ">"
         }
       ]
+    },
+    "_comment": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "--[^\\r\\n]*"
+        }
+      ]
     }
   },
   "extras": [
     {
       "type": "PATTERN",
+      "value": "[\\n]"
+    },
+    {
+      "type": "PATTERN",
       "value": "\\s"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_comment"
     }
   ],
   "conflicts": [],

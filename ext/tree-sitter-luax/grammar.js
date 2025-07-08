@@ -30,6 +30,8 @@ const PREC = {
 module.exports = grammar({
   name: "luax",
 
+  extras: $ => [/[\n]/, /\s/, $._comment],
+
   rules: {
     source_file: $ => optional($.block),
 
@@ -106,7 +108,7 @@ module.exports = grammar({
 
     forinstat: $ => seq(
       "for",
-      list(() => field("rarg", $.name)), "in", list(() => field("exp", $._exp)),
+      list(() => field("arg", $.name)), "in", list(() => field("exp", $._exp)),
       "do",
       optional($.block),
       "end",
@@ -130,7 +132,7 @@ module.exports = grammar({
       $.name, repeat(seq(".", $.name)), optional(seq(":", alias($.name, $.method_name))),
     ),
     _var: $ => prec(PREC.PRIORITY, choice(
-      $.name,
+      alias($.name, $.varname),
       $.getindex,
       $.getprop,
     )),
@@ -156,10 +158,10 @@ module.exports = grammar({
     ),
 
     functioncall: $ => prec.right(PREC.FUNCTION, seq(
-      field("name", choice(
-        $.prefixexp,
-        seq($.prefixexp, ":", $.name),
-      )),
+      choice(
+        field("name", $.prefixexp),
+        seq($.prefixexp, ":", field("name", $.name)),
+      ),
       field("args", $.args),
     )),
     args: $ => choice(
@@ -247,6 +249,10 @@ module.exports = grammar({
       )),
       "<", "/", alias(optional($.name), "closingname"), ">",
     ),
+
+    _comment: $ => choice(
+      /--[^\r\n]*/,
+    )
   },
 });
 

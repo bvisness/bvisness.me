@@ -21,6 +21,13 @@
         ],
         "configuration": "./language-configuration.json"
       }
+    ],
+    "grammars": [
+      {
+        "language": "luax",
+        "scopeName": "source.luax",
+        "path": "./syntaxes/luax.tmLanguage.json"
+      }
     ]
   },
   "scripts": {

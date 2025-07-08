@@ -9,7 +9,7 @@ link = <a href={ url("foo.txt") }>Hello!</a>
 (source_file
   (block
     (assignstat_global
-      lhs: (name)
+      lhs: (varname)
       rhs: (namedtag
         name: (name)
         (att
@@ -17,7 +17,7 @@ link = <a href={ url("foo.txt") }>Hello!</a>
           (prefixexp
             (functioncall
               name: (prefixexp
-                (name))
+                (varname))
               args: (args
                 (string)))))
         children: (tagchildren)))))
@@ -52,12 +52,12 @@ end
   (block
     (functioncall
       name: (prefixexp
-        (name))
+        (varname))
       args: (args
         (string)))
     (functioncall
       name: (prefixexp
-        (name))
+        (varname))
       args: (args
         (string)))
     (funcstat
@@ -71,7 +71,7 @@ end
           (prefixexp
             (getprop
               (prefixexp
-                (name))
+                (varname))
               (name)))
           (block
             (retstat
@@ -98,7 +98,7 @@ end
                               (prefixexp
                                 (getprop
                                   (prefixexp
-                                    (name))
+                                    (varname))
                                   (name)))))))
                       (prefixexp
-                        (name)))))))))))))
+                        (varname)))))))))))))

@@ -1,0 +1,132 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "LuaX",
+  "patterns": [
+    {
+      "name": "comment.block.lua",
+      "begin": "--\\[\\[",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.comment.begin.lua"
+        }
+      },
+      "end": "\\]\\]",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.comment.end.lua"
+        }
+      },
+      "patterns": [
+        {
+          "match": ".+?",
+          "name": "comment.content.lua"
+        }
+      ]
+    },
+    {
+      "name": "comment.line.double-dash.lua",
+      "match": "--.*$",
+      "captures": {
+        "0": {
+          "name": "punctuation.definition.comment.lua"
+        }
+      }
+    },
+    {
+      "name": "comment.block.html",
+      "begin": "<!--",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.comment.begin.html"
+        }
+      },
+      "end": "-->",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.comment.end.html"
+        }
+      },
+      "patterns": [
+        {
+          "match": "[\\s\\S]+?",
+          "name": "comment.content.html"
+        }
+      ]
+    },
+    {
+      "name": "meta.tag.html",
+      "begin": "(</?)\\s*([a-zA-Z0-9:-]+)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.begin.html"
+        },
+        "2": {
+          "name": "entity.name.tag.html"
+        }
+      },
+      "end": "(/?>)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.tag.end.html"
+        }
+      },
+      "patterns": [
+        {
+          "name": "meta.embedded.expression.luax",
+          "begin": "\\{",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.tag.begin.luax"
+            }
+          },
+          "end": "\\}",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.tag.end.html"
+            }
+          },
+          "patterns": []
+        }
+      ]
+    },
+    {
+      "name": "meta.tag.fragment.luax",
+      "match": "</?>",
+      "captures": {
+        "0": {
+          "name": "punctuation.definition.tag.fragment.luax"
+        }
+      }
+    },
+    {
+      "name": "meta.tag.doctype.luax",
+      "match": "<!DOCTYPE\\s+html>",
+      "captures": {
+        "0": {
+          "name": "keyword.other.doctype.luax"
+        }
+      }
+    },
+    {
+      "name": "meta.interpolation.double-brace.luax",
+      "begin": "\\{\\{",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.tag.begin.luax"
+        }
+      },
+      "end": "\\}\\}",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.tag.end.luax"
+        }
+      },
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    }
+  ],
+  "scopeName": "source.luax"
+}

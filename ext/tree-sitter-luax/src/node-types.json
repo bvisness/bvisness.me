@@ -67,7 +67,7 @@
             "named": true
           },
           {
-            "type": "name",
+            "type": "varname",
             "named": true
           }
         ]
@@ -419,6 +419,16 @@
     "type": "forinstat",
     "named": true,
     "fields": {
+      "arg": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "name",
+            "named": true
+          }
+        ]
+      },
       "exp": {
         "multiple": true,
         "required": true,
@@ -477,16 +487,6 @@
           },
           {
             "type": "unop",
-            "named": true
-          }
-        ]
-      },
-      "rarg": {
-        "multiple": true,
-        "required": true,
-        "types": [
-          {
-            "type": "name",
             "named": true
           }
         ]
@@ -804,13 +804,9 @@
         ]
       },
       "name": {
-        "multiple": true,
+        "multiple": false,
         "required": true,
         "types": [
-          {
-            "type": ":",
-            "named": false
-          },
           {
             "type": "name",
             "named": true
@@ -821,6 +817,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "prefixexp",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1129,10 +1135,6 @@
           "named": true
         },
         {
-          "type": "name",
-          "named": true
-        },
-        {
           "type": "namedtag",
           "named": true
         },
@@ -1158,6 +1160,10 @@
         },
         {
           "type": "unop",
+          "named": true
+        },
+        {
+          "type": "varname",
           "named": true
         }
       ]
@@ -1708,6 +1714,10 @@
   {
     "type": "until",
     "named": false
+  },
+  {
+    "type": "varname",
+    "named": true
   },
   {
     "type": "while",

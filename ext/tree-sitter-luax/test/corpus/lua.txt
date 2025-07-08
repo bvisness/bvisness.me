@@ -1,0 +1,268 @@
+===========
+Expressions
+===========
+
+a = 1
+a = b
+foo("foo")
+a, b = "foo", bar()
+return a
+
+---
+
+(source_file
+  (block
+    (assignstat_global
+      lhs: (varname)
+      rhs: (number))
+    (assignstat_global
+      lhs: (varname)
+      rhs: (prefixexp
+        (varname)))
+    (functioncall
+      name: (prefixexp
+        (varname))
+      args: (args
+        (string)))
+    (assignstat_global
+      lhs: (varname)
+      lhs: (varname)
+      rhs: (string)
+      rhs: (prefixexp
+        (functioncall
+          name: (prefixexp
+            (varname))
+          args: (args))))
+    (retstat
+      (prefixexp
+        (varname)))))
+
+======
+Tables
+======
+
+a = {
+  "string",
+  3,
+
+  foo = bar;
+  bar = cheese();
+
+  [3] = 3,
+  ["foo"] = 8,
+}
+
+---
+
+(source_file
+  (block
+    (assignstat_global
+      lhs: (varname)
+      rhs: (tableconstructor
+        (field
+          (string))
+        (field
+          (number))
+        (field
+          (name)
+          (prefixexp
+            (varname)))
+        (field
+          (name)
+          (prefixexp
+            (functioncall
+              name: (prefixexp
+                (varname))
+              args: (args))))
+        (field
+          (number)
+          (number))
+        (field
+          (string)
+          (number))))))
+
+===================
+Function statements
+===================
+
+function foo(a, b)
+  return a + b
+end
+
+function foo(a, ...) end
+
+function foo.bar:baz() end
+
+---
+
+(source_file
+  (block
+    (funcstat
+      name: (funcname
+        (name))
+      par: (name)
+      par: (name)
+      body: (block
+        (retstat
+          (prefixexp
+            (varname))
+          (binop)
+          (prefixexp
+            (varname)))))
+    (funcstat
+      name: (funcname
+        (name))
+      par: (name)
+      par: (ellipsis))
+    (funcstat
+      name: (funcname
+        (name)
+        (name)
+        (method_name)))))
+
+===============
+Local functions
+===============
+
+local function foo()
+  return 3
+end
+
+---
+
+(source_file
+  (block
+    (localfuncstat
+      name: (name)
+      body: (block
+        (retstat
+          (number))))))
+
+====================
+Function expressions
+====================
+
+foo.bar = function(a, b)
+  return 3
+end
+
+---
+
+(source_file
+  (block
+    (assignstat_global
+      lhs: (getprop
+        (prefixexp
+          (varname))
+        (name))
+      rhs: (functiondef
+        par: (name)
+        par: (name)
+        body: (block
+          (retstat
+            (number)))))))
+
+==============
+Function calls
+==============
+
+foo(a, b)
+foo.bar(a, b)
+foo:bar(a, b)
+foo.bar:baz(a, b)
+
+---
+
+(source_file
+  (block
+    (functioncall
+      name: (prefixexp
+        (varname))
+      args: (args
+        (prefixexp
+          (varname))
+        (prefixexp
+          (varname))))
+    (functioncall
+      name: (prefixexp
+        (getprop
+          (prefixexp
+            (varname))
+          (name)))
+      args: (args
+        (prefixexp
+          (varname))
+        (prefixexp
+          (varname))))
+    (functioncall
+      (prefixexp
+        (varname))
+      name: (name)
+      args: (args
+        (prefixexp
+          (varname))
+        (prefixexp
+          (varname))))
+    (functioncall
+      (prefixexp
+        (getprop
+          (prefixexp
+            (varname))
+          (name)))
+      name: (name)
+      args: (args
+        (prefixexp
+          (varname))
+        (prefixexp
+          (varname))))))
+
+============
+For-in loops
+============
+
+for a, b in ipairs(variants) do
+  print(a, b)
+end
+
+---
+
+(source_file
+  (block
+    (forinstat
+      arg: (name)
+      arg: (name)
+      exp: (prefixexp
+        (functioncall
+          name: (prefixexp
+            (varname))
+          args: (args
+            (prefixexp
+              (varname)))))
+      (block
+        (functioncall
+          name: (prefixexp
+            (varname))
+          args: (args
+            (prefixexp
+              (varname))
+            (prefixexp
+              (varname))))))))
+
+========
+Comments
+========
+
+-- It's ok, don't feel so glum
+foo.bar = broken
+
+---
+
+(source_file
+  (block
+    (assignstat_global
+      (getprop
+        (prefixexp
+          (varname))
+        (name))
+      (prefixexp
+        (varname)))))

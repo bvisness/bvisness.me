@@ -1,0 +1,104 @@
+-- Hello I am comment
+require("util")
+
+function Base(atts, children)
+    local darkEnabled = not atts.lightOnly
+
+    return <><!DOCTYPE html>
+        <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+            <title>{{ atts.title and atts.title .. " | " or "" }}Ben Visness</title>
+            
+            <meta name="author" content="Ben Visness" />
+            {{ atts.description and
+                <meta name="description" content={ truncate(atts.description, 160) } />
+            }}
+            
+            <!-- CSS -->
+            <link rel="stylesheet" href={ bust("/tachyons.min.css") } />
+            <link rel="stylesheet" href={ bust("/style.css") } />
+            <link rel="stylesheet" href={ bust("/style2.css") } />
+
+            <link rel="canonical" href={ permalink() } />
+            <link rel="alternate" type="application/rss+xml" href={ absurl("/index.xml") } title="Ben Visness" />
+
+            <!-- General OpenGraph data -->
+            {{ atts.socialImage and <>
+                <link rel="image_src" href={ atts.socialImage } />
+                <meta property="og:image" content={ atts.socialImage } />
+            </> }}
+
+            <!-- Twitter metadata -->
+            {{ atts.socialImage and <>
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:image" content={ atts.socialImage } />
+            </> or <>
+                <meta name="twitter:card" content="summary" />
+            </> }}
+            <meta name="twitter:site" content="@its_bvisness" />
+            <meta name="twitter:title" content={ atts.title or "Ben Visness" } />
+            {{ atts.description and
+                <meta name="twitter:description" content={ atts.description} />
+            }}
+
+            <style>
+                :root {
+                    --blockquote-bar: #dfe2e5;
+                    --body-background: white;
+                    --code-background: #f5f5f5;
+                    --codeblock-background: #272822;
+                    --footer-text-color: #999;
+                    --hr-color: #ccc;
+                    --text-color: black;
+                    --border-color: black;
+
+                    {{ darkEnabled and "color-scheme: light dark" }}
+                }
+
+                <!-- TODO: some kind of "raw fragment", or just propagate whether tags are allowed? -->
+                {{
+                    darkEnabled and [[
+                        @media (prefers-color-scheme: dark) {
+                            :root {
+                                --blockquote-bar: #424242;
+                                --body-background: #222;
+                                --code-background: #0f0f0f;
+                                --codeblock-background: #171717;
+                                --hr-color: #525252;
+                                --text-color: white;
+                                --border-color: white;
+                            }
+
+                            a {
+                                color: white;
+                            }
+                        }
+                    ]]
+                }}
+
+                .bg--codeblock {
+                    background-color: var(--codeblock-background);
+                }
+
+                .bg--body {
+                    background-color: var(--body-background);
+                }
+            </style>
+
+            {{ atts.head and atts.head() }}
+        </head>
+
+        <body>
+            {{ bhp.expand(children) }}
+
+            <p>
+                It's funny how everything is "crazy" all the time.
+            </p>
+            <p>
+                At least, that's what I think.
+            </p>
+        </body>
+    </>
+end
