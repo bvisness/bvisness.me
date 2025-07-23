@@ -10,6 +10,12 @@ end
 
 return slugify({
     {
+        title = "High-level is the goal",
+        description = "Why should anyone care about low-level programming?",
+        slug = "high-level",
+        date = os.time({ year = 2025, month = 7, day = 22 }),
+    },
+    {
         title = "Micro-libraries need to die already",
         description = "Somehow people are still putting tiny libraries on npm, and it really needs to stop.",
         slug = "microlibraries",
