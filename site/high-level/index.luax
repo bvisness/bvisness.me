@@ -74,7 +74,7 @@ return <SimpleArticle article={ article }>
   </p>
   <img src="newreddit.png"/>
   <p>
-    This is New Reddit. It’s a new frontend they rolled out roughly a decade ago, and most Redditors hate it. Because so many people hate it, Old Reddit is still online, and this gives us a unique opportunity to compare two functionally identical pieces of software made a decade apart.
+    This is New Reddit. It’s a new frontend they rolled out roughly a decade ago, and people hate it. Because so many people hate it, Old Reddit is still online, and this gives us a unique opportunity to compare two functionally identical pieces of software made a decade apart.
   </p>
   <p>
     Back in 2023, I was experiencing horrible lag on New Reddit. Typing comments was sluggish, comments took a long time to expand and collapse, and even hovering over a tooltip would cause a full-page hitch—all typical of modern software. Old Reddit, on the other hand, was a breath of fresh air—everything responded instantly. Aside from outdated aesthetics, Old Reddit was better in every way.
@@ -134,49 +134,46 @@ return <SimpleArticle article={ article }>
   <hr/>
 
   <p>
-    Thankfully, there are of course other stacks to choose from. At any point in this stack, we can find alternatives:
+    Thankfully, React+Redux is not the only possible software stack. We can choose alternatives at every point in the stack:
   </p>
   <ul>
     <li>
-      We could choose a different JavaScript framework. Perhaps we could use Vue, or Svelte, or SolidJS, since these have presumably had time to learn from React’s mistakes. Or, of course, you could ditch all the frameworks and just use JS and the DOM APIs directly, especially if your application is mostly static like Reddit.
+      We could choose a different JavaScript framework. Perhaps we could use Vue, or Svelte, or SolidJS, since these have presumably had time to learn from React’s mistakes. Or, of course, we could ditch all the frameworks and just use the DOM APIs directly, especially if your application is mostly static like Reddit.
     </li>
     <li>
-      We could use other APIs within the browser instead of HTML, CSS, and JS. For example, we could build our app in WebGL and WebAssembly, building our own UI stack or using an alternative framework like Flutter. Doing this yourself might sound crazy, but it’s been done successfully many times before—for example, Figma famously <a href="https://www.figma.com/blog/building-a-professional-design-tool-on-the-web/">built their app from scratch</a> in WASM and WebGL, including a custom text rendering engine and custom versions of common UI components, and Figma’s outstanding performance has led to domination in the design market. Google Docs and Google Sheets also use WASM and WebGL for rendering their documents instead of HTML and CSS.
+      We could use other browser APIs instead of HTML, CSS, and JS. We could use an alternative framework like Flutter, or we could build a custom UI stack in WebGL and WebAssembly. Building it yourself might sound crazy, but it’s been done successfully many times before—for example, Figma famously <a href="https://www.figma.com/blog/building-a-professional-design-tool-on-the-web/">built their app from scratch</a> in WASM and WebGL, and it runs shockingly well on very large projects. Google Docs and Google Sheets also use WebGL instead of HTML and CSS, and the apps themselves are written in Java and compiled to JS or WASM.
     </li>
     <li>
-      We don’t have to build web apps! We can build native apps instead, perhaps using alternative cross-platform frameworks like Qt, game engines like Unreal, OS abstraction layers like SDL, or again just using the native APIs directly. This is obviously the right choice for performance-intensive apps, and a valid option in general for developers who are serious about delivering a high-quality experience.
+      We could build a native app! We could use a cross-platform framework like Qt, a game engine like Unreal, an OS abstraction layer like SDL, or again just use the native APIs directly and build the rest from scratch. This is obviously the right choice for performance-intensive applications, and a valid option in general for developers who are serious about delivering a high-quality experience.
     </li>
   </ul>
   <p>
-    We actually have not just a stack, but a tree. Every point on this tree is a valid choice for how to build your software, and different points in the tree will be better fits for different kinds of software.
-  </p>
-
-  <p>
-    I like to imagine that when the developers of New Reddit sat down at the whiteboard, this is what they saw:
-  </p>
-
-  <TODO>"The foundations of the world</TODO>
-
-  <p>
-    There are not a lot of choices here. Critically, the best choice for them (direct DOM manipulation, like Old Reddit) is not even on the table. For whatever reason, I think they just didn’t even consider it as an option.
+    Together all these choices actually form a tree. Every point on this tree is a valid stack you could choose to build your software on. Most importantly, different choices in this tree will be better for different kinds of software, so being comfortable with many options will allow you to make a better choice for each problem you face.
   </p>
   <p>
-    The problem here is that their view of the world is too high-level. You can’t actually access most of the tree if all you know is the highest level of the tree. If all you know is React, the choice is made for you—you can only use React or frameworks on top of React. But the lower level you can go, the more the tree opens up to you, and the better your choice of stack can be.
+    Unfortunately, I imagine that this is how the developers of New Reddit saw the tree:
+  </p>
+  <TODO>"The foundations of the world"</TODO>
+  <p>
+    There are not a lot of choices here. Critically, the best choice for them (direct DOM manipulation, like Old Reddit) was not even on the table. For whatever reason, I think they just didn’t even consider it as an option. Ew, icky, we can't just keep doing what Old Reddit did! We can't use <em>jQuery!</em>
   </p>
   <p>
-    The first reason, then, that we should care about low-level is that the lower you can go, the better choices you can make. We can make better software by <em>starting</em> in the right place, with the right frame and the right stack. We can build trucks instead of Trucklas.
+    Their view of the world was too high-level. If all you know is React, you have no choices—you can only use React, or frameworks on top of React. But the lower level you can go, the more the tree opens up to you. Going lower level allows you to access other choices, and to recognize when another choice would be a better fit.
+  </p>
+  <p>
+    The first reason, then, that we care about low-level is that it allows us to make better choices. We can make better software by <em>starting</em> in the right place, with the right frame and the right stack. Low-level programming allows us to build trucks instead of Trucklas.
   </p>
 
   <hr/>
 
   <p>
-    But…this isn’t really enough, right? The software industry will not be saved by a few programmers making better choices. It’s an improvement, to be sure, but it’s far from the answer.
+    But…this isn’t really enough, right? The software industry will not be saved by a few programmers making better choices. It would help, to be sure, but it’s far from the answer.
   </p>
   <p>
-    We are now faced with a more uncomfortable question: what if there are no good options in this tree? What if none of these choices are actually good for the kind of software we want to make?
+    This presents an uncomfortable question: What if there are no good options in this tree? What if none of these choices are actually good for the kind of software we want to make?
   </p>
   <p>
-    For example, what if you want to ship a native app, so you have direct access to the hardware, but you also want a cross-platform UI? What are your choices? You could use Qt, but it tends to feel very dated and has strong opinions about how you architect your software. Game engines would likewise be a strange fit for a lot of applications, offering plenty of rendering power but little for 2D UI. There are some relative newcomers like Flutter, but Flutter makes you buy into Dart, and we all know Dart is not the right tool for a performance-intensive application. So what do you do? There are no good choices on the market—you’ll have to build it yourself.
+    For example, what if your app wants direct access to the hardware, but you also want a cross-platform UI? What are your choices? You could use Qt, but it tends to feel very dated and has strong opinions about how you architect your software. Game engines would likewise be a strange fit for a lot of applications, offering plenty of rendering power but little for 2D UI. There are some relative newcomers like Flutter, but Flutter makes you buy into Dart, and we all know Dart is not the right tool for a performance-intensive application. So what do you do? There are no good choices on the market—you’ll have to build it yourself.
   </p>
   <p>
     Our tree is top-heavy. If we survey the software development landscape today, we see an insane number of JavaScript libraries and frameworks, an ever-growing number of browser APIs, and very little development outside of browsers besides frameworks that are Web-compatible and therefore subject to the same constraints. If our tree was a real tree, it would look something like this—and this is not a healthy tree.
