@@ -33,7 +33,12 @@ local function renderRec(node, b)
     end
 
     if type(node) ~= "table" then
-        b:add(tostring(node))
+        if type(node) == "boolean" or type(node) == "nil" then
+            -- Do not render booleans or nil at all.
+            -- If you want to render these, explicitly convert them to string.
+        else
+            b:add(tostring(node))
+        end
         return
     end
 
