@@ -46,7 +46,7 @@ return <SimpleArticle article={ article }>
   <Wide class="items-start">
     <>
       <p>
-        In 2019, a maker and YouTuber named Simone Giertz put out a project called <a href="https://youtu.be/jKv_N0IDS2A?si=jdvzynwWmbfc9fx-">“Truckla”</a>.
+        In 2019, a maker and YouTuber named Simone Giertz finished a project called <a href="https://youtu.be/jKv_N0IDS2A?si=jdvzynwWmbfc9fx-">“Truckla”</a>.
       </p>
       <p>
         Simone wanted an Tesla pickup truck, but the Cybertruck was still just a rumor, and she was feeling impatient. So she did what any reasonable person would do, and decided to convert a Tesla Model 3 into a pickup truck.
@@ -85,7 +85,7 @@ return <SimpleArticle article={ article }>
   <p>
     This is a pretty easy question, actually. All that needs to happen—all that <em>should</em> happen—is to hide or remove a few DOM elements, and update some text to say “collapsed”. A well-written Reddit frontend should more or less do exactly this. But let’s see what New Reddit did:
   </p>
-  <Wide>
+  <Wide wideness="8rem">
     <img src="jquery.png"/>
   </Wide>
   <p>
@@ -104,7 +104,7 @@ return <SimpleArticle article={ article }>
     On my first-gen M1 MacBook Air, it took Old Reddit about 10 milliseconds to collapse a comment. That could definitely be improved, but 10 milliseconds is fine. It feels responsive and keeps the site running at 60 frames per second. New Reddit, on the other hand, took <b>almost 200 milliseconds</b>—almost 20 times slower than Old Reddit, and probably 50 to 100 times slower than if you wrote the required DOM calls by hand.
   </p>
   <p>
-    So, once we pick our jaws up off the floor, we have to ask the question: How on earth did we get here? Were Reddit’s devs just stupid, lazy JS framework fanboys who would rather build Rube Goldberg machines than do their jobs?
+    So, once we pick our jaws up off the floor, we have to ask the question: How on earth did we get here? Were New Reddit’s devs just stupid, lazy JS framework fanboys who would rather build Rube Goldberg machines than do their jobs?
   </p>
   <p>
     Maybe tbh. But laziness alone doesn’t tell the whole story. Mere laziness doesn’t produce the kind of pervasive waste I saw in New Reddit. The real problem with New Reddit was the stack it was built on.
@@ -209,6 +209,81 @@ return <SimpleArticle article={ article }>
   </p>
   <p>
     Not everyone who makes their own text editor will have great ideas about the future of programming. Not everyone who makes their own compiler will have great ideas about programming languages. Not everyone who makes their own UI library will have great ideas about UI design. But <em>some</em> of them will. And it only takes a few of them to make a difference in the software industry.
+  </p>
+
+  <hr/>
+
+  <p>
+    So, to recap: the first reason we care about low-level is because low-level knowledge leads to better engineering choices. The second reason we care about low-level is because, in the long term, low-level knowledge is the path to better tools and better ways of programming—it is a <em>requirement</em> for building the platforms of the future.
+  </p>
+  <p>
+    But there is still one big problem with all of this: low-level programming today is absolutely <em>terrible</em>.
+  </p>
+  <p>
+    Low-level programming is so frustrating, and so difficult. The <em>experience</em> of low-level programming does not hold a candle to the experience of using high-level tools today—the very tools we see as a problem.
+  </p>
+  <p>
+    If I want to make a React app, I can simply Google “how to build react app” and I will find a beautifully-crafted web page with demos, installation guides, documentation, and resources to get me on my way. It has commands I can run to get an app up and running in five minutes. If I change a line of code in my editor, it refreshes immediately in my browser, shortening that feedback loop and making learning fun. And there is a wealth of other resources online: dev tools, libraries, tutorials, and more, making it easy for anyone to get up and running.
+  </p>
+  <p>
+    This is simply not the case for the low-level space. If you’re lucky, you can maybe find an expensive book or course. But more likely, you’ll just get a gigantic manual that lists every property of the system in excruciating detail, which is totally worthless for learning and barely usable as reference. And that’s if you’re lucky—there’s a good chance that you’ll only get a wiki or a maze of man pages, which are impenetrable walls of jargon. In some cases the only documentation that exists is the Linux Kernel Mailing List, and you can only pray that the one guy who can answer your question hasn’t flamed out in the past decade.
+  </p>
+  <p>
+    This isn’t just bad for beginners, it’s bad for <em>everyone</em>. If this is the state of low-level knowledge, how can we expect <em>anyone</em> to practice low-level programming, much less the wider industry?
+  </p>
+  <p>
+    And the story doesn’t end there, because low-level <em>tools</em> are terrible too. In a browser, I can open up the dev tools, go to Performance, click Record, and I will get a complete timeline of everything my application did. Every JavaScript function, every network request, every frame rendered, all correlated on a timeline so you can understand how everything relates. It is a developer’s dream, and it is a single click away! But the low-level space just does not have tools like this. There are a few decent profilers, but in most cases you just have to run a command-line program with some bizarre set of flags, pipe it through other tools, and then squint at a PDF or whatever.
+  </p>
+  <p>
+    The crazy thing is: <b>there is no reason for this to be the case</b>. We could absolutely have the same kind of “dev tools” for native development that we do for the web. We could have profilers that are actually designed to highlight useful info. We could have GUIs that show us network and file I/O, or inter-process communication. We could have interactive documentation and live reloading. We could have editor plugins and language servers to help beginners along. The raw capabilities are there. We're just waiting for someone with high-level sensibilities to come along and build the tools of our dreams.
+  </p>
+  <p>
+    But until we build that, why should we expect <em>anyone</em> to learn low-level programming? <em>How</em> can we expect them to?
+  </p>
+
+  <hr/>
+
+  <p>
+    So now we come back to Handmade, and what makes Handmade Hero so special. Most programmers look at game engines and think that only a super-genius could write one—and the idea of making a game without an engine is lunacy. But Handmade Hero just doesn’t care. Casey just sits down, shows you how to compile C, shows you how to put pixels on the screen, and before too long, you have a game. Not the most sophisticated game in the world, but a game nonetheless.
+  </p>
+  <p>
+    Handmade Hero shatters the barrier between low-level and high-level. You make a game, <em>and</em> you make an engine. The mystique is stripped away and replaced by an actual understanding of how games are made. And for many people, when they finally go through Handmade Hero, their reaction is: “Hey, this is not as hard as I thought!” It turns out you <em>absolutely can</em> make your own engine, despite the naysayers online.
+  </p>
+  <p>
+    I personally have found this to be true of so many “low-level” disciplines. “Low-level” programming is not impossible; in fact, in many cases, it’s <em>simpler</em> than the high-level web dev work I used to do! Today’s “high-level” frameworks and tools are so complicated and so poorly designed that they are <em>harder</em> to understand and work with than their low-level counterparts. But all the modern nonsense like Svelte, Symfony, Kubernetes—they have docs! They have dev tools! Because, for some reason, people are not afraid of them!
+  </p>
+  <p>
+    Low-level programming is <em>artificially</em> terrible. I really believe that. And I know that it doesn’t have to be this way.
+  </p>
+
+  <hr/>
+
+  <p>
+    So my final question about low-level programming is: why do we even call it “low-level”?
+  </p>
+  <p>
+    The intent of any “high-level” tool is to make it easier to express our intent as programmers. “High-level” tools abstract away difficult details so we can focus on what we really care about. And in many cases this has worked: we’ve seen it in the evolution of programming languages, in the development of the web, and yes, even the proliferation of game engines.
+  </p>
+  <p>
+    But notice: this is not about where these tools are in the stack. It’s not about how many layers they’ve built on top of. “High-level” is about <b>the expression of the programmer’s intent.</b> The position in the stack is ultimately irrelevant if programmers can use it to achieve their goals.
+  </p>
+  <p>
+    What then does this mean for “low-level”? The conclusion is inevitable: the reason we call things “low-level” is <em>because</em> they are terrible to use. They are “low-level” <em>because</em> we do not use them directly! <em>Because</em> we sweep them under the rug and build abstractions on top, they <em>become</em> this low level that we don’t want to touch anymore!
+  </p>
+  <p>
+    Why are things “low-level” today? <b>Because no one has made them high-level yet.</b>
+  </p>
+  <p>
+    When I imagine a better future for the software industry, I <em>don’t</em> imagine one where everyone is making their own text editors, their own debuggers, or their own UI frameworks. Instead, I imagine a future where we have new “high-level” tools, built from lower in the stack. I imagine new tools that give the same high-level benefits we expect today, and in fact do <em>more</em> than the tools we have today, because they are freed from the constraining decisions of the past. We can build new platforms, new tools, and new libraries that <em>learn</em> from the past, but build on solid foundations instead of piling more on top.
+  </p>
+  <p>
+    For the developers who truly care about making high-quality software, tools built lower in the stack can be their superpower. These programmers can be equipped to fine-tune their software in ways the web could never allow. And for the lazy Reddit dev who would rather push some slop out the door for a paycheck? Hey, at least their slop can run on a simpler, smaller, more efficient platform. It’s still a net positive in the end.
+  </p>
+  <p>
+    The Handmade community is positioned right in the middle of that Venn diagram today. We have people with low-level expertise. We have people with a drive to make software better. Our job, then, is <em>not</em> to just write low-level code and feel smug for knowing how things work. Our job is to build a <em>new</em> high level for the rest of the software industry.
+  </p>
+  <p>
+    Low-level programming is <em>not</em> the goal unto itself. High-level programming—a <em>new</em> kind of high-level programming—is the goal, and low-level is how we get there.
   </p>
 
   <hr/>
