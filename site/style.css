@@ -654,7 +654,7 @@ footer svg {
 
 .container {
   width: 90%;
-  max-width: 800px;
+  max-width: var(--site-width);
   margin-left: auto;
   margin-right: auto;
 }

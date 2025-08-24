@@ -15,6 +15,11 @@ function Head(atts, children)
           url(AvenirNextCyr-Bold.ttf) format("truetype");
       }
 
+      :root {
+        --site-width: 62rem;
+        --gutter-width: 6rem;
+      }
+
       h1, h2, h3, h4, h5 {
         font-family: Avenir Next;
       }
@@ -24,14 +29,109 @@ function Head(atts, children)
         color: inherit;
       }
 
-      .title {
-        height: 36rem;
+      .high-level {
+        position: relative;
+        padding-left: var(--gutter-width);
+
+        .wide {
+          --wideness-fudge: var(--gutter-width);
+        }
       }
 
-      .title .stack {
+      .gutter {
+        position: absolute; 
+        width: var(--gutter-width);
+        margin-left: calc(-1 * var(--gutter-width));
+      }
+
+      .cover {
+        background-color: var(--body-background);
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+      }
+
+      .cover-up, .cover-down {
+        position: absolute;
+        left: 0;
+        right: 0;
+
+        &::before {
+          content: "";
+          position: absolute;
+          left: var(--spacing-3);
+          right: var(--spacing-3);
+          top: 0;
+          bottom: 0;
+
+          border-image: linear-gradient(
+            to right,
+            var(--body-background) 0%,
+            var(--hr-color) 30%,
+            var(--hr-color) 70%,
+            var(--body-background) 100%
+          ) 1;
+        }
+
+        &::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          background-color: var(--body-background);
+        }
+      }
+
+      .cover-up {
+        &::before {
+          border-top: 1px solid var(--hr-color);
+          box-shadow: 0px -15px 26px -20px #000000;
+        }
+
+        &::after {
+          top: 1px;
+        }
+      }
+
+      .cover-down {
+        &::before {
+          border-bottom: 1px solid var(--hr-color);
+          box-shadow: 0px 15px 26px -20px #000000;
+        }
+
+        &::after {
+          bottom: 1px;
+        }
+      }
+
+      .p-top {
+        bottom: calc(100% - 0.5rem);
+      }
+
+      .p-bottom {
+        top: calc(100% - 0.375rem);
+      }
+
+      .stack-container {
+        height: 100%;
+        z-index: -1;
+        padding-top: var(--spacing-4);
+      }
+
+      .stack {
         width: 2rem;
         fill: var(--text-color);
         margin: 0 2rem;
+        position: sticky;
+        top: 8rem;
+      }
+
+      .title {
+        height: 36rem;
       }
 
       .title .text {
@@ -40,7 +140,7 @@ function Head(atts, children)
       }
 
       hr:not(.hr-normal) {
-        margin: 3.2rem calc(3.2rem / -1.6);
+        margin: 3.2rem calc(3.2rem / 1.6);
       }
 
       .dropcap:first-letter {
@@ -55,6 +155,17 @@ function Head(atts, children)
       }
     </style>
   </>
+end
+
+function ContentGutter(atts, children)
+  children = bhp.nosource(children)
+
+  return <div class="relative">
+    {{ children[1] }}
+    <div class="gutter" style="top: 0; bottom: 0">
+      {{ children[2] }}
+    </div>
+  </div>
 end
 
 function Wide(atts, children)
@@ -90,12 +201,16 @@ return <Common
 >
   <hr class="hr-normal" />
 
-  <article>
+  <article class="high-level">
+    <div class="gutter stack-container">
+      <div class="stack">
+        <Svg src="stack.svg" />
+      </div>
+    </div>
+
     <Wide wideness="24rem">
       <div class="title flex justify-center items-center">
-        <div class="stack">
-          <Svg src="stack.svg" />
-        </div>
+        
         <div class="text flex flex-column link-normal tc" style="gap: 2rem">
           <a href={ permalink() }>
             <h1 style="font-size: 4rem; margin: 0">
@@ -119,89 +234,100 @@ return <Common
     <p>
       The Handmade crowd seems to think that low-level programming is the key to building better software. But this doesn’t really make sense on the surface. How is this practical for the average programmer? Do we really expect everyone to make their own UI frameworks and memory allocators from scratch? Do we really think you should never use libraries? Even if the average programmer could actually work that way, would anything actually improve, or would the world of software just become more fragmented?
     </p>
-    <p>
-      I do believe, with all my heart, that low-level programming is the path to a better future for the software industry. But the previous criticisms are valid, and should be a serious concern for the Handmade programmer. So what is the connection here? What role does “low-level” have in a better future for software?
-    </p>
+    <ContentGutter>
+      <p>
+        I do believe, with all my heart, that low-level programming is the path to a better future for the software industry. But the previous criticisms are valid, and should be a serious concern for the Handmade programmer. So what is the connection here? What role does “low-level” have in a better future for software?
+      </p>
+      <div class="cover-up p-bottom h4"></div>
+    </ContentGutter>
 
-    <Wide wideness="12rem" class="mv4">
-      <img class="shadow" src="truckla.png" />
-    </Wide>
+    <ContentGutter>
+      <>
+        <Wide wideness="12rem" class="mv4">
+          <img class="shadow relative z-5" src="truckla.png" />
+        </Wide>
 
-    <p>
-      In 2019, a maker and YouTuber named Simone Giertz unveiled <a href="https://youtu.be/jKv_N0IDS2A?si=jdvzynwWmbfc9fx-">“Truckla”</a>.
-    </p>
-    <p>
-      Simone wanted an Tesla pickup truck, but the Cybertruck was still just a rumor, and she was feeling impatient. So she did what any reasonable person would do, and decided to convert a Tesla Model 3 into a pickup truck.
-    </p>
-    <p>
-      The results speak for themselves. Truckla looks amazing, drives perfectly, and still functions  as a modern EV. This is no small feat—obviously you cannot just cut the roof off a sedan and call it a pickup truck. She and her team had to ensure that the car was structurally sound, that it could still charge, and that the software still worked as intended. Truckla is an impressive feat of engineering that took genuine creativity and craftsmanship.
-    </p>
-    <p>
-      And yet, Truckla is still not a great pickup truck! The bed size is small, it can’t haul that much weight, and it’s likely much less efficient than a truck engineered from the ground up. If you were in the market for a pickup truck, you would not buy a Truckla! (You might not buy a Cybertruck either, but I digress.)
-    </p>
-    <p>
-      Truckla is an excellent execution of a flawed idea. If you actually want to build a good pickup truck, you have to start with the <b>frame</b>.
-    </p>
+        <p>
+          In 2019, a maker and YouTuber named Simone Giertz unveiled <a href="https://youtu.be/jKv_N0IDS2A?si=jdvzynwWmbfc9fx-">“Truckla”</a>.
+        </p>
+        <p>
+          Simone wanted an Tesla pickup truck, but the Cybertruck was still just a rumor, and she was feeling impatient. So she did what any reasonable person would do, and decided to convert a Tesla Model 3 into a pickup truck.
+        </p>
+        <p>
+          The results speak for themselves. Truckla looks amazing, drives perfectly, and still functions  as a modern EV. This is no small feat—obviously you cannot just cut the roof off a sedan and call it a pickup truck. She and her team had to ensure that the car was structurally sound, that it could still charge, and that the software still worked as intended. Truckla is an impressive feat of engineering that took genuine creativity and craftsmanship.
+        </p>
+        <p>
+          And yet, Truckla is still not a great pickup truck! The bed size is small, it can’t haul that much weight, and it’s likely much less efficient than a truck engineered from the ground up. If you were in the market for a pickup truck, you would not buy a Truckla! (You might not buy a Cybertruck either, but I digress.)
+        </p>
+        <p>
+          Truckla is an excellent execution of a flawed idea. If you actually want to build a good pickup truck, you have to start with the <b>frame</b>.
+        </p>
 
-    <hr/>
-    
-    <p>
-      In the world of software, the equivalent of the "frame" is the tech stack. Programming languages, frameworks, libraries, and platforms shape software in the same way that the frame shapes the car. If you start with a sedan and try to convert it to a truck, you will get a bad truck—and in exactly the same way, if you start with the wrong stack, you’ll get bad software. It doesn’t matter how much engineering effort you put in.
-    </p>
-    <p>
-      As an example, let’s look at a program that everyone has interacted with at some point.
-    </p>
+        <hr/>
+        
+        <p>
+          In the world of software, the equivalent of the "frame" is the tech stack. Programming languages, frameworks, libraries, and platforms shape software in the same way that the frame shapes the car. If you start with a sedan and try to convert it to a truck, you will get a bad truck—and in exactly the same way, if you start with the wrong stack, you’ll get bad software. It doesn’t matter how much engineering effort you put in.
+        </p>
+        <p>
+          As an example, let’s look at a program that everyone has interacted with at some point.
+        </p>
 
-    <Wide wideness="8rem" class="mv4">
-      <img class="shadow" src="newreddit.png"/>
-    </Wide>
+        <Wide wideness="8rem" class="mv4">
+          <img class="shadow relative z-5" src="newreddit.png"/>
+        </Wide>
 
-    <p>
-      This is New Reddit. It’s a new frontend they rolled out roughly a decade ago, and people hate it. Because so many people hate it, Old Reddit is still online, and this gives us a unique opportunity to compare two functionally identical pieces of software made a decade apart.
-    </p>
-    <p>
-      Back in 2023, I was experiencing horrible lag on New Reddit. Typing comments was sluggish, comments took a long time to expand and collapse, and even hovering over a tooltip would cause a full-page hitch—all typical of modern software. Old Reddit, on the other hand, was a breath of fresh air—everything responded instantly. Aside from outdated aesthetics, Old Reddit was better in every way.
-    </p>
-    <p>
-      So here’s a thought experiment: How much work should it take to collapse a single comment?
-    </p>
-    <p>
-      This is a pretty easy question, actually. All that needs to happen—all that <em>should</em> happen—is to hide or remove a few DOM elements, and update some text to say “collapsed”. A well-written Reddit frontend should more or less do exactly this. But let’s see what New Reddit did:
-    </p>
+        <p>
+          This is New Reddit. It’s a new frontend they rolled out roughly a decade ago, and people hate it. Because so many people hate it, Old Reddit is still online, and this gives us a unique opportunity to compare two functionally identical pieces of software made a decade apart.
+        </p>
+        <p>
+          Back in 2023, I was experiencing horrible lag on New Reddit. Typing comments was sluggish, comments took a long time to expand and collapse, and even hovering over a tooltip would cause a full-page hitch—all typical of modern software. Old Reddit, on the other hand, was a breath of fresh air—everything responded instantly. Aside from outdated aesthetics, Old Reddit was better in every way.
+        </p>
+        <p>
+          So here’s a thought experiment: How much work should it take to collapse a single comment?
+        </p>
+        <p>
+          This is a pretty easy question, actually. All that needs to happen—all that <em>should</em> happen—is to hide or remove a few DOM elements, and update some text to say “collapsed”. A well-written Reddit frontend should more or less do exactly this. But let’s see what New Reddit did:
+        </p>
 
-    <Wide wideness="8rem" class="mv4">
-      <img class="shadow" src="jquery.png"/>
-    </Wide>
+        <Wide wideness="8rem" class="mv4">
+          <img class="shadow relative z-5" src="jquery.png"/>
+        </Wide>
 
-    <p>
-      Gross. Call stacks thirty functions deep, layout computation in the middle of rendering, some kind of event or animation framework, and…hold on, is that jQuery?
-    </p>
-    <p>
-      My mistake, that’s actually a profile of Old Reddit. Here’s New Reddit:
-    </p>
-    <Wide wideness="32rem" class="mv4">
-      <img class="shadow" src="burnitwithfire.png"/>
-    </Wide>
-    <p>
-      If you care about quality software, then your jaw should be on the floor. Again, this was the work being performed when collapsing a <em>single comment</em>. It is a <em>staggering</em> amount of waste for what should have been a handful of DOM calls.
-    </p>
-    <p>
-      On my first-gen M1 MacBook Air, it took Old Reddit about 10 milliseconds to collapse a comment. That could definitely be improved, but 10 milliseconds is fine. It feels responsive and keeps the site running at 60 frames per second. New Reddit, on the other hand, took <b>almost 200 milliseconds</b>—almost 20 times slower than Old Reddit, and probably 50 to 100 times slower than if you wrote the required DOM calls by hand.
-    </p>
-    <p>
-      So, once we pick our jaws up off the floor, we have to ask the question: How on earth did we get here? Were New Reddit’s devs just stupid, lazy JS framework fanboys who would rather build Rube Goldberg machines than do their jobs?
-    </p>
-    <p>
-      Maybe tbh. But laziness alone doesn’t tell the whole story. Mere laziness doesn’t produce the kind of pervasive waste I saw in New Reddit. The real problem with New Reddit was the stack it was built on.
-    </p>
+        <p>
+          Gross. Call stacks thirty functions deep, layout computation in the middle of rendering, some kind of event or animation framework, and…hold on, is that jQuery?
+        </p>
+        <p>
+          My mistake, that’s actually a profile of Old Reddit. Here’s New Reddit:
+        </p>
+        <Wide wideness="32rem" class="mv4">
+          <img class="shadow relative z-5" src="burnitwithfire.png"/>
+        </Wide>
+        <p>
+          If you care about quality software, then your jaw should be on the floor. Again, this was the work being performed when collapsing a <em>single comment</em>. It is a <em>staggering</em> amount of waste for what should have been a handful of DOM calls.
+        </p>
+        <p>
+          On my first-gen M1 MacBook Air, it took Old Reddit about 10 milliseconds to collapse a comment. That could definitely be improved, but 10 milliseconds is fine. It feels responsive and keeps the site running at 60 frames per second. New Reddit, on the other hand, took <b>almost 200 milliseconds</b>—almost 20 times slower than Old Reddit, and probably 50 to 100 times slower than if you wrote the required DOM calls by hand.
+        </p>
+        <p>
+          So, once we pick our jaws up off the floor, we have to ask the question: How on earth did we get here? Were New Reddit’s devs just stupid, lazy JS framework fanboys who would rather build Rube Goldberg machines than do their jobs?
+        </p>
+        <p>
+          Maybe tbh. But laziness alone doesn’t tell the whole story. Mere laziness doesn’t produce the kind of pervasive waste I saw in New Reddit. The real problem with New Reddit was the stack it was built on.
+        </p>
 
-    <hr/>
+        <hr/>
+      </>
+      <div class="cover"></div>
+    </ContentGutter>
 
+    <ContentGutter>
+      <p>
+        So what was the Reddit stack? Back in 2023, New Reddit was a React app with Redux for state management. (These days it seems they have rewritten it in Web Components.) React and Redux of course sit atop the web platform: HTML, CSS, and JavaScript. This platform is implemented by some browser engine, which then runs on some operating system, and finally on the user’s physical hardware (which is itself extremely complicated, but we have to stop somewhere).
+      </p>
+      <div class="cover-down p-top h4"></div>
+    </ContentGutter>
     <p>
-      So what was the Reddit stack? Back in 2023, New Reddit was a React app with Redux for state management. (These days it seems they have rewritten it in Web Components.) React and Redux of course sit atop the web platform: HTML, CSS, and JavaScript. This platform is implemented by some browser engine, which then runs on some operating system, and finally on the user’s physical hardware (which is itself extremely complicated, but we have to stop somewhere).
-    </p>
-    <p>
-      Before I was hired at Mozilla, I worked on an application that used precisely this same stack. Our application was an employee scheduling program that allowed managers to create weekly schedules for hourly workers. In about 2016 we replaced our aging Backbone.js frontend with a new one written in React and Redux, presumably because it was a popular choice at the time.
+      At my last job, I worked on an application that used precisely this same stack. Our application was an employee scheduling program that allowed managers to create weekly schedules for hourly workers. In about 2016 we replaced our aging Backbone.js frontend with a new one written in React and Redux, presumably because it was a popular choice at the time.
     </p>
     <p>
       As a result, I became intimately familiar with how a React+Redux app is constructed. I also spent a lot of time trying to improve the app’s abysmal performance. I lived inside the Chrome and React profilers, diligently tracking down slow functions and suppressing unnecessary React updates. We had a whole caching system for our Redux selectors, and I added logging to help us find selectors with a high cache miss rate. I built custom JS parsers to make graphs of our selector dependencies and to find ways to split the app into smaller pieces. Unfortunately, none of my work made much of a difference—performance continued to plummet as the app increased in complexity.
@@ -370,9 +496,5 @@ return <Common
     <p>
       Low-level programming is <em>not</em> the goal unto itself. High-level programming—a <em>new</em> kind of high-level programming—is the goal, and low-level is how we get there.
     </p>
-
-    <hr/>
-
-    <p><i>This article is an adaptation of a talk I gave at Handmade Seattle 2023. I have republished my talk in written form for posterity. I hope you enjoyed it and found it inspiring.</i></p>
   </article>
 </Common>

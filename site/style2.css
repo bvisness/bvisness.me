@@ -202,6 +202,7 @@ body {
 
   .wide {
     --wideness: 18rem;
+    --wideness-fudge: 0rem;
     margin-left: calc(var(--wideness) * -1);
     margin-right: calc(var(--wideness) * -1);
     display: flex;
@@ -217,7 +218,7 @@ body {
   }
 
   .wide>* {
-    max-width: calc(100vw - calc(calc(2 * var(--spacing-3)) + var(--spacing-4)));
+    max-width: calc(calc(100vw - var(--wideness-fudge)) - calc(calc(2 * var(--spacing-3)) + var(--spacing-4)));
   }
 }
 

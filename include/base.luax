@@ -44,6 +44,7 @@ function Base(atts, children)
 
             <style>
                 :root {
+                    --site-width: 800px;
                     --blockquote-bar: #dfe2e5;
                     --body-background: white;
                     --code-background: #f5f5f5;
