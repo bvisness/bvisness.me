@@ -314,17 +314,19 @@ return <Common
         <p>
           Maybe tbh. But laziness alone doesn’t tell the whole story. Mere laziness doesn’t produce the kind of pervasive waste I saw in New Reddit. The real problem with New Reddit was the stack it was built on.
         </p>
-
-        <hr/>
       </>
       <div class="cover"></div>
     </ContentGutter>
 
     <ContentGutter>
-      <p>
-        So what was the Reddit stack? Back in 2023, New Reddit was a React app with Redux for state management. (These days it seems they have rewritten it in Web Components.) React and Redux of course sit atop the web platform: HTML, CSS, and JavaScript. This platform is implemented by some browser engine, which then runs on some operating system, and finally on the user’s physical hardware (which is itself extremely complicated, but we have to stop somewhere).
-      </p>
-      <div class="cover-down p-top h4"></div>
+      <>
+        <hr/>
+
+        <p>
+          So what was the Reddit stack? Back in 2023, New Reddit was a React app with Redux for state management. (These days it seems they have rewritten it in Web Components.) React and Redux of course sit atop the web platform: HTML, CSS, and JavaScript. This platform is implemented by some browser engine, which then runs on some operating system, and finally on the user’s physical hardware (which is itself extremely complicated, but we have to stop somewhere).
+        </p>
+      </>
+      <div class="cover-down h4" style="bottom: calc(100% - 1px)"></div>
     </ContentGutter>
     <p>
       At my last job, I worked on an application that used precisely this same stack. Our application was an employee scheduling program that allowed managers to create weekly schedules for hourly workers. In about 2016 we replaced our aging Backbone.js frontend with a new one written in React and Redux, presumably because it was a popular choice at the time.
