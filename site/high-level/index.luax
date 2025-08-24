@@ -18,6 +18,9 @@ function Head(atts, children)
       :root {
         --site-width: 62rem;
         --gutter-width: 6rem;
+        --stack-width: 32px;
+        --stack-height: 518px;
+        --stack-position: calc(50vh - calc(var(--stack-height) / 2));
       }
 
       h1, h2, h3, h4, h5 {
@@ -122,12 +125,14 @@ function Head(atts, children)
         padding-top: var(--spacing-4);
       }
 
-      .stack {
-        width: 2rem;
+      svg {
         fill: var(--text-color);
+      }
+
+      .stack {
         margin: 0 2rem;
         position: sticky;
-        top: 8rem;
+        top: var(--stack-position);
       }
 
       .title {
@@ -152,6 +157,34 @@ function Head(atts, children)
 
       img.shadow {
         box-shadow: 0 7px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .clip-contents {
+        clip-path: inset(0);
+      }
+
+      .background-shadow {
+        --size: 2rem;
+        position: relative;
+
+        &::before, &::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          right: 0;
+          height: var(--size);
+          z-index: 1;
+        }
+
+        &::before {
+          top: 0;
+          background-image: linear-gradient(to bottom, var(--body-background), var(--body-background-transparent));
+        }
+
+        &::after {
+          bottom: 0;
+          background-image: linear-gradient(to top, var(--body-background), var(--body-background-transparent));
+        }
       }
     </style>
   </>
@@ -266,7 +299,7 @@ return <Common
         <hr/>
         
         <p>
-          In the world of software, the equivalent of the "frame" is the tech stack. Programming languages, frameworks, libraries, and platforms shape software in the same way that the frame shapes the car. If you start with a sedan and try to convert it to a truck, you will get a bad truck—and in exactly the same way, if you start with the wrong stack, you’ll get bad software. It doesn’t matter how much engineering effort you put in.
+          In the world of software, the equivalent of the "frame" is the tech stack. Software is shaped by programming languages, frameworks, libraries, and platforms in the same way that the car is shaped by the frame. If you start with a sedan and try to convert it to a truck, you will get a bad truck—and in exactly the same way, if you start with the wrong stack, you’ll get bad software, regardless of how much engineering effort you put in.
         </p>
         <p>
           As an example, let’s look at a program that everyone has interacted with at some point.
@@ -277,7 +310,7 @@ return <Common
         </Wide>
 
         <p>
-          This is New Reddit. It’s a new frontend they rolled out roughly a decade ago, and people hate it. Because so many people hate it, Old Reddit is still online, and this gives us a unique opportunity to compare two functionally identical pieces of software made a decade apart.
+          This is New Reddit. It’s a new frontend they rolled out roughly a decade ago, and it is...not well-loved. Because so many people hate it, Old Reddit is still online, and this gives us a unique opportunity to compare two functionally identical pieces of software made a decade apart.
         </p>
         <p>
           Back in 2023, I was experiencing horrible lag on New Reddit. Typing comments was sluggish, comments took a long time to expand and collapse, and even hovering over a tooltip would cause a full-page hitch—all typical of modern software. Old Reddit, on the other hand, was a breath of fresh air—everything responded instantly. Aside from outdated aesthetics, Old Reddit was better in every way.
@@ -319,15 +352,18 @@ return <Common
     </ContentGutter>
 
     <ContentGutter>
-      <>
-        <hr/>
-
-        <p>
-          So what was the Reddit stack? Back in 2023, New Reddit was a React app with Redux for state management. (These days it seems they have rewritten it in Web Components.) React and Redux of course sit atop the web platform: HTML, CSS, and JavaScript. This platform is implemented by some browser engine, which then runs on some operating system, and finally on the user’s physical hardware (which is itself extremely complicated, but we have to stop somewhere).
-        </p>
-      </>
+      <hr/>
       <div class="cover-down h4" style="bottom: calc(100% - 1px)"></div>
     </ContentGutter>
+
+    <p>
+      So what was the Reddit stack? Back in 2023, New Reddit was a React app with Redux for state management. (These days it seems they have rewritten it in Web Components.) React and Redux of course sit atop the web platform: HTML, CSS, and JavaScript. This platform is implemented by some browser engine, which then runs on some operating system, and finally on the user’s physical hardware (which is itself extremely complicated, but we have to stop somewhere).
+    </p>
+    <div class="pv5 clip-contents background-shadow" style="height: calc(516px + calc(var(--spacing-5) * 2))">
+      <div class="fixed" style="top: var(--stack-position)">
+        <Svg src="redditstack.svg" />
+      </div>
+    </div>
     <p>
       At my last job, I worked on an application that used precisely this same stack. Our application was an employee scheduling program that allowed managers to create weekly schedules for hourly workers. In about 2016 we replaced our aging Backbone.js frontend with a new one written in React and Redux, presumably because it was a popular choice at the time.
     </p>
