@@ -1,0 +1,2 @@
+local article = require("articles")["graphviz"]
+return bhp.redirect(article.externalUrl)

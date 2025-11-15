@@ -1,0 +1,2 @@
+local article = require("articles")["memory64"]
+return bhp.redirect(article.externalUrl)

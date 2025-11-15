@@ -10,6 +10,23 @@ end
 
 return slugify({
     {
+        title = "Who needs Graphviz when you can build it yourself?",
+        description = "Exploring a new layout algorithm for control flow graphs.",
+        slug = "graphviz",
+        date = os.time({ year = 2025, month = 10, day = 28 }),
+        externalUrl = "https://spidermonkey.dev/blog/2025/10/28/iongraph-web.html",
+        externalDesc = "Published on spidermonkey.dev.",
+    },
+    {
+        title = "Is Memory64 actually worth using?",
+        description =
+        "The Memory64 proposal for WebAssembly has now shipped in major browsers. But should you actually use it?",
+        slug = "memory64",
+        date = os.time({ year = 2025, month = 1, day = 15 }),
+        externalUrl = "https://spidermonkey.dev/blog/2025/01/15/is-memory64-actually-worth-using.html",
+        externalDesc = "Published on spidermonkey.dev.",
+    },
+    {
         title = "Micro-libraries need to die already",
         description = "Somehow people are still putting tiny libraries on npm, and it really needs to stop.",
         slug = "microlibraries",
