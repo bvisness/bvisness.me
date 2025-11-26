@@ -70,7 +70,7 @@ return <SimpleArticle article={ article }>
         <strong>The library may have a large footprint.</strong> Libraries are often just way bigger than you need. This bloat can come from multiple sources: features you never use, metadata in <code>node_modules</code>, duplicate versions of the same package, and of course piles and piles of transitive dependencies. Furthermore, this footprint is highly variable—a routine update can invisibly quadruple the footprint of a package.
       </p>
       <p>
-        This footprint negatively affects all stages of the process: increased install times, increased build times, larger bundle sizes for users. This problem is so prevalent in the JavaScript ecosystem that many common packages have a total footprint in the hundreds of megabytes, a truly shocking amount of waste. The issue has gotten so bad that there is now an initiative called <a href="https://e18e.dev">e18e</a> that is attempting to clean things up.
+        This footprint negatively affects all stages of the process: increased install times, increased build times, larger bundle sizes for users. This problem is so prevalent in the JavaScript ecosystem that many common packages have a total footprint in the hundreds of megabytes, a truly shocking amount of waste.
       </p>
     </li>
     <li>
@@ -197,5 +197,11 @@ function isNumber(num) {
   </p>
   <p>
     If you are a proponent of tiny libraries, I encourage you to overcome your fear and try writing the code yourself. You are more capable than you think.
+  </p>
+
+  <hr/>
+
+  <p>
+    <i>This post was updated in November 2025 to remove a reference to a JS-ecosystem cleanup initiative which I no longer wish to support.</i>
   </p>
 </SimpleArticle>
