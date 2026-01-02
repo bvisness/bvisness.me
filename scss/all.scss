@@ -123,7 +123,7 @@ article {
         margin-bottom: 0.4em;
     }
 
-    img, video {
+    img, video, picture {
         display: block;
         max-width: 100%;
 
@@ -131,6 +131,10 @@ article {
             margin-left: auto;
             margin-right: auto;
         }
+    }
+
+    picture {
+        overflow: hidden;
     }
 
     blockquote {
