@@ -722,6 +722,8 @@ article li {
 article img, article video {
   display: block;
   max-width: 100%;
+}
+article img :not(.no-center), article video :not(.no-center) {
   margin-left: auto;
   margin-right: auto;
 }

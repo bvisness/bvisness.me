@@ -258,18 +258,23 @@ return <Common
     </Wide>
 
     <p>
-      I’ve been in the Handmade community for a long time. If you’ve heard of Handmade, you likely think it's about “low-level programming” in some way. After all, we’re a whole community inspired by <a href="https://www.youtube.com/watch?v=A2dxjOjWHxQ">Handmade Hero</a>, a series where you learn to make a game and engine from scratch.
+      If you have heard of the Handmade community, you likely think we are about “low-level programming” in some way. After all, we are a community inspired by <a href="https://www.youtube.com/watch?v=A2dxjOjWHxQ">Handmade Hero</a>, a series where you learn to make a game and engine from scratch.
     </p>
     <p>
       We in the Handmade community often bemoan the state of the software industry. Modern software is slow and bloated beyond belief—our computers are literally ten times more powerful than a decade ago, yet they run <em>worse</em> than they used to, purely because the software is so bad. The actual user experience has steadily declined over the years despite the insane power at our fingertips. Worst of all, people’s expectations have hit rock bottom, and everyone thinks this is normal.
     </p>
-    <img class="shadow mv4 br3" src="dell.png" />
+    <div class="flex justify-center mv4">
+      <div class="flex flex-column items-start g2">
+        <img class="no-center shadow br3" src="dell.png" alt="Tweet from @Dell: 'Dang, my computer's running slow' -me, with 47 tabs open, 12 apps running simultaneously, and a podcast minimized in the background." />
+        <div><i>(12 apps at once! Can you even imagine?)</i></div>
+      </div>
+    </div>
     <p>
       The Handmade crowd seems to think that low-level programming is the key to building better software. But this doesn’t really make sense on the surface. How is this practical for the average programmer? Do we really expect everyone to make their own UI frameworks and memory allocators from scratch? Do we really think you should never use libraries? Even if the average programmer could actually work that way, would anything actually improve, or would the world of software just become more fragmented?
     </p>
     <ContentGutter>
       <p>
-        I do believe, with all my heart, that low-level programming is the path to a better future for the software industry. But the previous criticisms are valid, and should be a serious concern for the Handmade programmer. So what is the connection here? What role does “low-level” have in a better future for software?
+        I do believe, with all my heart, that low-level programming is the path to a better future for the software industry. But the previous criticisms are valid, and should be a serious concern for the Handmade programmer. So what is the connection here? What role does “low-level” play in a better future for software?
       </p>
       <div class="cover-up p-bottom h4"></div>
     </ContentGutter>
@@ -290,16 +295,16 @@ return <Common
           The results speak for themselves. Truckla looks amazing, drives perfectly, and still functions  as a modern EV. This is no small feat—obviously you cannot just cut the roof off a sedan and call it a pickup truck. She and her team had to ensure that the car was structurally sound, that it could still charge, and that the software still worked as intended. Truckla is an impressive feat of engineering that took genuine creativity and craftsmanship.
         </p>
         <p>
-          And yet, Truckla is still not a great pickup truck! The bed size is small, it can’t haul that much weight, and it’s likely much less efficient than a truck engineered from the ground up. If you were in the market for a pickup truck, you would not buy a Truckla! (You might not buy a Cybertruck either, but I digress.)
+          And yet, Truckla is still a pretty bad pickup truck! The bed size is small, it can’t haul much weight, and it’s likely much less efficient than a truck engineered from the ground up. If you were in the market for a pickup truck, you would not buy Truckla! (You might not buy a Cybertruck either, but I digress.)
         </p>
         <p>
-          Truckla is an excellent execution of a flawed idea. If you actually want to build a good pickup truck, you have to start with the <b>frame</b>.
+          Truckla is an excellent execution of a flawed idea. If you want to build a good pickup truck, you have to start with the frame.
         </p>
 
         <hr/>
         
         <p>
-          In the world of software, the equivalent of the "frame" is the tech stack. Software is shaped by programming languages, frameworks, libraries, and platforms in the same way that the car is shaped by the frame. If you start with a sedan and try to convert it to a truck, you will get a bad truck—and in exactly the same way, if you start with the wrong stack, you’ll get bad software, regardless of how much engineering effort you put in.
+          In the world of software, the equivalent of the "frame" is the tech stack. Software is shaped by programming languages, frameworks, libraries, and platforms in the same way that a car is shaped by its frame. If you convert a sedan into a truck, you will get a bad truck, and if you start with the wrong stack, you will get bad software. No engineering effort will be able to save you.
         </p>
         <p>
           As an example, let’s look at a program that everyone has interacted with at some point.
@@ -310,16 +315,16 @@ return <Common
         </Wide>
 
         <p>
-          This is New Reddit. It’s a new frontend they rolled out roughly a decade ago, and it is...not well-loved. Because so many people hate it, Old Reddit is still online, and this gives us a unique opportunity to compare two functionally identical pieces of software made a decade apart.
+          This is New Reddit. It is a new frontend they rolled out roughly a decade ago, and it is...not well-loved. Because so many people hate it, Old Reddit is still online, and this gives us a unique opportunity to compare two functionally identical pieces of software made a decade apart.
         </p>
         <p>
-          Back in 2023, I was experiencing horrible lag on New Reddit. Typing comments was sluggish, comments took a long time to expand and collapse, and even hovering over a tooltip would cause a full-page hitch—all typical of modern software. Old Reddit, on the other hand, was a breath of fresh air—everything responded instantly. Aside from outdated aesthetics, Old Reddit was better in every way.
+          Back in 2023, I was experiencing horrible lag on New Reddit. The comment editor was sluggish, UI was slow to expand and collapse, and even hovering over a tooltip would cause a full-page hitch—all typical of modern software. Old Reddit, on the other hand, was a breath of fresh air—everything responded instantly. Aside from outdated aesthetics, Old Reddit was better in every way.
         </p>
         <p>
           So here’s a thought experiment: How much work should it take to collapse a single comment?
         </p>
         <p>
-          This is a pretty easy question, actually. All that needs to happen—all that <em>should</em> happen—is to hide or remove a few DOM elements, and update some text to say “collapsed”. A well-written Reddit frontend should more or less do exactly this. But let’s see what New Reddit did:
+          This is a pretty easy question. All that needs to happen—all that <em>should</em> happen—is to hide or remove a few DOM elements, and update some text to say “collapsed”. A well-written Reddit frontend should more or less do exactly this. But let’s see what New Reddit did:
         </p>
 
         <Wide wideness="8rem" class="mv4">
@@ -336,16 +341,16 @@ return <Common
           <img class="shadow relative z-5" src="burnitwithfire.png"/>
         </Wide>
         <p>
-          If you care about quality software, then your jaw should be on the floor. Again, this was the work being performed when collapsing a <em>single comment</em>. It is a <em>staggering</em> amount of waste for what should have been a handful of DOM calls.
+          At the time, it took New Reddit <b>almost 200 milliseconds</b> to collapse a single comment. That is 200 milliseconds of pure JavaScript, with hardly any DOM work in sight. If you care about quality software, your jaw should be on the floor. It is a staggering amount of waste for what should have been a few DOM calls. And you feel it as a user—an ugly, intense hitch.
         </p>
         <p>
-          On my first-gen M1 MacBook Air, it took Old Reddit about 10 milliseconds to collapse a comment. That could definitely be improved, but 10 milliseconds is fine. It feels responsive and keeps the site running at 60 frames per second. New Reddit, on the other hand, took <b>almost 200 milliseconds</b>—almost 20 times slower than Old Reddit, and probably 50 to 100 times slower than if you wrote the required DOM calls by hand.
+          Old Reddit, on the other hand, did its work in about 10 milliseconds. This could have been improved, but 10 milliseconds is totally fine. It felt responsive and kept the site running at 60 frames per second. And despite using a couple old frameworks, it still ran 20 times faster than New Reddit.
         </p>
         <p>
-          So, once we pick our jaws up off the floor, we have to ask the question: How on earth did we get here? Were New Reddit’s devs just stupid, lazy JS framework fanboys who would rather build Rube Goldberg machines than do their jobs?
+          So, we must pick up our jaws off the floor and ask the question: How on earth did we get here? Were New Reddit’s devs just stupid, lazy JS fanboys who would rather build Rube Goldberg machines than do their jobs?
         </p>
         <p>
-          Maybe tbh. But laziness alone doesn’t tell the whole story. Mere laziness doesn’t produce the kind of pervasive waste I saw in New Reddit. The real problem with New Reddit was the stack it was built on.
+          Maybe tbh. But laziness alone doesn’t tell the whole story. The real problem with New Reddit was the stack it was built on.
         </p>
       </>
       <div class="cover"></div>
