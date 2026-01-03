@@ -274,7 +274,7 @@ func (s GoSearcher) Search(l *lua.LState, b *Instance) int {
 	}
 }
 
-func (b *Instance) initSearchers(l *lua.LState) {
+func (b *Instance) initSearchers(l *lua.LState, extraSearchers ...Searcher) {
 	p := l.GetGlobal("package")
 	oldSearchers := l.GetField(p, "loaders").(*lua.LTable)
 	preloadSearcher := oldSearchers.RawGetInt(1).(*lua.LFunction)
@@ -301,8 +301,8 @@ func (b *Instance) initSearchers(l *lua.LState) {
 		return builtinGoSearcher.Search(l, b)
 	}))
 
-	// Add user searchers
-	for _, s := range b.Searchers {
+	// Add user searchers from both BHP instance and this request
+	for _, s := range append(b.Searchers, extraSearchers...) {
 		s := s // >:(
 
 		i++

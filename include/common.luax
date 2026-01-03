@@ -2,6 +2,7 @@ require("base")
 require("images")
 
 function Common(atts, children)
+  local doHeader = not atts.noHeader
   local socialImage = atts.opengraphImage or atts.banner
 
   return <Base
@@ -11,11 +12,14 @@ function Common(atts, children)
     lightOnly={ atts.lightOnly }
     socialImage={ socialImage and absurl(socialImage) }
   >
-    <div class="container">
-      <header class="site-header">
-        <h1><a href={ absurl("/") }>Ben Visness</a></h1>
-      </header>
-    </div>
+    {{
+      doHeader and
+      <div class="container">
+        <header class="site-header">
+          <h1><a href={ absurl("/") }>Ben Visness</a></h1>
+        </header>
+      </div>
+    }}
 
     <div class="container">
       <main>

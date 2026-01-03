@@ -120,7 +120,9 @@ func (b *Instance) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (b *Instance) serveLuaX(file fs.File, srcFilename string, r *http.Request, w http.ResponseWriter) {
 	l := lua.NewState()
 	defer l.Close()
-	b.initSearchers(l)
+	b.initSearchers(l, &FSSearcher{
+		FS: os.DirFS(filepath.Dir(srcFilename)),
+	})
 
 	// TODO: Require without parsing
 	utils.Must(l.DoString("require(\"bhp\")"))

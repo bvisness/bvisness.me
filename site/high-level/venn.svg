@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1498 798" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <style>
+        :root {
+            --venn-blue: rgb(193,215,239);
+            --venn-green: rgba(17, 219, 73, 0.23);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --venn-blue: rgb(30, 57, 85);
+                --venn-green: rgba(17, 155, 55, 0.23);
+            }
+        }
+    </style>
+    <g transform="matrix(17.0952,0,0,17.0952,-1823.38,-1720.81)">
+        <circle cx="130" cy="124" r="21" style="fill:var(--venn-blue);"/>
+    </g>
+    <g transform="matrix(17.0952,0,0,17.0952,-1123.38,-1720.81)">
+        <circle cx="130" cy="124" r="21" style="fill:var(--venn-green);"/>
+    </g>
+    <g id="Lines--Fill-" serif:id="Lines (Fill)">
+        <g transform="matrix(17.0952,0,0,17.0952,-1823.38,-1720.81)">
+            <path d="M130,102.591C118.184,102.591 108.591,112.184 108.591,124C108.591,135.816 118.184,145.409 130,145.409C141.816,145.409 151.409,135.816 151.409,124C151.409,112.184 141.816,102.591 130,102.591ZM130,103.409C141.364,103.409 150.591,112.636 150.591,124C150.591,135.364 141.364,144.591 130,144.591C118.636,144.591 109.409,135.364 109.409,124C109.409,112.636 118.636,103.409 130,103.409Z"/>
+        </g>
+        <g transform="matrix(17.0952,0,0,17.0952,-1123.38,-1720.81)">
+            <path d="M130,102.591C118.184,102.591 108.591,112.184 108.591,124C108.591,135.816 118.184,145.409 130,145.409C141.816,145.409 151.409,135.816 151.409,124C151.409,112.184 141.816,102.591 130,102.591ZM130,103.409C141.364,103.409 150.591,112.636 150.591,124C150.591,135.364 141.364,144.591 130,144.591C118.636,144.591 109.409,135.364 109.409,124C109.409,112.636 118.636,103.409 130,103.409Z"/>
+        </g>
+    </g>
+    <g transform="matrix(1,0,0,1,-538.979,250.803)">
+        <text x="723.371px" y="138.957px" style="font-family:'AvenirNextCyr-Bold', 'Avenir Next Cyr', sans-serif;font-weight:750;font-size:48px;">P<tspan x="752.027px 770.171px " y="138.957px 138.957px ">ro</tspan>gr<tspan x="850.331px " y="138.957px ">a</tspan>mmers with</text>
+        <text x="739.235px" y="192.957px" style="font-family:'AvenirNextCyr-Bold', 'Avenir Next Cyr', sans-serif;font-weight:750;font-size:48px;">drive to innova<tspan x="1089.63px " y="192.957px ">t</tspan>e</text>
+    </g>
+    <g transform="matrix(1,0,0,1,160.397,250.803)">
+        <text x="825.059px" y="138.957px" style="font-family:'AvenirNextCyr-Bold', 'Avenir Next Cyr', sans-serif;font-weight:750;font-size:48px;">L<tspan x="849.443px " y="138.957px ">o</tspan>w-level</text>
+        <text x="779.675px" y="192.957px" style="font-family:'AvenirNextCyr-Bold', 'Avenir Next Cyr', sans-serif;font-weight:750;font-size:48px;">pr<tspan x="829.355px " y="192.957px ">o</tspan>gr<tspan x="909.515px " y="192.957px ">a</tspan>mmers</text>
+    </g>
+</svg>

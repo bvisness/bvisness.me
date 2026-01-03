@@ -10,6 +10,12 @@ end
 
 return slugify({
     {
+        title = "High-level is the goal",
+        description = "Why should anyone care about low-level programming?",
+        slug = "high-level",
+        date = os.time({ year = 2025, month = 7, day = 22 }),
+    },
+    {
         title = "Who needs Graphviz when you can build it yourself?",
         description = "Exploring a new layout algorithm for control flow graphs.",
         slug = "graphviz",

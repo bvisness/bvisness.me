@@ -50,7 +50,7 @@ footer {
 
 .container {
     width: 90%;
-    max-width: 800px;
+    max-width: var(--site-width);
     margin-left: auto;
     margin-right: auto;
 }
@@ -127,11 +127,14 @@ article {
         margin-bottom: 0.4em;
     }
 
-    img, video {
+    img, video, picture {
         display: block;
         max-width: 100%;
-        margin-left: auto;
-        margin-right: auto;
+
+        :not(.no-center) {
+            margin-left: auto;
+            margin-right: auto;
+        }
     }
 
     blockquote {

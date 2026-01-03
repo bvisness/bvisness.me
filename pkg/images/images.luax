@@ -2,10 +2,20 @@
 
 require("vec")
 
+local contentTypeOrder = {"image/webp", "image/png", "image/jpeg"}
+for i, contentType in ipairs(contentTypeOrder) do
+    -- Insert a reverse lookup into the same table; for example, if "image/png"
+    -- is at index 2, then contentTypeOrder["image/png"] == 2.
+    contentTypeOrder[contentType] = i
+end
+
 function Picture(atts, children)
     atts.scale = atts.scale or 1
 
     local variants = images.variants(atts.src, atts.scale)
+    table.sort(variants, function(a, b)
+        return contentTypeOrder[a.contentType] < contentTypeOrder[b.contentType]
+    end)
 
     local optsByType = {}
     for _, variant in ipairs(variants) do
@@ -24,7 +34,7 @@ function Picture(atts, children)
     
     return <picture class={ atts.class }>
         {{ bhp.expand(sources) }}
-        <img src={ absurl(atts.src) } alt={ atts.alt } />
+        <img src={ absurl(atts.src) } alt={ atts.alt } class={ atts.imgclass } />
     </picture>
 end
 

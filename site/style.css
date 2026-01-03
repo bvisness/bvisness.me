@@ -654,7 +654,7 @@ footer svg {
 
 .container {
   width: 90%;
-  max-width: 800px;
+  max-width: var(--site-width);
   margin-left: auto;
   margin-right: auto;
 }
@@ -722,9 +722,11 @@ article p code::before, article p code::after, article ol code::before, article 
 article li {
   margin-bottom: 0.4em;
 }
-article img, article video {
+article img, article video, article picture {
   display: block;
   max-width: 100%;
+}
+article img :not(.no-center), article video :not(.no-center), article picture :not(.no-center) {
   margin-left: auto;
   margin-right: auto;
 }
