@@ -460,5 +460,11 @@ return <Common
     <p>
       Low-level programming is <em>not</em> the goal unto itself. High-level programming—a <em>new</em> kind of high-level programming—is the goal, and low-level is how we get there.
     </p>
+
+    <hr />
+
+    <p class="i">
+      This post is adapted from a talk I delivered in 2023. The original talk can be viewed <a href="https://www.youtube.com/watch?v=AmrBpxAtPrI">here</a>.
+    </p>
   </article>
 </Common>
