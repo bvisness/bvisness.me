@@ -28,20 +28,6 @@ function Head(atts, children)
         color: inherit;
       }
 
-      .title-stack {
-        position: absolute;
-        left: 0;
-        top: 0;
-      }
-
-      .p-top {
-        bottom: calc(100% - 0.5rem);
-      }
-
-      .p-bottom {
-        top: calc(100% - 0.375rem);
-      }
-
       svg {
         fill: var(--text-color);
       }
@@ -50,42 +36,29 @@ function Head(atts, children)
         margin: 3.2rem calc(3.2rem / 1.6);
       }
 
-      .dropcap:first-letter {
-        float: left;
-        font-family: Avenir Next;
-        font-size: 4em;
-        margin: 0.16em 0.1em 0 0;
-      }
-
       .shadow {
         box-shadow: 0 7px 20px rgba(0, 0, 0, 0.2);
       }
 
-      .clip-contents {
-        clip-path: inset(0);
+      .title {
+        h1 {
+          font-size: 3.6rem;
+        }
+
+        h2 {
+          font-size: 1.4rem;
+        }
       }
 
-      .background-shadow {
-        --size: 2rem;
-        position: relative;
+      @media screen and (min-width: 60em) {
+        .title {
+          h1 {
+            font-size: 4rem;
+          }
 
-        &::before, &::after {
-          content: "";
-          position: absolute;
-          left: 0;
-          right: 0;
-          height: var(--size);
-          z-index: 1;
-        }
-
-        &::before {
-          top: 0;
-          background-image: linear-gradient(to bottom, var(--body-background), var(--body-background-transparent));
-        }
-
-        &::after {
-          bottom: 0;
-          background-image: linear-gradient(to top, var(--body-background), var(--body-background-transparent));
+          h2 {
+            font-size: 1.6rem;
+          }
         }
       }
     </style>
@@ -126,17 +99,19 @@ return <Common
   <hr class="hr-normal" />
 
   <article class="high-level">
-    <div class="relative flex justify-center items-center" style="height: 36rem">
-      <Svg src="stack.svg" />
-      <div class="flex-grow-1">
+    <div class="title relative flex justify-center items-center pv5 pv4-ns">
+      <div class="dn db-ns flex-shrink-0">
+        <Svg src="stack.svg" />
+      </div>
+      <div class="flex-grow-1 ph4-ns">
         <div class="flex flex-column link-normal tc" style="gap: 2rem">
           <a href={ permalink() }>
-            <h1 style="font-size: 4rem; margin: 0">
+            <h1 class="ma0">
               {{ article.title }}
             </h1>
           </a>
-          <h2 style="font-size: 1.6rem; line-height: 0.65; margin: 0">
-            Why should anyone care about<br/>low-level programming?
+          <h2 class="ma0">
+            Why should anyone care about low-level programming?
           </h2>
         </div>
       </div>
@@ -223,10 +198,10 @@ return <Common
     </Wide>
 
     <p>
-      At the time, it took New Reddit <b>almost 200 milliseconds</b> to collapse a single comment. That is 200 milliseconds of pure JavaScript, with hardly any DOM work in sight. If you care about quality software, your jaw should be on the floor. It is a staggering amount of waste for what should have been a few DOM calls. And you feel it as a user—an ugly, intense hitch.
+      At the time, it took New Reddit <b>almost 200 milliseconds</b> to collapse a single comment. That is 200 milliseconds of pure JavaScript, with hardly any DOM work in sight. If you care about quality software, your jaw should be on the floor. It is a staggering amount of waste for what should have been a few DOM calls. And you feel it as a user: an ugly, intense hitch.
     </p>
     <p>
-      Old Reddit, on the other hand, did its work in about 10 milliseconds. This could have been improved, but 10 milliseconds is totally fine. It felt responsive and kept the site running at 60 frames per second. And despite using a couple old frameworks, it still ran 20 times faster than New Reddit.
+      Old Reddit, on the other hand, did its work in about 10 milliseconds. That could be improved, but 10 milliseconds is totally fine. It feels responsive and keeps the site running at 60 frames per second. So despite using a couple old frameworks, Old Reddit still ran 20 times faster than New Reddit, and felt fresher as a result.
     </p>
     <p>
       So, we must pick up our jaws off the floor and ask the question: How on earth did we get here? Were New Reddit’s devs just stupid, lazy JS fanboys who would rather build Rube Goldberg machines than do their jobs?
@@ -358,7 +333,7 @@ return <Common
       So the second reason I believe low-level is critical to the future of the software industry is that it simply expands the circle. We can capture some of those people with the drive to innovate and equip them to actually innovate in meaningful ways. We need more people exploring this low-level space, and I know that for many people, low-level knowledge would open their eyes to possibilities they would never have even conceived of before.
     </p>
     <p>
-      Not everyone who makes their own text editor will have great ideas about the future of programming. Not everyone who makes their own compiler will have great ideas about programming languages. Not everyone who makes their own UI library will have great ideas about UI design. But <em>some</em> of them will. And it only takes a few of them to make a difference in the software industry.
+      Not everyone who makes their own text editor will have great ideas about the future of programming. Not everyone who makes their own compiler will have great ideas about programming languages. But <em>some</em> of them will. And it only takes a few of them to make a difference in the software industry.
     </p>
 
     <Svg src="vennbigger.svg" />
@@ -415,10 +390,10 @@ return <Common
       So now we come back to Handmade, and what made Handmade Hero so special. Most programmers look at game engines and think that only a super-genius could write one—and the idea of making a game without an engine is lunacy. But Handmade Hero just didn’t care. Casey just sat down, showed you how to compile C, showed you how to put pixels on the screen, and before too long, you had a game. Not the most sophisticated game in the world, but a game nonetheless.
     </p>
     <p>
-      Handmade Hero shattered the barrier between low-level and high-level. He made a game, <em>and</em> he made an engine. The mystique was stripped away and replaced by an actual understanding of how games are made. Many people have the same reaction when they finally go through Handmade Hero: “Hey, this is not as hard as I thought!” It turns out you <em>absolutely can</em> make your own engine, despite the naysayers online.
+      Handmade Hero shattered the barrier between low-level and high-level. Casey made a game, <em>and</em> he made an engine. The mystique was stripped away and replaced by an actual understanding of how games are made. Many people have the same reaction when they finally go through Handmade Hero: “Hey, this is not as hard as I thought!” It turns out you <em>absolutely can</em> make your own engine, despite the naysayers online.
     </p>
     <p>
-      I personally have found this to be true of so many “low-level” disciplines. “Low-level” programming is not impossible; in fact, in many cases, it’s <em>simpler</em> than the high-level web dev work I used to do! Today’s “high-level” frameworks and tools are so complicated and so poorly designed that they are <em>harder</em> to understand and work with than their low-level counterparts. But all the modern nonsense like Svelte, Symfony, Kubernetes—they have docs! They have dev tools! Because, for some reason, people are not afraid of them!
+      I personally have found this to be true of so many “low-level” disciplines. “Low-level” programming is not impossible; in fact, in many cases, it’s <em>simpler</em> than the high-level web dev work I used to do! Today’s “high-level” frameworks and tools are so complicated and so poorly designed that they are <em>harder</em> to understand and work with than their low-level counterparts. But all the modern nonsense like Svelte, Symfony, Kubernetes—those tools have docs! They have dev tools! Because, for some reason, people are not afraid of them!
     </p>
     <p>
       Low-level programming is <em>artificially</em> terrible. I really believe that. And I know that it doesn’t have to be this way.
