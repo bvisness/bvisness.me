@@ -9,7 +9,7 @@ function Head(atts, children)
         font-family: "Avenir Next Cyr";
         font-weight: bold;
         src:
-          local(Avenir Next), local(AvenirNext-Bold),
+          local(AvenirNext-Bold),
           url(AvenirNextCyr-Bold.woff2) format("woff2"),
           url(AvenirNextCyr-Bold.woff) format("woff"),
           url(AvenirNextCyr-Bold.ttf) format("truetype");
