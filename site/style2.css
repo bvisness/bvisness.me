@@ -44,6 +44,14 @@ body {
   gap: var(--spacing-4);
 }
 
+.g5 {
+  gap: var(--spacing-5);
+}
+
+.g6 {
+  gap: var(--spacing-6);
+}
+
 .minw-1 {
   min-width: var(--size-1);
 }
@@ -198,6 +206,14 @@ body {
 
   .g4-l {
     gap: var(--spacing-4);
+  }
+
+  .g5-l {
+    gap: var(--spacing-5);
+  }
+
+  .g6-l {
+    gap: var(--spacing-6);
   }
 
   .wide {

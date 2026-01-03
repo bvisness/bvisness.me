@@ -34,7 +34,7 @@ function Picture(atts, children)
     
     return <picture class={ atts.class }>
         {{ bhp.expand(sources) }}
-        <img src={ absurl(atts.src) } alt={ atts.alt } />
+        <img src={ absurl(atts.src) } alt={ atts.alt } class={ atts.imgclass } />
     </picture>
 end
 

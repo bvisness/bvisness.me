@@ -727,9 +727,6 @@ article img :not(.no-center), article video :not(.no-center), article picture :n
   margin-left: auto;
   margin-right: auto;
 }
-article picture {
-  overflow: hidden;
-}
 article blockquote {
   margin-left: 0;
   margin-right: 0;

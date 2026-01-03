@@ -150,7 +150,7 @@ return <Common
     </p>
     <div class="flex justify-center mv4">
       <div class="flex flex-column items-start g2">
-        <Picture class="no-center shadow br3" src={ relpath("dell.png") } alt="Tweet from @Dell: 'Dang, my computer's running slow' -me, with 47 tabs open, 12 apps running simultaneously, and a podcast minimized in the background." />
+        <Picture class="no-center" imgclass="shadow br3" src={ relpath("dell.png") } alt="Tweet from @Dell: 'Dang, my computer's running slow' -me, with 47 tabs open, 12 apps running simultaneously, and a podcast minimized in the background." />
         <div><i>(12 apps at once! Can you even imagine?)</i></div>
       </div>
     </div>
@@ -162,7 +162,7 @@ return <Common
     </p>
 
     <Wide wideness="12rem" class="mv4">
-      <Picture class="shadow relative z-5" src={ relpath("truckla.png") } />
+      <Picture imgclass="shadow relative z-5" src={ relpath("truckla.png") } />
     </Wide>
 
     <p>
@@ -191,7 +191,7 @@ return <Common
     </p>
 
     <Wide wideness="8rem" class="mv4">
-      <Picture class="shadow relative z-5" src={ relpath("newreddit.png") } />
+      <Picture imgclass="shadow relative z-5" src={ relpath("newreddit.png") } />
     </Wide>
 
     <p>
@@ -208,7 +208,7 @@ return <Common
     </p>
 
     <Wide wideness="8rem" class="mv4">
-      <Picture class="shadow relative z-5" src={ relpath("jquery.png") } />
+      <Picture imgclass="shadow relative z-5" src={ relpath("jquery.png") } />
     </Wide>
 
     <p>
@@ -219,7 +219,7 @@ return <Common
     </p>
 
     <Wide wideness="32rem" class="mv4">
-      <Picture class="shadow relative z-5" src={ relpath("burnitwithfire.png") } />
+      <Picture imgclass="shadow relative z-5" src={ relpath("burnitwithfire.png") } />
     </Wide>
 
     <p>
@@ -314,7 +314,7 @@ return <Common
     
     <Wide wideness="8rem">
       <Svg src="treestack.svg" />
-      <Picture src={ relpath("tree.png") } />
+      <Picture imgclass="shadow" src={ relpath("tree.png") } />
     </Wide>
 
     <p>
@@ -336,7 +336,11 @@ return <Common
       It requires a particular type of person. It needs to be someone with inherent drive and passion for innovation in software. But they also need to have low-level knowledge. They need to be able to make different choices from those who came before, to explore parts of the tree that haven’t yet been explored.
     </p>
     
-    <Svg src="venn.svg" />
+    <div class="flex justify-center">
+      <div class="flex-grow-1" style="max-width: 48rem">
+        <Svg src="venn.svg" />
+      </div>
+    </div>
 
     <p>
       The overlap between these circles is <em>tiny</em>. There are so few people who fit into both categories that we are just not seeing much innovation in that space. In fact, this image is pretty generous when you consider how few low-level programmers there are in general.
@@ -376,6 +380,20 @@ return <Common
     <p>
       This is simply not the case for the low-level space. If you’re lucky, you can maybe find an expensive book or course. But more likely, you’ll just get a gigantic manual that lists every property of the system in excruciating detail, which is totally worthless for learning and barely usable as reference. And that’s if you’re lucky—there’s a good chance that you’ll only get a wiki or a maze of man pages, which are impenetrable walls of jargon. In some cases the only documentation that exists is the Linux Kernel Mailing List, and you can only pray that the one guy who can answer your question hasn’t flamed out in the past decade.
     </p>
+
+    <Wide>
+      <div class="flex flex-column flex-row-ns justify-center items-center g5">
+        <div class="flex flex-column g4" style="max-width: 34rem">
+          <Picture imgclass="shadow" src={ relpath("react.png") } scale={ 2 } alt="Screenshot of the React docs" />
+          <Picture src={ relpath("hearteyes.png") } scale={ 2 } alt="😍" />
+        </div>
+        <div class="flex flex-column g4" style="max-width: 34rem">
+          <Picture imgclass="shadow" src={ relpath("dwarf2.png") } scale={ 2 } alt="Screenshot of the DWARF debug info manual" />
+          <Picture src={ relpath("scream.png") } scale={ 2 } alt="😱" />
+        </div>
+      </div>
+    </Wide>
+
     <p>
       This isn’t just bad for beginners, it’s bad for <em>everyone</em>. If this is the state of low-level knowledge, how can we expect <em>anyone</em> to practice low-level programming, much less the wider industry?
     </p>
@@ -386,16 +404,18 @@ return <Common
       The crazy thing is: <b>there is no reason for this to be the case</b>. We could absolutely have the same kind of “dev tools” for native development that we do for the web. We could have profilers that are actually designed to highlight useful info. We could have GUIs that show us network and file I/O, or inter-process communication. We could have interactive documentation and live reloading. We could have editor plugins and language servers to help beginners along. The raw capabilities are there. We're just waiting for someone with high-level sensibilities to come along and build the tools of our dreams.
     </p>
     <p>
-      But until we build that, why should we expect <em>anyone</em> to learn low-level programming? <em>How</em> can we expect them to?
+      But until we build that, why should we expect <em>anyone</em> to learn low-level programming? How can we expect them to?
     </p>
 
     <hr/>
 
+    <Picture class="mb4" src={ relpath("hero.png") } scale={ 2 } />
+
     <p>
-      So now we come back to Handmade, and what makes Handmade Hero so special. Most programmers look at game engines and think that only a super-genius could write one—and the idea of making a game without an engine is lunacy. But Handmade Hero just doesn’t care. Casey just sits down, shows you how to compile C, shows you how to put pixels on the screen, and before too long, you have a game. Not the most sophisticated game in the world, but a game nonetheless.
+      So now we come back to Handmade, and what made Handmade Hero so special. Most programmers look at game engines and think that only a super-genius could write one—and the idea of making a game without an engine is lunacy. But Handmade Hero just didn’t care. Casey just sat down, showed you how to compile C, showed you how to put pixels on the screen, and before too long, you had a game. Not the most sophisticated game in the world, but a game nonetheless.
     </p>
     <p>
-      Handmade Hero shatters the barrier between low-level and high-level. You make a game, <em>and</em> you make an engine. The mystique is stripped away and replaced by an actual understanding of how games are made. And for many people, when they finally go through Handmade Hero, their reaction is: “Hey, this is not as hard as I thought!” It turns out you <em>absolutely can</em> make your own engine, despite the naysayers online.
+      Handmade Hero shattered the barrier between low-level and high-level. He made a game, <em>and</em> he made an engine. The mystique was stripped away and replaced by an actual understanding of how games are made. Many people have the same reaction when they finally go through Handmade Hero: “Hey, this is not as hard as I thought!” It turns out you <em>absolutely can</em> make your own engine, despite the naysayers online.
     </p>
     <p>
       I personally have found this to be true of so many “low-level” disciplines. “Low-level” programming is not impossible; in fact, in many cases, it’s <em>simpler</em> than the high-level web dev work I used to do! Today’s “high-level” frameworks and tools are so complicated and so poorly designed that they are <em>harder</em> to understand and work with than their low-level counterparts. But all the modern nonsense like Svelte, Symfony, Kubernetes—they have docs! They have dev tools! Because, for some reason, people are not afraid of them!
@@ -430,6 +450,13 @@ return <Common
     <p>
       The Handmade community is positioned right in the middle of that Venn diagram today. We have people with low-level expertise. We have people with a drive to make software better. Our job, then, is <em>not</em> to just write low-level code and feel smug for knowing how things work. Our job is to build a <em>new</em> high level for the rest of the software industry.
     </p>
+
+    <div class="flex justify-center pv3">
+      <div class="w-100" style="max-width: 48rem">
+        <Svg src="final.svg" />
+      </div>
+    </div>
+
     <p>
       Low-level programming is <em>not</em> the goal unto itself. High-level programming—a <em>new</em> kind of high-level programming—is the goal, and low-level is how we get there.
     </p>
