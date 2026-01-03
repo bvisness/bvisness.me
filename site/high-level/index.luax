@@ -6,7 +6,7 @@ function Head(atts, children)
   return <>
     <style>
       @font-face {
-        font-family: "Avenir Next";
+        font-family: "Avenir Next Cyr";
         font-weight: bold;
         src:
           local(Avenir Next), local(AvenirNext-Bold),
@@ -20,7 +20,7 @@ function Head(atts, children)
       }
 
       h1, h2, h3, h4, h5 {
-        font-family: Avenir Next;
+        font-family: "Avenir Next Cyr";
       }
 
       .link-normal a {
@@ -201,7 +201,7 @@ return <Common
       At the time, it took New Reddit <b>almost 200 milliseconds</b> to collapse a single comment. That is 200 milliseconds of pure JavaScript, with hardly any DOM work in sight. If you care about quality software, your jaw should be on the floor. It is a staggering amount of waste for what should have been a few DOM calls. And you feel it as a user: an ugly, intense hitch.
     </p>
     <p>
-      Old Reddit, on the other hand, did its work in about 10 milliseconds. That could be improved, but 10 milliseconds is totally fine. It feels responsive and keeps the site running at 60 frames per second. So despite using a couple old frameworks, Old Reddit still ran 20 times faster than New Reddit, and felt fresher as a result.
+      Old Reddit, on the other hand, did its work in about 10 milliseconds. That could be improved, but 10 milliseconds is totally fine. It feels responsive and keeps the site running at 60 frames per second. So Old Reddit is the clear winner here, with a UI 20 times faster than New Reddit.
     </p>
     <p>
       So, we must pick up our jaws off the floor and ask the question: How on earth did we get here? Were New Reddit’s devs just stupid, lazy JS fanboys who would rather build Rube Goldberg machines than do their jobs?
@@ -213,7 +213,7 @@ return <Common
     <hr/>
 
     <p>
-      So what was the Reddit stack? Back in 2023, New Reddit was a React app with Redux for state management. (These days it seems they have rewritten it in Web Components.) React and Redux of course sit atop the web platform: HTML, CSS, and JavaScript. This platform is implemented by some browser engine, which then runs on some operating system, and finally on the user’s physical hardware (which is itself extremely complicated, but we have to stop somewhere).
+      So what was the Reddit stack? Back in 2023, New Reddit was a React app with Redux for state management. (These days they seem to have rewritten it in Web Components.) React and Redux of course sit atop the web platform: HTML, CSS, and JavaScript. This platform is implemented by some browser engine, which then runs on some operating system, and finally on the user’s physical hardware (which is itself extremely complicated, but we have to stop somewhere).
     </p>
 
     <Svg src="redditstack2.svg" />
@@ -222,10 +222,10 @@ return <Common
       At my last job, I worked on an application that used precisely this same stack. Our application was an employee scheduling program that allowed managers to create weekly schedules for hourly workers. In about 2016 we replaced our aging Backbone.js frontend with a new one written in React and Redux, presumably because it was a popular choice at the time.
     </p>
     <p>
-      As a result, I became intimately familiar with how a React+Redux app is constructed. I also spent a lot of time trying to improve the app’s abysmal performance. I lived inside the Chrome and React profilers, diligently tracking down slow functions and suppressing unnecessary React updates. We had a whole caching system for our Redux selectors, and I added logging to help us find selectors with a high cache miss rate. I built custom JS parsers to make graphs of our selector dependencies and to find ways to split the app into smaller pieces. Unfortunately, none of my work made much of a difference—performance continued to plummet as the app increased in complexity.
+      As a result, I became intimately familiar with how a React+Redux app is constructed. I also spent a lot of time trying to improve the app’s abysmal performance. I lived inside the Chrome and React profilers, diligently tracking down slow functions and suppressing unnecessary React updates. We had a whole caching system for our Redux selectors, and I added logging to help us find selectors with a high cache miss rate. I built scripts to parse our source code and make graphs of our selector dependencies, so I could find places to split the app bundle into smaller pieces. Unfortunately, none of my work made much of a difference—performance continued to plummet as the app increased in complexity.
     </p>
     <p>
-      When you try to make a fast React+Redux app, you are constantly fighting the framework. These two libraries constantly do unnecessary work, and your job is to <em>suppress</em> that work until things run acceptably again. But sometimes the cure is worse than the poison: an expensive <code>shouldComponentUpdate</code> versus an expensive React re-render. Everything wants to update all the time, and as the app grows larger, the frequency and complexity of updates increases until there's no salvaging it.
+      When you try to make a fast React+Redux app, you are constantly fighting the frameworks. These two libraries constantly do unnecessary work, and your job is to <em>suppress</em> that work until things run acceptably again. But sometimes the cure is worse than the poison: an expensive <code>shouldComponentUpdate</code> versus an expensive React re-render. Everything wants to update all the time, and as the app grows larger, the frequency and complexity of updates increases until there's no salvaging it.
     </p>
     <p>
       New Reddit exemplified this perfectly: collapsing a comment would dispatch a Redux action, which would update the global Redux store, which would cause <em>all</em> Redux-connected components on the page to update, which would cause all their children to update as well. In other words, <b>collapsing one comment triggered an update for nearly every React component on the page.</b> No amount of caching, DOM-diffing, or <code>shouldComponentUpdate</code> can save you from this amount of waste.
@@ -237,27 +237,27 @@ return <Common
     <hr/>
 
     <p>
-      Thankfully, React+Redux is not the only possible software stack. We can choose alternatives at every point in the stack:
+      Thankfully, React+Redux is not the only possible software stack. We can choose alternatives at every point:
     </p>
     <ul>
       <li>
-        We could choose a different JavaScript framework. Perhaps we could use Vue, or Svelte, or SolidJS, since these have presumably had time to learn from React’s mistakes. Or, of course, we could ditch all the frameworks and just use the DOM APIs directly, especially if your application is mostly static like Reddit.
+        You could choose a different JavaScript framework. Perhaps you could use Vue, or Svelte, or SolidJS, since these have presumably had time to learn from React’s mistakes. Or, of course, you could ditch all the frameworks and just use the DOM APIs directly, especially if your application is mostly static like Reddit.
       </li>
       <li>
-        We could use other browser APIs instead of HTML, CSS, and JS. We could use an alternative framework like Flutter, or we could build a custom UI stack in WebGL and WebAssembly. Building it yourself might sound crazy, but it’s been done successfully many times before—for example, Figma famously <a href="https://www.figma.com/blog/building-a-professional-design-tool-on-the-web/">built their app from scratch</a> in WASM and WebGL, and it runs shockingly well on very large projects. Google Docs and Google Sheets also use WebGL instead of HTML and CSS, and the apps themselves are written in Java and compiled to JS or WASM.
+        You could use other browser APIs instead of HTML, CSS, and JS. You could use an alternative framework like Flutter, or you could build a custom UI stack in WebGL and WebAssembly. Building it yourself might sound crazy, but it’s been done successfully many times before—for example, Figma famously <a href="https://www.figma.com/blog/building-a-professional-design-tool-on-the-web/">built their app from scratch</a> in WASM and WebGL, and it runs shockingly well on very large projects. Google Docs and Google Sheets also use WebGL instead of HTML and CSS, and the apps themselves are written in Java and compiled to JS or WASM.
       </li>
       <li>
-        We could build a native app! We could use a cross-platform framework like Qt, a game engine like Unreal, an OS abstraction layer like SDL, or again just use the native APIs directly and build the rest from scratch. This is obviously the right choice for performance-intensive applications, and a valid option in general for developers who are serious about delivering a high-quality experience.
+        You could build a native app! You could use a cross-platform framework like Qt, a game engine like Unity, an OS abstraction layer like SDL, or again just use the native APIs directly and build the rest from scratch. This is obviously the right choice for performance-intensive applications, and a valid option in general for developers who are serious about delivering a high-quality experience.
       </li>
     </ul>
     <p>
-      Together all these choices actually form a tree. Every point on this tree is a valid stack you could choose to build your software on. Most importantly, different choices in this tree will be better for different kinds of software, so being comfortable with many options will allow you to make a better choice for each problem you face.
+      Together all these choices actually form a tree. Every node in this tree is a valid stack you could choose to build your software on. Most importantly, different choices in this tree will be better for different kinds of software, so being comfortable with many options allows you to make better choices for each problem you face.
     </p>
 
     <Svg src="allstack.svg" />
 
     <p>
-      Unfortunately, I imagine that this is how the developers of New Reddit saw the tree:
+      Unfortunately, this is how I imagine the developers of New Reddit saw the tree:
     </p>
     
     <Svg src="foundations.svg" />
@@ -266,7 +266,7 @@ return <Common
       There are not a lot of choices here. Critically, the best choice for them (direct DOM manipulation, like Old Reddit) was not even on the table. For whatever reason, I think they just didn’t even consider it as an option. Ew, icky, we can't just keep doing what Old Reddit did! We can't use <em>jQuery!</em>
     </p>
     <p>
-      Their view of the world was too high-level. If all you know is React, you have no choices—you can only use React, or frameworks on top of React. But the lower level you can go, the more the tree opens up to you. Going lower level allows you to access other choices, and to recognize when another choice would be a better fit.
+      Their view of the world was too high-level. If all you know is React, you have no choices—you can only use React, or meta-frameworks on top of React. But the lower level you can go, the more the tree opens up to you. Going lower level allows you to access other choices, and to recognize when another choice would be a better fit.
     </p>
     <p>
       The first reason, then, that we care about low-level is that it allows us to make better choices. We can make better software by <em>starting</em> in the right place, with the right frame and the right stack. Low-level programming allows us to build trucks instead of Trucklas.
@@ -308,7 +308,7 @@ return <Common
       But who is going to do that? Who is going to build that future for the software industry?
     </p>
     <p>
-      It requires a particular type of person. It needs to be someone with inherent drive and passion for innovation in software. But they also need to have low-level knowledge. They need to be able to make different choices from those who came before, to explore parts of the tree that haven’t yet been explored.
+      It requires a particular type of person. They must have inherent drive and passion for innovation in software. But they also must have low-level knowledge. They need to be able to make different choices from those who came before, to explore parts of the tree that haven’t yet been explored.
     </p>
     
     <div class="flex justify-center">
@@ -321,16 +321,16 @@ return <Common
       The overlap between these circles is <em>tiny</em>. There are so few people who fit into both categories that we are just not seeing much innovation in that space. In fact, this image is pretty generous when you consider how few low-level programmers there are in general.
     </p>
     <p>
-      On the other hand, there actually are lots of people in the software industry with a drive to innovate. The problem is, they’re all making JavaScript frameworks.
+      On the other hand, there are actually lots of people in the software industry with a drive to innovate. The problem is, they’re all making JavaScript frameworks.
     </p>
 
     <Svg src="vennbig.svg" />
 
     <p>
-      They don’t possess the low-level knowledge required to actually make a significant difference. That’s just the reality of it—if you build up at the top of the tree, all the important decisions have already been made for you. It's like painting a Truckla a different color. It is not going to make a difference!
+      They don’t possess the low-level knowledge required to actually make a significant difference. That’s just the reality: if you build from the top of the tree, all the important decisions have already been made for you. It's like painting a Truckla a different color—it will not make a difference!
     </p>
     <p>
-      So the second reason I believe low-level is critical to the future of the software industry is that it simply expands the circle. We can capture some of those people with the drive to innovate and equip them to actually innovate in meaningful ways. We need more people exploring this low-level space, and I know that for many people, low-level knowledge would open their eyes to possibilities they would never have even conceived of before.
+      So the second reason I believe low-level is critical to the future of the software industry is that it simply expands the circle. We can capture some of those people with the drive to innovate and equip them to actually innovate in meaningful ways. We need more people exploring this low-level space, and I know that for many people, low-level knowledge would open their eyes to possibilities they would never have dreamed of before.
     </p>
     <p>
       Not everyone who makes their own text editor will have great ideas about the future of programming. Not everyone who makes their own compiler will have great ideas about programming languages. But <em>some</em> of them will. And it only takes a few of them to make a difference in the software industry.
@@ -373,7 +373,7 @@ return <Common
       This isn’t just bad for beginners, it’s bad for <em>everyone</em>. If this is the state of low-level knowledge, how can we expect <em>anyone</em> to practice low-level programming, much less the wider industry?
     </p>
     <p>
-      And the story doesn’t end there, because low-level <em>tools</em> are terrible too. In a browser, I can open up the dev tools, go to Performance, click Record, and I will get a complete timeline of everything my application did. Every JavaScript function, every network request, every frame rendered, all correlated on a timeline so you can understand how everything relates. It is a developer’s dream, and it is a single click away! But the low-level space just does not have tools like this. There are a few decent profilers, but in most cases you just have to run a command-line program with some bizarre set of flags, pipe it through other tools, and then squint at a PDF or whatever.
+      And the story doesn’t end there, because low-level <em>tools</em> are terrible too. In a browser, I can open up the dev tools, go to Performance, click “Record”, and I will get a complete timeline of everything my application did. Every JavaScript function, every network request, every frame rendered, all correlated on a timeline so you can understand how everything relates. It is a developer’s dream, and it is a single click away! But the low-level space just does not have tools like this. There are a few decent profilers, but in most cases you just have to run a command-line program with some bizarre set of flags, pipe it through other tools, and then squint at a PDF or whatever.
     </p>
     <p>
       The crazy thing is: <b>there is no reason for this to be the case</b>. We could absolutely have the same kind of “dev tools” for native development that we do for the web. We could have profilers that are actually designed to highlight useful info. We could have GUIs that show us network and file I/O, or inter-process communication. We could have interactive documentation and live reloading. We could have editor plugins and language servers to help beginners along. The raw capabilities are there. We're just waiting for someone with high-level sensibilities to come along and build the tools of our dreams.
@@ -405,7 +405,7 @@ return <Common
       So my final question about low-level programming is: why do we even call it “low-level”?
     </p>
     <p>
-      The intent of any “high-level” tool is to make it easier to express our intent as programmers. “High-level” tools abstract away difficult details so we can focus on what we really care about. And in many cases this has worked: we’ve seen it in the evolution of programming languages, in the development of the web, and yes, even the proliferation of game engines.
+      The intent of any “high-level” tool is to make it easier to express our intent as programmers. “High-level” tools abstract away difficult details so we can focus on what we really care about. And in many cases this has worked: we’ve seen it in the evolution of programming languages, in the proliferation of game engines, and yes, even in the development of the web.
     </p>
     <p>
       But notice: this is not about where these tools are in the stack. It’s not about how many layers they’ve built on top of. “High-level” is about <b>the expression of the programmer’s intent.</b> The position in the stack is ultimately irrelevant if programmers can use it to achieve their goals.
@@ -419,19 +419,19 @@ return <Common
     <p>
       When I imagine a better future for the software industry, I <em>don’t</em> imagine one where everyone is making their own text editors, their own debuggers, or their own UI frameworks. Instead, I imagine a future where we have new “high-level” tools, built from lower in the stack. I imagine new tools that give the same high-level benefits we expect today, and in fact do <em>more</em> than the tools we have today, because they are freed from the constraining decisions of the past. We can build new platforms, new tools, and new libraries that <em>learn</em> from the past, but build on solid foundations instead of piling more on top.
     </p>
-    <p>
-      For the developers who truly care about making high-quality software, tools built lower in the stack can be their superpower. These programmers can be equipped to fine-tune their software in ways the web could never allow. And for the lazy Reddit dev who would rather push some slop out the door for a paycheck? Hey, at least their slop can run on a simpler, smaller, more efficient platform. It’s still a net positive in the end.
-    </p>
-    <p>
-      The Handmade community is positioned right in the middle of that Venn diagram today. We have people with low-level expertise. We have people with a drive to make software better. Our job, then, is <em>not</em> to just write low-level code and feel smug for knowing how things work. Our job is to build a <em>new</em> high level for the rest of the software industry.
-    </p>
 
     <div class="flex justify-center pv3">
       <div class="w-100" style="max-width: 48rem">
         <Svg src="final.svg" />
       </div>
     </div>
-
+    
+    <p>
+      For the developers who truly care about making high-quality software, tools built lower in the stack can be their superpower. These programmers can be equipped to fine-tune their software in ways the web could never allow. And for the lazy Reddit dev who would rather push some slop out the door for a paycheck? Hey, at least their slop can run on a simpler, smaller, more efficient platform. It’s still a net positive in the end.
+    </p>
+    <p>
+      The Handmade community is positioned right in the middle of that Venn diagram today. We have people with low-level expertise. We have people with a drive to make software better. Our job, then, is <em>not</em> to just write low-level code and feel smug for knowing how things work. Our job is to build a <em>new</em> high level for the rest of the software industry.
+    </p>
     <p>
       Low-level programming is <em>not</em> the goal unto itself. High-level programming—a <em>new</em> kind of high-level programming—is the goal, and low-level is how we get there.
     </p>
@@ -439,7 +439,7 @@ return <Common
     <hr />
 
     <p class="i">
-      This post is adapted from a talk I delivered in 2023. The original talk can be viewed <a href="https://www.youtube.com/watch?v=AmrBpxAtPrI">here</a>.
+      This post is adapted from a talk I delivered to the Handmade community in 2023. The original talk can be viewed <a href="https://www.youtube.com/watch?v=AmrBpxAtPrI">here</a>.
     </p>
   </article>
 </Common>
