@@ -14,6 +14,7 @@ return slugify({
         description = "Why should anyone care about low-level programming?",
         slug = "high-level",
         date = os.time({ year = 2026, month = 1, day = 3 }),
+        opengraphImage = "high-level/thumb.png",
     },
     {
         title = "Who needs Graphviz when you can build it yourself?",
