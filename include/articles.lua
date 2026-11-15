@@ -10,6 +10,13 @@ end
 
 return slugify({
     {
+        title = "Periodic-Oriented Programming for FIRST Robotics",
+        description =
+        "The way that I teach students to write robot code is so simple it almost seems like it shouldn't work.",
+        slug = "periodic-oriented-programming",
+        date = os.time({ year = 2026, month = 11, day = 14 }),
+    },
+    {
         title = "High-level is the goal",
         description = "Why should anyone care about low-level programming?",
         slug = "high-level",
