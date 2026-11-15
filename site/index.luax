@@ -6,23 +6,25 @@ return <Base>
     <Common>
         <div class="list">
             {{ bhp.map(articles, function (a)
-                return <article>
-                    <header>
-                        <h1><a href={ absurl(a.slug) }>{{ a.externalUrl and <Svg src="svg/external-link.svg" /> }} {{ a.title }}</a></h1>
-                        <span class="post-details">
-                            <time
-                                datetime={ os.date("%Y-%m-%dT%H:%M:%S%z", a.date) }
-                                itemprop="datePublished"
-                            >
-                                {{ os.date("%B %-d, %Y", a.date) }}
-                            </time>
-                        </span>
-                    </header>
-                    <p>
-                        {{ a.description }}
-                    </p>
-                    {{ a.externalDesc and <p><i>{{ a.externalDesc }}</i></p> }}
-                </article>
+                if not a.secret then
+                    return <article>
+                        <header>
+                            <h1><a href={ absurl(a.slug) }>{{ a.externalUrl and <Svg src="svg/external-link.svg" /> }} {{ a.title }}</a></h1>
+                            <span class="post-details">
+                                <time
+                                    datetime={ os.date("%Y-%m-%dT%H:%M:%S%z", a.date) }
+                                    itemprop="datePublished"
+                                >
+                                    {{ os.date("%B %-d, %Y", a.date) }}
+                                </time>
+                            </span>
+                        </header>
+                        <p>
+                            {{ a.description }}
+                        </p>
+                        {{ a.externalDesc and <p><i>{{ a.externalDesc }}</i></p> }}
+                    </article>
+                end
             end) }}
         </div>
     </Common>
