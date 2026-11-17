@@ -708,13 +708,13 @@ article header h1 svg {
 article p, article ol, article ul {
   line-height: 1.5;
 }
-article p code, article ol code, article ul code {
+article p code:not(pre code), article ol code:not(pre code), article ul code:not(pre code) {
   background-color: var(--code-background);
   padding: 0.2em 0;
   border-radius: 3px;
   white-space: nowrap;
 }
-article p code::before, article p code::after, article ol code::before, article ol code::after, article ul code::before, article ul code::after {
+article p code:not(pre code)::before, article p code:not(pre code)::after, article ol code:not(pre code)::before, article ol code:not(pre code)::after, article ul code:not(pre code)::before, article ul code:not(pre code)::after {
   content: " ";
   letter-spacing: -0.2em;
   display: inline-block;
